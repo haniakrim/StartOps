@@ -62,51 +62,33 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        canvas: "#0b0d10",
-        surface: "#18191b",
-        "surface-elevated": "#1f2126",
-        "surface-deepest": "#070809",
-        hairline: "#303236",
-        coral: "#ff8964",
-        "electric-blue": "#5683da",
-        violet: "#6452db",
-        success: "#8dc572",
-        warning: "#f0ad4e",
-        error: "#be6464",
-        "app-error": "#eb5757",
-      },
-      fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        app: ['IBM Plex Sans', '-apple-system', 'system-ui', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        xs: "4px",
-        card: "20px",
-        panel: "24px",
-        hero: "30px",
       },
       keyframes: {
         "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
         },
         "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-        "pulse-glow": {
-          "0%, 100%": { opacity: "0.3" },
-          "50%": { opacity: "0.5" },
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-glow": "pulse-glow 4s ease-in-out infinite",
       },
     },
   },
