@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -40,8 +41,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { user, profile, signOut } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const userName = profile
+    ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim()
+    : user?.email?.split("@")[0] || "User";
+  const userInitials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+  const userRole = profile?.role || "Member";
 
   return (
     <div className="min-h-screen bg-[#0b0d10] text-white flex">
@@ -62,7 +75,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {/* Logo */}
         <div className="h-16 flex items-center px-4 border-b border-white/10">
           <div className="w-8 h-8 rounded-lg bg-[#6452db] flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-sm">N</span>
+            <span className="text-white font-bold text-sm">S</span>
           </div>
           {!collapsed && (
             <span className="ml-3 font-semibold text-white tracking-tight">
@@ -117,16 +130,27 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3 mt-2 px-2">
             <Avatar className="w-8 h-8 bg-[#6452db]">
               <AvatarFallback className="bg-[#6452db] text-white text-xs">
-                JD
+                {userInitials}
               </AvatarFallback>
             </Avatar>
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
-                  John Doe
+                  {userName}
                 </p>
-                <p className="text-xs text-white/40 truncate">Admin</p>
+                <p className="text-xs text-white/40 truncate capitalize">
+                  {userRole}
+                </p>
               </div>
+            )}
+            {!collapsed && (
+              <button
+                onClick={signOut}
+                className="text-white/30 hover:text-[#be6464] transition-colors"
+                title="Sign out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             )}
           </div>
         </div>
@@ -168,7 +192,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Button
               variant="ghost"
               size="icon"
-              className="text-white/60 hover:text-white hover:bg-white/5"
+              onClick={signOut}
+              className="text-white/60 hover:text-[#be6464] hover:bg-white/5"
+              title="Sign out"
             >
               <LogOut className="w-5 h-5" />
             </Button>
