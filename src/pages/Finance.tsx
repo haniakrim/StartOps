@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, FileText, CreditCard, AlertTriangle,
   Plus, Search, Filter, Loader2, Download, CheckCircle, Clock, XCircle,
-  BarChart3, ArrowUpRight
+  BarChart3, ArrowUpRight, Truck, Star, MapPin, Globe
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,19 @@ interface Expense {
   created_at: string;
 }
 
+interface Vendor {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  address: string | null;
+  category: string | null;
+  rating: number;
+  payment_terms: string | null;
+  is_active: boolean;
+}
+
 const statusColors: Record<string, string> = {
   draft: "bg-white/10 text-white/50",
   sent: "bg-[#5683da]/20 text-[#5683da]",
@@ -58,11 +71,15 @@ export default function Finance() {
     invoice_number: "", amount: "", contact_id: "", due_date: "", status: "draft"
   });
   const [contacts, setContacts] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
   const [anomalies, setAnomalies] = useState<any[]>([]);
+  const [vendorDialogOpen, setVendorDialogOpen] = useState(false);
+  const [newVendor, setNewVendor] = useState({ name: "", email: "", phone: "", website: "", address: "", category: "", payment_terms: "" });
 
   useEffect(() => {
     fetchFinanceData();
     fetchContacts();
+    fetchVendors();
     detectAnomalies();
   }, []);
 
@@ -92,6 +109,38 @@ export default function Finance() {
   async function fetchContacts() {
     const { data } = await supabase.from("contacts").select("id, first_name, last_name").order("first_name");
     setContacts(data || []);
+  }
+
+  async function fetchVendors() {
+    try {
+      const { data, error } = await supabase.from("vendors").select("*").order("name");
+      if (error) throw error;
+      setVendors(data || []);
+    } catch (error: any) {
+      toast.error("Failed to load vendors: " + error.message);
+    }
+  }
+
+  async function createVendor(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      const { error } = await supabase.from("vendors").insert({
+        name: newVendor.name,
+        email: newVendor.email || null,
+        phone: newVendor.phone || null,
+        website: newVendor.website || null,
+        address: newVendor.address || null,
+        category: newVendor.category || null,
+        payment_terms: newVendor.payment_terms || null,
+      });
+      if (error) throw error;
+      toast.success("Vendor added");
+      setVendorDialogOpen(false);
+      setNewVendor({ name: "", email: "", phone: "", website: "", address: "", category: "", payment_terms: "" });
+      fetchVendors();
+    } catch (error: any) {
+      toast.error("Failed to add vendor: " + error.message);
+    }
   }
 
   async function detectAnomalies() {
@@ -273,6 +322,7 @@ export default function Finance() {
         <TabsList className="bg-[#18191b] border border-white/10">
           <TabsTrigger value="invoices" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><FileText className="w-4 h-4 mr-2" />Invoices</TabsTrigger>
           <TabsTrigger value="expenses" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><CreditCard className="w-4 h-4 mr-2" />Expenses</TabsTrigger>
+          <TabsTrigger value="vendors" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Truck className="w-4 h-4 mr-2" />Vendors</TabsTrigger>
           <TabsTrigger value="cashflow" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><BarChart3 className="w-4 h-4 mr-2" />Cash Flow</TabsTrigger>
         </TabsList>
 
@@ -336,6 +386,106 @@ export default function Finance() {
               </table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="vendors" className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <input type="text" placeholder="Search vendors..." className="w-64 bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+            </div>
+            <Dialog open={vendorDialogOpen} onOpenChange={setVendorDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                  <Plus className="w-4 h-4 mr-2" />Add Vendor
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-[#18191b] border-white/10 text-white">
+                <DialogHeader><DialogTitle>Add Vendor</DialogTitle></DialogHeader>
+                <form onSubmit={createVendor} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Vendor Name</Label>
+                    <Input required value={newVendor.name} onChange={(e) => setNewVendor(p => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-white/70">Email</Label>
+                      <Input type="email" value={newVendor.email} onChange={(e) => setNewVendor(p => ({ ...p, email: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-white/70">Phone</Label>
+                      <Input value={newVendor.phone} onChange={(e) => setNewVendor(p => ({ ...p, phone: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Website</Label>
+                    <Input value={newVendor.website} onChange={(e) => setNewVendor(p => ({ ...p, website: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="https://..." />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Address</Label>
+                    <Input value={newVendor.address} onChange={(e) => setNewVendor(p => ({ ...p, address: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-white/70">Category</Label>
+                      <Input value={newVendor.category} onChange={(e) => setNewVendor(p => ({ ...p, category: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., Software" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-white/70">Payment Terms</Label>
+                      <Input value={newVendor.payment_terms} onChange={(e) => setNewVendor(p => ({ ...p, payment_terms: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Net 30" />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Add Vendor</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {vendors.map(vendor => (
+              <Card key={vendor.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
+                      <Truck className="w-5 h-5 text-[#6452db]" />
+                    </div>
+                    <Badge variant="secondary" className={`text-xs ${vendor.is_active ? "bg-[#8dc572]/20 text-[#8dc572]" : "bg-white/10 text-white/50"}`}>
+                      {vendor.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                  <h3 className="text-base font-semibold text-white mb-1">{vendor.name}</h3>
+                  <p className="text-sm text-white/50 mb-3">{vendor.category || "No category"}</p>
+                  <div className="space-y-2">
+                    {vendor.email && (
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <Mail className="w-3.5 h-3.5 text-white/30" />
+                        {vendor.email}
+                      </div>
+                    )}
+                    {vendor.website && (
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <Globe className="w-3.5 h-3.5 text-white/30" />
+                        {vendor.website}
+                      </div>
+                    )}
+                    {vendor.address && (
+                      <div className="flex items-center gap-2 text-sm text-white/60">
+                        <MapPin className="w-3.5 h-3.5 text-white/30" />
+                        {vendor.address}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-sm text-white/60">
+                      <Star className="w-3.5 h-3.5 text-[#f0ad4e]" />
+                      <span className="text-white">{vendor.rating || 0}/5</span>
+                      {vendor.payment_terms && <span className="text-white/40">· {vendor.payment_terms}</span>}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {vendors.length === 0 && (
+              <div className="col-span-full text-center py-12 text-sm text-white/40">No vendors yet. Add your first vendor!</div>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="cashflow" className="mt-6">

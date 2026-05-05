@@ -26,6 +26,9 @@ import Finance from "./pages/Finance";
 import Inventory from "./pages/Inventory";
 import Projects from "./pages/Projects";
 import Employees from "./pages/Employees";
+import Workflows from "./pages/Workflows";
+import CustomFields from "./pages/CustomFields";
+import Communications from "./pages/Communications";
 
 const queryClient = new QueryClient();
 
@@ -223,6 +226,30 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Employees />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/workflows"
+              element={
+                <ProtectedRoute>
+                  <Workflows />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/custom-fields"
+              element={
+                <ProtectedRoute>
+                  <CustomFields />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/communications"
+              element={
+                <ProtectedRoute>
+                  <Communications />
                 </ProtectedRoute>
               }
             />

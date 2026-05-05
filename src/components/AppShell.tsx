@@ -26,6 +26,9 @@ import {
   Package,
   FolderKanban,
   Briefcase,
+  Mail,
+  Zap,
+  ListFilter,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -44,6 +47,9 @@ const navItems = [
   { path: "/inventory", icon: Package, label: "Inventory" },
   { path: "/projects", icon: FolderKanban, label: "Projects" },
   { path: "/employees", icon: Briefcase, label: "People" },
+  { path: "/communications", icon: Mail, label: "Communications" },
+  { path: "/workflows", icon: Zap, label: "Workflows" },
+  { path: "/custom-fields", icon: ListFilter, label: "Custom Fields" },
   { path: "/organization", icon: Settings, label: "Organization" },
   { path: "/security", icon: Shield, label: "Security" },
   { path: "/analytics", icon: BarChart3, label: "Analytics" },
