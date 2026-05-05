@@ -66,7 +66,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           {!collapsed && (
             <span className="ml-3 font-semibold text-white tracking-tight">
-              StartOps
+              NexusCRM
             </span>
           )}
           <button

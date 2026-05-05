@@ -63,13 +63,13 @@ const ssoProviders = [
   {
     name: "Google Workspace",
     status: "connected",
-    domain: "startops.com",
+    domain: "nexuscrm.com",
     lastSync: "2 hours ago",
   },
   {
     name: "Microsoft Azure AD",
     status: "connected",
-    domain: "startops.com",
+    domain: "nexuscrm.com",
     lastSync: "1 day ago",
   },
   {
@@ -337,7 +337,7 @@ export default function Security() {
                     </Label>
                     <div className="flex gap-2">
                       <Input
-                        value="https://startops.com/saml/metadata"
+                        value="https://nexuscrm.com/saml/metadata"
                         readOnly
                         className="bg-[#0b0d10] border-white/10 text-white text-sm"
                       />
@@ -356,7 +356,7 @@ export default function Security() {
                     </Label>
                     <div className="flex gap-2">
                       <Input
-                        value="https://startops.com/saml/acs"
+                        value="https://nexuscrm.com/saml/acs"
                         readOnly
                         className="bg-[#0b0d10] border-white/10 text-white text-sm"
                       />
