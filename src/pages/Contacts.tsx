@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Search, Filter, Plus, MoreHorizontal, Mail, Phone, Building2, MapPin, ArrowUpDown, Download, Star, Loader2,
+  Search, Filter, Plus, MoreHorizontal, Mail, Phone, Building2, MapPin, ArrowUpDown, Download, Upload, Star, Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,10 @@ export default function Contacts() {
   const [detailContactId, setDetailContactId] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [newContact, setNewContact] = useState({ first_name: "", last_name: "", email: "", company: "", title: "", phone: "" });
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<Record<string, string>[]>([]);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => { fetchContacts(); }, []);
 
@@ -76,6 +80,85 @@ export default function Contacts() {
     }
   }
 
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportFile(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const parsed = parseCSV(text);
+      setImportPreview(parsed.slice(0, 5));
+    };
+    reader.readAsText(file);
+  }
+
+  function parseCSV(text: string) {
+    const lines = text.split('\n').filter(line => line.trim());
+    if (lines.length < 2) return [];
+    const parseLine = (line: string): string[] => {
+      const result: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result.map(v => v.replace(/^"|"$/g, ''));
+    };
+    const headers = parseLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'));
+    return lines.slice(1).map(line => {
+      const values = parseLine(line);
+      const obj: Record<string, string> = {};
+      headers.forEach((h, i) => {
+        obj[h] = values[i] || '';
+      });
+      return obj;
+    }).filter(row => Object.values(row).some(v => v.trim() !== ''));
+  }
+
+  async function importContacts() {
+    if (!importFile || importPreview.length === 0) return;
+    try {
+      setImporting(true);
+      const text = await importFile.text();
+      const parsed = parseCSV(text);
+      const contactsToInsert = parsed.map(row => ({
+        first_name: row.first_name || row.firstname || row['first name'] || '',
+        last_name: row.last_name || row.lastname || row['last name'] || '',
+        email: row.email || null,
+        phone: row.phone || null,
+        company: row.company || null,
+        title: row.title || null,
+        status: row.status || 'Lead',
+        organization_id: (await supabase.auth.getUser()).data.user?.id,
+      })).filter(c => c.first_name || c.last_name);
+      if (contactsToInsert.length === 0) {
+        toast.error("No valid contacts found in CSV");
+        return;
+      }
+      const { error } = await supabase.from("contacts").insert(contactsToInsert);
+      if (error) throw error;
+      toast.success(`${contactsToInsert.length} contacts imported successfully`);
+      setImportDialogOpen(false);
+      setImportFile(null);
+      setImportPreview([]);
+      fetchContacts();
+    } catch (error: any) {
+      toast.error("Failed to import contacts: " + error.message);
+    } finally {
+      setImporting(false);
+    }
+  }
+
   const filtered = contacts.filter((c) =>
     `${c.first_name} ${c.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
     (c.company?.toLowerCase() || "").includes(search.toLowerCase()) ||
@@ -105,6 +188,7 @@ export default function Contacts() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Download className="w-4 h-4 mr-2" />Export</Button>
+          <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)} className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Upload className="w-4 h-4 mr-2" />Import</Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90"><Plus className="w-4 h-4 mr-2" />Add Contact</Button>
@@ -122,6 +206,47 @@ export default function Contacts() {
                 <div className="space-y-2"><Label className="text-white/70">Title</Label><Input value={newContact.title} onChange={(e) => setNewContact((prev) => ({ ...prev, title: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
                 <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Contact</Button>
               </form>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+            <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-lg">
+              <DialogHeader><DialogTitle>Import Contacts from CSV</DialogTitle></DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label className="text-white/70">CSV File</Label>
+                  <Input type="file" accept=".csv" onChange={handleFileChange} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <p className="text-xs text-white/40">Expected columns: first_name, last_name, email, phone, company, title</p>
+                </div>
+                {importPreview.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Preview ({importPreview.length} rows)</Label>
+                    <div className="max-h-40 overflow-y-auto rounded-md bg-[#0b0d10] border border-white/10 p-2">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-white/10">
+                            {Object.keys(importPreview[0]).map(key => (
+                              <th key={key} className="text-left py-1 px-2 text-white/50">{key}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importPreview.map((row, i) => (
+                            <tr key={i} className="border-b border-white/5">
+                              {Object.values(row).map((val: any, j) => (
+                                <td key={j} className="py-1 px-2 text-white/70">{val}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                <Button onClick={importContacts} disabled={importing || importPreview.length === 0} className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                  {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+                  Import {importPreview.length > 0 ? `${importPreview.length}+ Contacts` : 'Contacts'}
+                </Button>
+              </div>
             </DialogContent>
           </Dialog>
         </div>

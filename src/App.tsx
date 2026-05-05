@@ -31,8 +31,6 @@ import CustomFields from "./pages/CustomFields";
 import Communications from "./pages/Communications";
 import Forecasts from "./pages/Forecasts";
 import Timesheets from "./pages/Timesheets";
-import Forecasts from "./pages/Forecasts";
-import Timesheets from "./pages/Timesheets";
 import Calendar from "./pages/Calendar";
 
 const queryClient = new QueryClient();
