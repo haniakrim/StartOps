@@ -1,17 +1,19 @@
-import { FileText, User, Shield, Settings, Database } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, User, Shield, Settings, Database, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-const logs = [
-  { action: "User login", actor: "john@startops.com", target: "Account", time: "2 min ago", type: "auth", severity: "info" },
-  { action: "API key regenerated", actor: "sarah@startops.com", target: "Production API", time: "15 min ago", type: "security", severity: "warning" },
-  { action: "Deal updated", actor: "james@startops.com", target: "Acme Corp - $45K", time: "1 hour ago", type: "data", severity: "info" },
-  { action: "SSO configuration changed", actor: "admin@startops.com", target: "Google Workspace", time: "3 hours ago", type: "security", severity: "warning" },
-  { action: "Contact deleted", actor: "mike@startops.com", target: "Jane Smith", time: "5 hours ago", type: "data", severity: "info" },
-  { action: "Failed login attempt", actor: "unknown", target: "admin@startops.com", time: "6 hours ago", type: "auth", severity: "error" },
-  { action: "Webhook created", actor: "lisa@startops.com", target: "contact.created", time: "1 day ago", type: "settings", severity: "info" },
-  { action: "Role permission updated", actor: "admin@startops.com", target: "Sales Team", time: "2 days ago", type: "security", severity: "warning" },
-];
+interface AuditLog {
+  id: string;
+  action: string;
+  actor: string;
+  target: string;
+  time: string;
+  type: string;
+  severity: string;
+}
 
 const typeIcons: Record<string, React.ElementType> = {
   auth: User,
@@ -26,7 +28,49 @@ const severityColors: Record<string, string> = {
   error: "bg-[#eb5757]/20 text-[#eb5757]",
 };
 
-const Audit = () => {
+export default function Audit() {
+  const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => { fetchLogs(); }, []);
+
+  async function fetchLogs() {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      const mapped: AuditLog[] = (data || []).map((log: any) => ({
+        id: log.id,
+        action: log.action,
+        actor: log.user_id ? `User ${log.user_id.slice(0, 8)}` : "System",
+        target: log.entity_type + (log.entity_id ? ` ${log.entity_id.slice(0, 8)}` : ""),
+        time: new Date(log.created_at).toLocaleString(),
+        type: log.entity_type === "auth" ? "auth" : log.entity_type === "security" ? "security" : "data",
+        severity: log.action.includes("delete") || log.action.includes("fail") ? "error" : log.action.includes("update") ? "warning" : "info",
+      }));
+
+      setLogs(mapped);
+    } catch (error: any) {
+      toast.error("Failed to load audit logs: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -43,11 +87,14 @@ const Audit = () => {
         </CardHeader>
         <CardContent className="p-6 pt-0">
           <div className="space-y-2">
-            {logs.map((log, i) => {
+            {logs.length === 0 && (
+              <p className="text-sm text-white/40 text-center py-8">No audit logs yet. Activity will appear here as users interact with the system.</p>
+            )}
+            {logs.map((log) => {
               const Icon = typeIcons[log.type] || FileText;
               return (
                 <div
-                  key={i}
+                  key={log.id}
                   className="flex items-center gap-4 p-3 rounded-md hover:bg-white/5 transition-colors"
                 >
                   <div className="w-8 h-8 rounded-md bg-[#0b0d10] flex items-center justify-center flex-shrink-0">
@@ -73,6 +120,4 @@ const Audit = () => {
       </Card>
     </div>
   );
-};
-
-export default Audit;
+}
