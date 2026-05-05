@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Plus,
   MoreHorizontal,
@@ -6,9 +6,9 @@ import {
   Calendar,
   User,
   Building2,
-  ArrowRight,
   Filter,
   Search,
+  Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,151 +30,180 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Deal {
-  id: number;
-  title: string;
-  company: string;
+  id: string;
+  name: string;
   value: number;
   probability: number;
-  contact: string;
-  closeDate: string;
   stage: string;
-  priority: string;
+  status: string;
+  expected_close_date: string | null;
+  contact_id: string | null;
+  contacts?: { first_name: string; last_name: string; company: string | null } | null;
 }
 
-const stages = [
-  { id: "lead", name: "Lead", color: "#5683da" },
-  { id: "qualified", name: "Qualified", color: "#6452db" },
-  { id: "proposal", name: "Proposal", color: "#ff8964" },
-  { id: "negotiation", name: "Negotiation", color: "#f0ad4e" },
-  { id: "closed-won", name: "Closed Won", color: "#8dc572" },
-  { id: "closed-lost", name: "Closed Lost", color: "#be6464" },
-];
-
-const initialDeals: Deal[] = [
-  {
-    id: 1,
-    title: "Enterprise License Renewal",
-    company: "Acme Corporation",
-    value: 125000,
-    probability: 75,
-    contact: "Sarah Chen",
-    closeDate: "2024-03-15",
-    stage: "negotiation",
-    priority: "High",
-  },
-  {
-    id: 2,
-    title: "New SaaS Implementation",
-    company: "TechStart Inc",
-    value: 89000,
-    probability: 60,
-    contact: "James Wilson",
-    closeDate: "2024-04-01",
-    stage: "proposal",
-    priority: "High",
-  },
-  {
-    id: 3,
-    title: "Data Migration Project",
-    company: "Global Systems",
-    value: 67500,
-    probability: 45,
-    contact: "Maria Garcia",
-    closeDate: "2024-03-30",
-    stage: "qualified",
-    priority: "Medium",
-  },
-  {
-    id: 4,
-    title: "Consulting Engagement",
-    company: "Apex Solutions",
-    value: 45000,
-    probability: 55,
-    contact: "David Kim",
-    closeDate: "2024-04-15",
-    stage: "proposal",
-    priority: "Medium",
-  },
-  {
-    id: 5,
-    title: "Platform Integration",
-    company: "DataFlow Ltd",
-    value: 38000,
-    probability: 80,
-    contact: "Emily Brown",
-    closeDate: "2024-03-10",
-    stage: "negotiation",
-    priority: "High",
-  },
-  {
-    id: 6,
-    title: "Annual Support Contract",
-    company: "MegaCorp Industries",
-    value: 220000,
-    probability: 90,
-    contact: "Robert Taylor",
-    closeDate: "2024-02-28",
-    stage: "closed-won",
-    priority: "High",
-  },
-  {
-    id: 7,
-    title: "Pilot Program",
-    company: "StartupXYZ",
-    value: 15000,
-    probability: 30,
-    contact: "Lisa Park",
-    closeDate: "2024-05-01",
-    stage: "lead",
-    priority: "Low",
-  },
-];
-
-const priorityColors: Record<string, string> = {
-  High: "bg-[#ff8964]/20 text-[#ff8964]",
-  Medium: "bg-[#f0ad4e]/20 text-[#f0ad4e]",
-  Low: "bg-white/10 text-white/50",
-};
+interface PipelineStage {
+  id: string;
+  name: string;
+  color: string;
+  order: number;
+}
 
 export default function Deals() {
-  const [deals, setDeals] = useState<Deal[]>(initialDeals);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [stages, setStages] = useState<PipelineStage[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [draggedDeal, setDraggedDeal] = useState<Deal | null>(null);
+  const [newDeal, setNewDeal] = useState({
+    name: "",
+    value: "",
+    probability: "50",
+    stage: "lead",
+    expected_close_date: "",
+    contact_id: "",
+  });
+  const [contacts, setContacts] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
+
+  useEffect(() => {
+    fetchPipelineAndDeals();
+    fetchContactsForSelect();
+  }, []);
+
+  async function fetchPipelineAndDeals() {
+    try {
+      setLoading(true);
+
+      // Get the first pipeline and its stages
+      const { data: pipelineData, error: pipelineError } = await supabase
+        .from("pipelines")
+        .select("stages")
+        .limit(1)
+        .single();
+
+      if (pipelineError) throw pipelineError;
+
+      const parsedStages: PipelineStage[] = pipelineData?.stages || [
+        { id: "lead", name: "Lead", color: "#5683da", order: 1 },
+        { id: "qualified", name: "Qualified", color: "#6452db", order: 2 },
+        { id: "proposal", name: "Proposal", color: "#ff8964", order: 3 },
+        { id: "negotiation", name: "Negotiation", color: "#f0ad4e", order: 4 },
+        { id: "closed-won", name: "Closed Won", color: "#8dc572", order: 5 },
+        { id: "closed-lost", name: "Closed Lost", color: "#be6464", order: 6 },
+      ];
+      setStages(parsedStages);
+
+      // Fetch deals with contact info
+      const { data: dealsData, error: dealsError } = await supabase
+        .from("deals")
+        .select(`
+          *,
+          contacts:contact_id (first_name, last_name, company)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (dealsError) throw dealsError;
+      setDeals(dealsData || []);
+    } catch (error: any) {
+      toast.error("Failed to load deals: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function fetchContactsForSelect() {
+    const { data } = await supabase
+      .from("contacts")
+      .select("id, first_name, last_name")
+      .order("first_name");
+    setContacts(data || []);
+  }
+
+  async function createDeal(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      const { error } = await supabase.from("deals").insert({
+        name: newDeal.name,
+        value: parseFloat(newDeal.value) || 0,
+        probability: parseInt(newDeal.probability) || 0,
+        stage: newDeal.stage,
+        expected_close_date: newDeal.expected_close_date || null,
+        contact_id: newDeal.contact_id || null,
+        status: "open",
+      });
+
+      if (error) throw error;
+
+      toast.success("Deal created successfully");
+      setDialogOpen(false);
+      setNewDeal({
+        name: "",
+        value: "",
+        probability: "50",
+        stage: "lead",
+        expected_close_date: "",
+        contact_id: "",
+      });
+      fetchPipelineAndDeals();
+    } catch (error: any) {
+      toast.error("Failed to create deal: " + error.message);
+    }
+  }
+
+  async function updateDealStage(dealId: string, newStage: string) {
+    try {
+      const { error } = await supabase
+        .from("deals")
+        .update({ stage: newStage, updated_at: new Date().toISOString() })
+        .eq("id", dealId);
+
+      if (error) throw error;
+
+      setDeals((prev) =>
+        prev.map((d) => (d.id === dealId ? { ...d, stage: newStage } : d))
+      );
+      toast.success("Deal moved to " + stages.find((s) => s.id === newStage)?.name);
+    } catch (error: any) {
+      toast.error("Failed to update deal: " + error.message);
+    }
+  }
 
   const filteredDeals = deals.filter(
     (d) =>
-      d.title.toLowerCase().includes(search.toLowerCase()) ||
-      d.company.toLowerCase().includes(search.toLowerCase())
+      d.name.toLowerCase().includes(search.toLowerCase()) ||
+      (d.contacts?.company?.toLowerCase() || "").includes(search.toLowerCase())
   );
 
   const getStageDeals = (stageId: string) =>
     filteredDeals.filter((d) => d.stage === stageId);
 
-  const handleDragStart = (deal: Deal) => {
-    setDraggedDeal(deal);
-  };
+  const stageTotal = (stageId: string) =>
+    getStageDeals(stageId).reduce((sum, d) => sum + (d.value || 0), 0);
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
+  const formatValue = (v: number) => `$${(v || 0).toLocaleString()}`;
+
+  const handleDragStart = (deal: Deal) => setDraggedDeal(deal);
+  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
 
   const handleDrop = (e: React.DragEvent, stageId: string) => {
     e.preventDefault();
     if (draggedDeal && draggedDeal.stage !== stageId) {
-      setDeals((prev) =>
-        prev.map((d) => (d.id === draggedDeal.id ? { ...d, stage: stageId } : d))
-      );
+      updateDealStage(draggedDeal.id, stageId);
       setDraggedDeal(null);
     }
   };
 
-  const formatValue = (v: number) =>
-    `$${v.toLocaleString()}`;
-
-  const stageTotal = (stageId: string) =>
-    getStageDeals(stageId).reduce((sum, d) => sum + d.value, 0);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -206,7 +235,7 @@ export default function Deals() {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Dialog>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 size="sm"
@@ -220,23 +249,37 @@ export default function Deals() {
               <DialogHeader>
                 <DialogTitle>Create New Deal</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 pt-4">
+              <form onSubmit={createDeal} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Deal Title</Label>
-                  <Input className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label className="text-white/70">Deal Name</Label>
+                  <Input
+                    required
+                    value={newDeal.name}
+                    onChange={(e) => setNewDeal((p) => ({ ...p, name: e.target.value }))}
+                    className="bg-[#0b0d10] border-white/10 text-white"
+                    placeholder="Enterprise License Renewal"
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">Value</Label>
+                    <Label className="text-white/70">Value ($)</Label>
                     <Input
                       type="number"
+                      required
+                      value={newDeal.value}
+                      onChange={(e) => setNewDeal((p) => ({ ...p, value: e.target.value }))}
                       className="bg-[#0b0d10] border-white/10 text-white"
+                      placeholder="125000"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-white/70">Probability (%)</Label>
                     <Input
                       type="number"
+                      min="0"
+                      max="100"
+                      value={newDeal.probability}
+                      onChange={(e) => setNewDeal((p) => ({ ...p, probability: e.target.value }))}
                       className="bg-[#0b0d10] border-white/10 text-white"
                     />
                   </div>
@@ -244,7 +287,10 @@ export default function Deals() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-white/70">Stage</Label>
-                    <Select>
+                    <Select
+                      value={newDeal.stage}
+                      onValueChange={(v) => setNewDeal((p) => ({ ...p, stage: v }))}
+                    >
                       <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
                         <SelectValue placeholder="Select stage" />
                       </SelectTrigger>
@@ -258,23 +304,37 @@ export default function Deals() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Priority</Label>
-                    <Select>
-                      <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
-                        <SelectValue placeholder="Select priority" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-white/70">Close Date</Label>
+                    <Input
+                      type="date"
+                      value={newDeal.expected_close_date}
+                      onChange={(e) => setNewDeal((p) => ({ ...p, expected_close_date: e.target.value }))}
+                      className="bg-[#0b0d10] border-white/10 text-white"
+                    />
                   </div>
                 </div>
-                <Button className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                <div className="space-y-2">
+                  <Label className="text-white/70">Contact</Label>
+                  <Select
+                    value={newDeal.contact_id}
+                    onValueChange={(v) => setNewDeal((p) => ({ ...p, contact_id: v }))}
+                  >
+                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                      <SelectValue placeholder="Select contact" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                      {contacts.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.first_name} {c.last_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">
                   Create Deal
                 </Button>
-              </div>
+              </form>
             </DialogContent>
           </Dialog>
         </div>
@@ -298,9 +358,7 @@ export default function Deals() {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: stage.color }}
                   />
-                  <h3 className="text-sm font-medium text-white">
-                    {stage.name}
-                  </h3>
+                  <h3 className="text-sm font-medium text-white">{stage.name}</h3>
                   <Badge
                     variant="secondary"
                     className="bg-white/10 text-white/50 text-xs"
@@ -313,7 +371,12 @@ export default function Deals() {
                 </span>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 min-h-[100px]">
+                {stageDeals.length === 0 && (
+                  <div className="text-center py-8 text-xs text-white/20 border border-dashed border-white/10 rounded-md">
+                    Drop deals here
+                  </div>
+                )}
                 {stageDeals.map((deal) => (
                   <Card
                     key={deal.id}
@@ -324,7 +387,7 @@ export default function Deals() {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="text-sm font-medium text-white">
-                          {deal.title}
+                          {deal.name}
                         </h4>
                         <Button
                           variant="ghost"
@@ -337,32 +400,34 @@ export default function Deals() {
                       <div className="flex items-center gap-2 mb-3">
                         <Building2 className="w-3 h-3 text-white/30" />
                         <span className="text-xs text-white/50">
-                          {deal.company}
+                          {deal.contacts?.company || "No company"}
                         </span>
                       </div>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-lg font-semibold text-white">
                           {formatValue(deal.value)}
                         </span>
-                        <Badge
-                          variant="secondary"
-                          className={`text-xs ${priorityColors[deal.priority]}`}
-                        >
-                          {deal.priority}
-                        </Badge>
                       </div>
                       <Progress
-                        value={deal.probability}
+                        value={deal.probability || 0}
                         className="h-1 bg-white/10 mb-3"
                       />
                       <div className="flex items-center justify-between text-xs text-white/40">
                         <div className="flex items-center gap-1">
                           <User className="w-3 h-3" />
-                          <span>{deal.contact}</span>
+                          <span>
+                            {deal.contacts
+                              ? `${deal.contacts.first_name} ${deal.contacts.last_name}`
+                              : "Unassigned"}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          <span>{deal.closeDate}</span>
+                          <span>
+                            {deal.expected_close_date
+                              ? new Date(deal.expected_close_date).toLocaleDateString()
+                              : "No date"}
+                          </span>
                         </div>
                       </div>
                     </CardContent>
