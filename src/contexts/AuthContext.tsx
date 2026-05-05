@@ -23,11 +23,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
+      if (!mounted) return;
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        fetchProfile(currentUser.id);
       } else {
         setLoading(false);
       }
@@ -35,10 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await fetchProfile(session.user.id);
+      (event, session) => {
+        if (!mounted) return;
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        if (currentUser) {
+          fetchProfile(currentUser.id);
         } else {
           setProfile(null);
           setLoading(false);
@@ -46,18 +52,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    return () => subscription.unsubscribe();
-  }, []);
+    async function fetchProfile(userId: string) {
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .maybeSingle();
+        if (error) throw error;
+        if (mounted) setProfile(data);
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+        if (mounted) setProfile(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-    setProfile(data);
-    setLoading(false);
-  }
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const signOut = async () => {
     await supabase.auth.signOut();
