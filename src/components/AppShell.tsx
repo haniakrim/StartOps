@@ -30,6 +30,8 @@ import {
   Zap,
   ListFilter,
   Calendar as CalendarIcon,
+  BrainCircuit,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -51,6 +53,9 @@ const navItems = [
   { path: "/communications", icon: Mail, label: "Communications" },
   { path: "/workflows", icon: Zap, label: "Workflows" },
   { path: "/custom-fields", icon: ListFilter, label: "Custom Fields" },
+  { path: "/calendar", icon: CalendarIcon, label: "Calendar" },
+  { path: "/forecasts", icon: BrainCircuit, label: "Forecasts" },
+  { path: "/timesheets", icon: Clock, label: "Timesheets" },
   { path: "/organization", icon: Settings, label: "Organization" },
   { path: "/security", icon: Shield, label: "Security" },
   { path: "/analytics", icon: BarChart3, label: "Analytics" },
