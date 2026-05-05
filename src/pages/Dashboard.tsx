@@ -7,6 +7,8 @@ import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { PipelineChart } from "@/components/dashboard/PipelineChart";
 import { TopDeals } from "@/components/dashboard/TopDeals";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
+import { ExecutiveBriefing } from "@/components/dashboard/ExecutiveBriefing";
+import { DealHealth } from "@/components/dashboard/DealHealth";
 import {
   DollarSign,
   Target,
@@ -103,6 +105,12 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <RevenueChart />
         <PipelineChart />
+      </div>
+
+      {/* AI Intelligence */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ExecutiveBriefing />
+        <DealHealth />
       </div>
 
       {/* Bottom section */}

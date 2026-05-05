@@ -21,6 +21,7 @@ import {
   Activity,
   UserCircle,
   Cog,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -41,6 +42,7 @@ const navItems = [
   { path: "/api", icon: Webhook, label: "API & Webhooks" },
   { path: "/audit", icon: FileText, label: "Audit Logs" },
   { path: "/support", icon: LifeBuoy, label: "Support" },
+  { path: "/assistant", icon: Sparkles, label: "AI Assistant" },
   { path: "/settings", icon: Cog, label: "Settings" },
 ];
 
