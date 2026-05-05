@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, X, User, GitBranch, Building2, ArrowRight } from "lucide-react";
+import {
+  Search, X, User, GitBranch, Building2, ArrowRight,
+  DollarSign, FolderKanban, Briefcase, Mail, FileText, Package
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 interface SearchResult {
   id: string;
-  type: "contact" | "deal" | "company";
+  type: "contact" | "deal" | "company" | "project" | "employee" | "invoice" | "communication" | "product";
   title: string;
   subtitle: string;
 }
@@ -50,43 +53,26 @@ export function GlobalSearch() {
       setLoading(true);
       const term = `%${q}%`;
 
-      const [contactsRes, dealsRes, companiesRes] = await Promise.all([
-        supabase
-          .from("contacts")
-          .select("id, first_name, last_name, company, email")
-          .or(`first_name.ilike.${term},last_name.ilike.${term},company.ilike.${term},email.ilike.${term}`)
-          .limit(5),
-        supabase
-          .from("deals")
-          .select("id, name, stage")
-          .ilike("name", term)
-          .limit(5),
-        supabase
-          .from("companies")
-          .select("id, name, industry")
-          .or(`name.ilike.${term},industry.ilike.${term}`)
-          .limit(5),
+      const [contactsRes, dealsRes, companiesRes, projectsRes, employeesRes, invoicesRes, commsRes, productsRes] = await Promise.all([
+        supabase.from("contacts").select("id, first_name, last_name, company, email").or(`first_name.ilike.${term},last_name.ilike.${term},company.ilike.${term},email.ilike.${term}`).limit(4),
+        supabase.from("deals").select("id, name, stage").ilike("name", term).limit(4),
+        supabase.from("companies").select("id, name, industry").or(`name.ilike.${term},industry.ilike.${term}`).limit(4),
+        supabase.from("projects").select("id, name, status").ilike("name", term).limit(3),
+        supabase.from("employees").select("id, first_name, last_name, title").or(`first_name.ilike.${term},last_name.ilike.${term}`).limit(3),
+        supabase.from("invoices").select("id, invoice_number, status").ilike("invoice_number", term).limit(3),
+        supabase.from("communications").select("id, subject, type").ilike("subject", term).limit(3),
+        supabase.from("products").select("id, name, sku").or(`name.ilike.${term},sku.ilike.${term}`).limit(3),
       ]);
 
       const mapped: SearchResult[] = [
-        ...(contactsRes.data || []).map((c) => ({
-          id: c.id,
-          type: "contact" as const,
-          title: `${c.first_name} ${c.last_name}`,
-          subtitle: c.company || c.email || "No company",
-        })),
-        ...(dealsRes.data || []).map((d) => ({
-          id: d.id,
-          type: "deal" as const,
-          title: d.name,
-          subtitle: d.stage,
-        })),
-        ...(companiesRes.data || []).map((c) => ({
-          id: c.id,
-          type: "company" as const,
-          title: c.name,
-          subtitle: c.industry || "No industry",
-        })),
+        ...(contactsRes.data || []).map((c: any) => ({ id: c.id, type: "contact" as const, title: `${c.first_name} ${c.last_name}`, subtitle: c.company || c.email || "No company" })),
+        ...(dealsRes.data || []).map((d: any) => ({ id: d.id, type: "deal" as const, title: d.name, subtitle: d.stage })),
+        ...(companiesRes.data || []).map((c: any) => ({ id: c.id, type: "company" as const, title: c.name, subtitle: c.industry || "No industry" })),
+        ...(projectsRes.data || []).map((p: any) => ({ id: p.id, type: "project" as const, title: p.name, subtitle: p.status })),
+        ...(employeesRes.data || []).map((e: any) => ({ id: e.id, type: "employee" as const, title: `${e.first_name} ${e.last_name}`, subtitle: e.title || "No title" })),
+        ...(invoicesRes.data || []).map((i: any) => ({ id: i.id, type: "invoice" as const, title: `Invoice ${i.invoice_number}`, subtitle: i.status })),
+        ...(commsRes.data || []).map((c: any) => ({ id: c.id, type: "communication" as const, title: c.subject || "No subject", subtitle: c.type })),
+        ...(productsRes.data || []).map((p: any) => ({ id: p.id, type: "product" as const, title: p.name, subtitle: p.sku || "No SKU" })),
       ];
 
       setResults(mapped);
@@ -103,16 +89,18 @@ export function GlobalSearch() {
     if (result.type === "contact") navigate(`/contacts`);
     else if (result.type === "deal") navigate(`/deals`);
     else if (result.type === "company") navigate(`/companies`);
+    else if (result.type === "project") navigate(`/projects`);
+    else if (result.type === "employee") navigate(`/employees`);
+    else if (result.type === "invoice") navigate(`/finance`);
+    else if (result.type === "communication") navigate(`/communications`);
+    else if (result.type === "product") navigate(`/inventory`);
   }
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={() => setOpen(false)}
-      />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
       <div className="relative w-full max-w-xl bg-[#18191b] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
           <Search className="w-5 h-5 text-white/40" />
@@ -121,38 +109,33 @@ export function GlobalSearch() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search contacts, deals, companies..."
+            placeholder="Search across your workspace..."
             className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none"
           />
           <div className="flex items-center gap-1.5">
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium text-white/40 bg-white/5 border border-white/10">
-              ESC
-            </kbd>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-white/40 hover:text-white"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium text-white/40 bg-white/5 border border-white/10">ESC</kbd>
+            <button onClick={() => setOpen(false)} className="text-white/40 hover:text-white"><X className="w-4 h-4" /></button>
           </div>
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto">
           {results.length === 0 && query.trim() && !loading && (
-            <div className="py-8 text-center text-sm text-white/40">
-              No results found for "{query}"
-            </div>
+            <div className="py-8 text-center text-sm text-white/40">No results found for "{query}"</div>
           )}
 
           {results.length > 0 && (
             <div className="py-2">
               {results.map((result, i) => {
                 const Icon =
-                  result.type === "contact"
-                    ? User
-                    : result.type === "deal"
-                      ? GitBranch
-                      : Building2;
+                  result.type === "contact" ? User
+                  : result.type === "deal" ? GitBranch
+                  : result.type === "company" ? Building2
+                  : result.type === "project" ? FolderKanban
+                  : result.type === "employee" ? Briefcase
+                  : result.type === "invoice" ? FileText
+                  : result.type === "communication" ? Mail
+                  : result.type === "product" ? Package
+                  : Search;
                 return (
                   <button
                     key={`${result.type}-${result.id}-${i}`}
@@ -163,12 +146,8 @@ export function GlobalSearch() {
                       <Icon className="w-4 h-4 text-white/40" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white truncate">
-                        {result.title}
-                      </p>
-                      <p className="text-xs text-white/40 capitalize">
-                        {result.type} · {result.subtitle}
-                      </p>
+                      <p className="text-sm text-white truncate">{result.title}</p>
+                      <p className="text-xs text-white/40 capitalize">{result.type} · {result.subtitle}</p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-white/20" />
                   </button>
@@ -179,13 +158,9 @@ export function GlobalSearch() {
 
           {query.trim() === "" && (
             <div className="py-6 px-4 text-center">
-              <p className="text-sm text-white/30">
-                Type to search across your workspace
-              </p>
+              <p className="text-sm text-white/30">Type to search across your workspace</p>
               <div className="flex items-center justify-center gap-2 mt-3">
-                <kbd className="px-2 py-1 rounded text-[10px] text-white/40 bg-white/5 border border-white/10">
-                  ⌘K
-                </kbd>
+                <kbd className="px-2 py-1 rounded text-[10px] text-white/40 bg-white/5 border border-white/10">⌘K</kbd>
                 <span className="text-xs text-white/30">to toggle</span>
               </div>
             </div>

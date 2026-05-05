@@ -29,6 +29,7 @@ import Employees from "./pages/Employees";
 import Workflows from "./pages/Workflows";
 import CustomFields from "./pages/CustomFields";
 import Communications from "./pages/Communications";
+import Calendar from "./pages/Calendar";
 
 const queryClient = new QueryClient();
 
@@ -250,6 +251,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Communications />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/calendar"
+              element={
+                <ProtectedRoute>
+                  <Calendar />
                 </ProtectedRoute>
               }
             />
