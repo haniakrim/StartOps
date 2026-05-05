@@ -9,6 +9,8 @@ import { TopDeals } from "@/components/dashboard/TopDeals";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { ExecutiveBriefing } from "@/components/dashboard/ExecutiveBriefing";
 import { DealHealth } from "@/components/dashboard/DealHealth";
+import { AIForecast } from "@/components/dashboard/AIForecast";
+import { AnomalyDetection } from "@/components/dashboard/AnomalyDetection";
 import {
   DollarSign,
   Target,
@@ -111,6 +113,12 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ExecutiveBriefing />
         <DealHealth />
+      </div>
+
+      {/* AI Forecasting & Anomalies */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <AIForecast />
+        <AnomalyDetection />
       </div>
 
       {/* Bottom section */}
