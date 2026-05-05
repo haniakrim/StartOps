@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   BarChart3, TrendingUp, TrendingDown, Users, DollarSign, Activity, Loader2,
-  Target, GitBranch, Calendar, Filter, ArrowUpRight, BrainCircuit, Funnel
+  Target, GitBranch, Calendar, Filter, ArrowUpRight, BrainCircuit
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -174,7 +174,7 @@ export default function Analytics() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="bg-[#18191b] border border-white/10">
           <TabsTrigger value="overview" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><BarChart3 className="w-4 h-4 mr-2" />Overview</TabsTrigger>
-          <TabsTrigger value="funnel" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Funnel className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
+          <TabsTrigger value="funnel" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Filter className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
           <TabsTrigger value="cohorts" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Users className="w-4 h-4 mr-2" />Cohorts</TabsTrigger>
           <TabsTrigger value="sources" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><GitBranch className="w-4 h-4 mr-2" />Sources</TabsTrigger>
         </TabsList>
@@ -284,7 +284,7 @@ export default function Analytics() {
             <Card className="bg-[#18191b] border-white/10">
               <CardHeader className="pb-2">
                 <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-                  <Funnel className="w-4 h-4 text-[#6452db]" />
+                  <Filter className="w-4 h-4 text-[#6452db]" />
                   Deal Conversion Funnel
                 </CardTitle>
               </CardHeader>

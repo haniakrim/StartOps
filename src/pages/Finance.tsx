@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, FileText, CreditCard, AlertTriangle,
   Plus, Search, Filter, Loader2, Download, CheckCircle, Clock, XCircle,
-  BarChart3, ArrowUpRight, Truck, Star, MapPin, Globe
+  BarChart3, ArrowUpRight, Truck, Star, MapPin, Globe, Mail
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

@@ -52,7 +52,13 @@ export default function Workflows() {
   const [editingWorkflow, setEditingWorkflow] = useState<Workflow | null>(null);
   const [expandedWorkflow, setExpandedWorkflow] = useState<string | null>(null);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    name: string;
+    description: string;
+    trigger_type: string;
+    trigger_config: Record<string, any>;
+    actions: { type: string; config: Record<string, any> }[];
+  }>({
     name: "",
     description: "",
     trigger_type: "deal_stage_changed",
