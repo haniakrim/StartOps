@@ -73,13 +73,25 @@ export default function Organization() {
 
       const { data: membersData, error: membersError } = await supabase
         .from("organization_members")
-        .select(`*, profiles:user_id (first_name, last_name, email, role)`)
+        .select("*")
         .order("joined_at", { ascending: false });
 
       if (membersError) throw membersError;
 
+      const userIds = [...new Set((membersData || []).map((m: any) => m.user_id).filter(Boolean))];
+      let profilesMap: Record<string, any> = {};
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, email, role")
+          .in("id", userIds);
+        (profilesData || []).forEach((p: any) => {
+          profilesMap[p.id] = p;
+        });
+      }
+
       const mappedMembers = (membersData || []).map((m: any) => {
-        const profile = m.profiles?.[0] || {};
+        const profile = profilesMap[m.user_id] || {};
         return {
           id: m.id,
           name: `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || "Unknown",
