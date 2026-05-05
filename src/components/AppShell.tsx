@@ -27,6 +27,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 
 const navItems = [
   { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -194,16 +195,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative text-white/60 hover:text-white hover:bg-white/5"
-            >
-              <Bell className="w-5 h-5" />
-              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center bg-[#ff8964] text-[10px] text-black border-0">
-                3
-              </Badge>
-            </Button>
+            <NotificationsDropdown />
             <Button
               variant="ghost"
               size="icon"
