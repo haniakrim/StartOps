@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Building2, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Building2, Eye, EyeOff, Loader2, Shield, UserPlus, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,7 +32,7 @@ export default function Login() {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -43,7 +43,15 @@ export default function Login() {
           },
         });
         if (error) throw error;
-        toast.success("Account created! Check your email to confirm.");
+        
+        // If session is returned, email confirmation is disabled — auto-login
+        if (data.session) {
+          toast.success("Account created! Welcome, admin.");
+          navigate("/dashboard");
+        } else {
+          toast.success("Account created! Check your email to confirm, then sign in.");
+          setIsSignUp(false);
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -71,8 +79,14 @@ export default function Login() {
             StartOps
           </h1>
           <p className="text-sm text-white/50 mt-2">
-            {isSignUp ? "Create your enterprise CRM workspace" : "Sign in to your workspace"}
+            {isSignUp ? "Create your admin account" : "Sign in to your workspace"}
           </p>
+          {isSignUp && (
+            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#8dc572]/10 border border-[#8dc572]/20">
+              <Shield className="w-3.5 h-3.5 text-[#8dc572]" />
+              <span className="text-xs text-[#8dc572] font-medium">New accounts are automatically assigned admin role</span>
+            </div>
+          )}
         </div>
 
         <div className="bg-[#18191b] border border-white/10 rounded-lg p-6">
@@ -109,7 +123,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-[#0b0d10] border-white/10 text-white"
-                placeholder="you@company.com"
+                placeholder="admin@company.com"
                 required
               />
             </div>
@@ -144,9 +158,15 @@ export default function Login() {
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : isSignUp ? (
-                "Create Account"
+                <>
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Create Admin Account
+                </>
               ) : (
-                "Sign In"
+                <>
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign In
+                </>
               )}
             </Button>
           </form>
@@ -157,7 +177,7 @@ export default function Login() {
               onClick={() => setIsSignUp(!isSignUp)}
               className="text-sm text-[#ff8964] hover:text-[#ff8964]/80 transition-colors"
             >
-              {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+              {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up as admin"}
             </button>
           </div>
         </div>
