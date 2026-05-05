@@ -131,6 +131,8 @@ export default function Contacts() {
       setImporting(true);
       const text = await importFile.text();
       const parsed = parseCSV(text);
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
       const contactsToInsert = parsed.map(row => ({
         first_name: row.first_name || row.firstname || row['first name'] || '',
         last_name: row.last_name || row.lastname || row['last name'] || '',
@@ -139,7 +141,7 @@ export default function Contacts() {
         company: row.company || null,
         title: row.title || null,
         status: row.status || 'Lead',
-        organization_id: (await supabase.auth.getUser()).data.user?.id,
+        organization_id: userId,
       })).filter(c => c.first_name || c.last_name);
       if (contactsToInsert.length === 0) {
         toast.error("No valid contacts found in CSV");
