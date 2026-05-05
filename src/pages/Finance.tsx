@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, FileText, CreditCard, AlertTriangle,
   Plus, Search, Filter, Loader2, Download, CheckCircle, Clock, XCircle,
-  BarChart3, PieChart, ArrowUpRight
+  BarChart3, ArrowUpRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
 
 interface Invoice {
   id: string;
@@ -363,14 +363,14 @@ export default function Finance() {
               <CardHeader className="pb-2"><CardTitle className="text-white text-base">Expense Breakdown</CardTitle></CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
+                  <RechartsPieChart>
                     <Pie data={pieData.length ? pieData : [{ name: "None", value: 1 }]} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={5} dataKey="value">
                       {(pieData.length ? pieData : [{ name: "None", value: 1 }]).map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} />
-                  </PieChart>
+                  </RechartsPieChart>
                 </ResponsiveContainer>
                 <div className="space-y-1 mt-2">
                   {pieData.map((entry, index) => (

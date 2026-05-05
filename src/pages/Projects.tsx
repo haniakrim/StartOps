@@ -31,6 +31,7 @@ interface Project {
 
 interface ProjectTask {
   id: string;
+  project_id: string;
   name: string;
   status: string;
   priority: string;
