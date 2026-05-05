@@ -18,17 +18,21 @@ import {
   LogOut,
   Menu,
   X,
+  Activity,
+  UserCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 const navItems = [
   { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/contacts", icon: Users, label: "Contacts" },
   { path: "/companies", icon: Building2, label: "Companies" },
   { path: "/deals", icon: GitBranch, label: "Deals" },
+  { path: "/activities", icon: Activity, label: "Activities" },
   { path: "/organization", icon: Settings, label: "Organization" },
   { path: "/security", icon: Shield, label: "Security" },
   { path: "/analytics", icon: BarChart3, label: "Analytics" },
@@ -134,14 +138,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               </AvatarFallback>
             </Avatar>
             {!collapsed && (
-              <div className="flex-1 min-w-0">
+              <button
+                onClick={() => window.location.href = "/profile"}
+                className="flex-1 min-w-0 text-left"
+              >
                 <p className="text-sm font-medium text-white truncate">
                   {userName}
                 </p>
                 <p className="text-xs text-white/40 truncate capitalize">
                   {userRole}
                 </p>
-              </div>
+              </button>
             )}
             {!collapsed && (
               <button
@@ -158,6 +165,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
+        <GlobalSearch />
+
         {/* Top bar */}
         <header className="h-16 flex items-center gap-4 px-6 border-b border-white/10 bg-[#0b0d10]/80 backdrop-blur-sm sticky top-0 z-30">
           <button
@@ -168,12 +177,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </button>
 
           <div className="flex-1 max-w-md">
-            <div className="relative">
+            <div className="relative cursor-pointer" onClick={() => {
+              const event = new KeyboardEvent("keydown", { key: "k", metaKey: true });
+              window.dispatchEvent(event);
+            }}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
               <input
                 type="text"
-                placeholder="Search contacts, deals, companies..."
-                className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50"
+                readOnly
+                placeholder="Search contacts, deals, companies... (⌘K)"
+                className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50 cursor-pointer"
               />
             </div>
           </div>
