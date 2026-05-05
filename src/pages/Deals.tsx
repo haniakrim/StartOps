@@ -52,7 +52,7 @@ export default function Deals() {
   async function fetchPipelineAndDeals() {
     try {
       setLoading(true);
-      const { data: pipelineData, error: pipelineError } = await supabase.from("pipelines").select("stages").limit(1).single();
+      const { data: pipelineData, error: pipelineError } = await supabase.from("pipelines").select("stages").limit(1).maybeSingle();
       if (pipelineError) throw pipelineError;
       const parsedStages: PipelineStage[] = pipelineData?.stages || [
         { id: "lead", name: "Lead", color: "#5683da", order: 1 },

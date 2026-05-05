@@ -53,27 +53,27 @@ export default function Calendar() {
       ]);
 
       const allEvents: CalendarEvent[] = [
-        ...(actsRes.data || []).map((a: any) => ({
+        ...(actsRes.data || []).filter((a: any) => a.due_date).map((a: any) => ({
           id: a.id, title: a.subject, date: new Date(a.due_date),
           type: "activity" as const, status: a.status, description: a.description,
           color: a.status === "completed" ? "#8dc572" : a.status === "overdue" ? "#be6464" : "#6452db",
         })),
-        ...(dealsRes.data || []).map((d: any) => ({
+        ...(dealsRes.data || []).filter((d: any) => d.expected_close_date).map((d: any) => ({
           id: d.id, title: d.name, date: new Date(d.expected_close_date),
           type: "deal" as const, status: d.stage, description: `Deal close date`,
           color: d.stage === "closed-won" ? "#8dc572" : d.stage === "closed-lost" ? "#be6464" : "#ff8964",
         })),
-        ...(invoicesRes.data || []).map((i: any) => ({
+        ...(invoicesRes.data || []).filter((i: any) => i.due_date).map((i: any) => ({
           id: i.id, title: `Invoice ${i.invoice_number}`, date: new Date(i.due_date),
           type: "invoice" as const, status: i.status, description: `$${(i.amount || 0).toLocaleString()}`,
           color: i.status === "paid" ? "#8dc572" : i.status === "overdue" ? "#be6464" : "#f0ad4e",
         })),
-        ...(projectsRes.data || []).map((p: any) => ({
+        ...(projectsRes.data || []).filter((p: any) => p.end_date).map((p: any) => ({
           id: p.id, title: p.name, date: new Date(p.end_date),
           type: "project" as const, status: p.status, description: "Project deadline",
           color: p.status === "completed" ? "#8dc572" : p.status === "at_risk" ? "#be6464" : "#5683da",
         })),
-        ...(tasksRes.data || []).map((t: any) => ({
+        ...(tasksRes.data || []).filter((t: any) => t.due_date).map((t: any) => ({
           id: t.id, title: t.name, date: new Date(t.due_date),
           type: "task" as const, status: t.status, description: "Project task",
           color: t.status === "completed" ? "#8dc572" : t.status === "in_progress" ? "#f0ad4e" : "#6452db",

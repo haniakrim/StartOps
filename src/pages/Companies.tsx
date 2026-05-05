@@ -48,10 +48,19 @@ export default function Companies() {
     try {
       setLoading(true);
       const { data, error } = await supabase.from("companies").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error) {
+        if (error.message?.includes("does not exist")) {
+          toast.error("Companies table not found. Run the setup SQL to create it.");
+        } else {
+          throw error;
+        }
+        setCompanies([]);
+        return;
+      }
       setCompanies(data || []);
     } catch (error: any) {
       toast.error("Failed to load companies: " + error.message);
+      setCompanies([]);
     } finally {
       setLoading(false);
     }
