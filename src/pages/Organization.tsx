@@ -104,7 +104,7 @@ const teamMembers: TeamMember[] = [
   {
     id: 1,
     name: "John Doe",
-    email: "john@nexuscrm.com",
+    email: "john@startops.com",
     role: "Admin",
     department: "Executive",
     status: "Active",
@@ -114,7 +114,7 @@ const teamMembers: TeamMember[] = [
   {
     id: 2,
     name: "Sarah Chen",
-    email: "sarah@nexuscrm.com",
+    email: "sarah@startops.com",
     role: "Manager",
     department: "Sales",
     status: "Active",
@@ -124,7 +124,7 @@ const teamMembers: TeamMember[] = [
   {
     id: 3,
     name: "James Wilson",
-    email: "james@nexuscrm.com",
+    email: "james@startops.com",
     role: "Manager",
     department: "Engineering",
     status: "Active",
@@ -134,7 +134,7 @@ const teamMembers: TeamMember[] = [
   {
     id: 4,
     name: "Mike Ross",
-    email: "mike@nexuscrm.com",
+    email: "mike@startops.com",
     role: "User",
     department: "Sales",
     status: "Active",
@@ -144,7 +144,7 @@ const teamMembers: TeamMember[] = [
   {
     id: 5,
     name: "Lisa Park",
-    email: "lisa@nexuscrm.com",
+    email: "lisa@startops.com",
     role: "User",
     department: "Marketing",
     status: "Away",
@@ -154,7 +154,7 @@ const teamMembers: TeamMember[] = [
   {
     id: 6,
     name: "David Kim",
-    email: "david@nexuscrm.com",
+    email: "david@startops.com",
     role: "Viewer",
     department: "Sales",
     status: "Inactive",
