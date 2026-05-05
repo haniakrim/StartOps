@@ -22,6 +22,10 @@ import Settings from "./pages/Settings";
 import Index from "./pages/Index";
 import Assistant from "./pages/Assistant";
 import NotFound from "./pages/NotFound";
+import Finance from "./pages/Finance";
+import Inventory from "./pages/Inventory";
+import Projects from "./pages/Projects";
+import Employees from "./pages/Employees";
 
 const queryClient = new QueryClient();
 
@@ -187,6 +191,38 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Assistant />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/finance"
+              element={
+                <ProtectedRoute>
+                  <Finance />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inventory"
+              element={
+                <ProtectedRoute>
+                  <Inventory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects"
+              element={
+                <ProtectedRoute>
+                  <Projects />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employees"
+              element={
+                <ProtectedRoute>
+                  <Employees />
                 </ProtectedRoute>
               }
             />

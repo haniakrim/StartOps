@@ -22,6 +22,10 @@ import {
   UserCircle,
   Cog,
   Sparkles,
+  DollarSign,
+  Package,
+  FolderKanban,
+  Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -36,6 +40,10 @@ const navItems = [
   { path: "/companies", icon: Building2, label: "Companies" },
   { path: "/deals", icon: GitBranch, label: "Deals" },
   { path: "/activities", icon: Activity, label: "Activities" },
+  { path: "/finance", icon: DollarSign, label: "Finance" },
+  { path: "/inventory", icon: Package, label: "Inventory" },
+  { path: "/projects", icon: FolderKanban, label: "Projects" },
+  { path: "/employees", icon: Briefcase, label: "People" },
   { path: "/organization", icon: Settings, label: "Organization" },
   { path: "/security", icon: Shield, label: "Security" },
   { path: "/analytics", icon: BarChart3, label: "Analytics" },
