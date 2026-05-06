@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { DollarSign, Calendar, User, Building2, TrendingUp, Loader2, Pencil, Trash2, GitBranch, MessageSquare, Clock, BrainCircuit, TrendingDown, Minus, History } from "lucide-react";
+import { DollarSign, Calendar, User, Building2, TrendingUp, Loader2, Pencil, Trash2, GitBranch, MessageSquare, Clock, BrainCircuit, TrendingDown, Minus, History, FileText } from "lucide-react";
 import { CommentsSection } from "@/components/CommentsSection";
+import { QuoteBuilder } from "@/components/quotes/QuoteBuilder";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +28,7 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
   const [stageHistory, setStageHistory] = useState<any[]>([]);
   const [communications, setCommunications] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
+  const [quoteBuilderOpen, setQuoteBuilderOpen] = useState(false);
 
   useEffect(() => { if (dealId && open) fetchDeal(); }, [dealId, open]);
 
@@ -108,6 +110,10 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
             <DialogTitle className="text-white">{loading ? "Loading..." : deal?.name || "Deal Details"}</DialogTitle>
             {!loading && deal && (
               <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/5" onClick={() => setQuoteBuilderOpen(true)}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Quote
+                </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white" onClick={() => setEditing(!editing)}><Pencil className="w-4 h-4" /></Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-[#be6464]" onClick={deleteDeal}><Trash2 className="w-4 h-4" /></Button>
               </div>
@@ -278,5 +284,13 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
         ) : null}
       </DialogContent>
     </Dialog>
+
+    <QuoteBuilder
+      open={quoteBuilderOpen}
+      onClose={() => setQuoteBuilderOpen(false)}
+      onSuccess={() => { setQuoteBuilderOpen(false); onUpdate?.(); }}
+      dealId={dealId}
+      contactId={deal?.contact_id}
+    />
   );
 }

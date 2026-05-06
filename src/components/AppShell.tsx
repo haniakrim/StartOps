@@ -34,6 +34,7 @@ import {
   Clock,
   Target,
   Sun,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -59,6 +60,7 @@ const navItems = [
   { path: "/calendar", icon: CalendarIcon, label: "Calendar" },
   { path: "/forecasts", icon: BrainCircuit, label: "Forecasts" },
   { path: "/timesheets", icon: Clock, label: "Timesheets" },
+  { path: "/quotes", icon: FileText, label: "Quotes" },
   { path: "/goals", icon: Target, label: "Goals" },
   { path: "/organization", icon: Settings, label: "Organization" },
   { path: "/security", icon: Shield, label: "Security" },

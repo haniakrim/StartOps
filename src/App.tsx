@@ -36,6 +36,7 @@ import Reports from "./pages/Reports";
 import Goals from "./pages/Goals";
 import Notifications from "./pages/Notifications";
 import Today from "./pages/Today";
+import Quotes from "./pages/Quotes";
 
 const queryClient = new QueryClient();
 
@@ -313,6 +314,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Timesheets />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quotes"
+              element={
+                <ProtectedRoute>
+                  <Quotes />
                 </ProtectedRoute>
               }
             />
