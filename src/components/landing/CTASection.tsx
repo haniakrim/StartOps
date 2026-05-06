@@ -11,10 +11,10 @@ export default function CTASection() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0066B1]/20 via-[#0A1628] to-[#E63946]/10 border border-white/10 p-12 lg:p-16 text-center"
+      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-background to-destructive/10 border border-border p-12 lg:p-16 text-center"
     >
       {/* Background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#0066B1]/10 rounded-full blur-[100px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/10 rounded-full blur-[100px]" />
 
       <div className="relative">
         <motion.div
@@ -22,9 +22,9 @@ export default function CTASection() {
           whileInView={{ scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="w-14 h-14 rounded-2xl bg-[#0066B1]/20 flex items-center justify-center mx-auto mb-6"
+          className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-6"
         >
-          <Sparkles className="w-7 h-7 text-[#0066B1]" />
+          <Sparkles className="w-7 h-7 text-primary" />
         </motion.div>
 
         <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -38,7 +38,7 @@ export default function CTASection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={() => navigate("/login")}
-            className="flex items-center gap-2 px-8 h-12 text-base bg-[#0066B1] text-white hover:bg-[#0066B1]/90 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-8 h-12 text-base bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors"
           >
             Get Started Free
             <ArrowRight className="w-4 h-4" />

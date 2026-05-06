@@ -176,7 +176,7 @@ export default function Index() {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="p-4 rounded-xl bg-[#18191b] border border-white/5"
+                  className="p-4 rounded-xl bg-card border border-border"
                 >
                   <p className="text-xs text-white/40 mb-1">{stat.label}</p>
                   <p className="text-lg font-semibold text-white">{stat.value}</p>
@@ -198,7 +198,7 @@ export default function Index() {
                 { label: "Burn Rate", value: "$48,200", bar: 45, color: "#E63946" },
                 { label: "Runway", value: "18 months", bar: 60, color: "#00BFFF" },
               ].map((item) => (
-                <div key={item.label} className="p-4 rounded-xl bg-[#18191b] border border-white/5">
+                <div key={item.label} className="p-4 rounded-xl bg-card border border-border">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-white/60">{item.label}</span>
                     <span className="text-sm font-medium text-white">{item.value}</span>

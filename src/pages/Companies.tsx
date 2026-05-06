@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Company {
@@ -37,6 +38,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Companies() {
+  const { organizationId } = useOrganization();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -47,16 +49,20 @@ export default function Companies() {
     name: "", industry: "", size: "", location: "", website: "", revenue: "", health: "80", status: "Prospect", notes: "",
   });
 
-  useEffect(() => { fetchCompanies(); }, []);
+  useEffect(() => { fetchCompanies(); }, [organizationId]);
   useRealtimeTable("companies", fetchCompanies);
 
   async function fetchCompanies() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from("companies")
         .select("*")
         .order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data, error } = await query;
 
       if (error) throw error;
       setCompanies(data || []);
@@ -70,6 +76,10 @@ export default function Companies() {
   async function saveCompany(e: React.FormEvent) {
     e.preventDefault();
     try {
+      if (!organizationId) {
+        toast.error("No organization found. Please sign out and sign in again.");
+        return;
+      }
       const payload = {
         name: form.name,
         industry: form.industry || null,
@@ -80,6 +90,7 @@ export default function Companies() {
         health: parseInt(form.health) || 80,
         status: form.status,
         notes: form.notes || null,
+        organization_id: organizationId,
       };
 
       if (editingCompany) {
@@ -128,34 +139,19 @@ export default function Companies() {
     try {
       const { error } = await supabase.from("companies").update({ status }).in("id", selected);
       if (error) throw error;
-      toast.success(`Status updated for ${selected.length} companies`);
+      toast.success(`${selected.length} companies updated`);
       setSelected([]);
       fetchCompanies();
     } catch (error: any) {
-      toast.error("Failed to update status: " + error.message);
+      toast.error("Failed to update companies: " + error.message);
     }
   }
 
-  function exportCompanies() {
-    const data = selected.length > 0 ? companies.filter(c => selected.includes(c.id)) : companies;
-    const csv = [
-      ["Name", "Industry", "Size", "Location", "Website", "Revenue", "Health", "Status", "Notes"].join(","),
-      ...data.map(c =>
-        [c.name, c.industry || "", c.size || "", c.location || "", c.website || "", c.revenue || "", c.health, c.status, c.notes || ""].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")
-      ),
-    ].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `companies-export-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success(`${data.length} companies exported`);
-    setSelected([]);
+  function resetForm() {
+    setForm({ name: "", industry: "", size: "", location: "", website: "", revenue: "", health: "80", status: "Prospect", notes: "" });
   }
 
-  function editCompany(company: Company) {
+  function openEdit(company: Company) {
     setEditingCompany(company);
     setForm({
       name: company.name,
@@ -171,213 +167,176 @@ export default function Companies() {
     setDialogOpen(true);
   }
 
-  function resetForm() {
-    setForm({ name: "", industry: "", size: "", location: "", website: "", revenue: "", health: "80", status: "Prospect", notes: "" });
-  }
-
-  const filtered = companies.filter((c) =>
+  const filtered = companies.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
-    (c.industry?.toLowerCase() || "").includes(search.toLowerCase()) ||
-    (c.location?.toLowerCase() || "").includes(search.toLowerCase())
+    (c.industry && c.industry.toLowerCase().includes(search.toLowerCase())) ||
+    (c.location && c.location.toLowerCase().includes(search.toLowerCase()))
   );
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-white tracking-tight">Companies</h1>
-          <p className="text-sm text-white/50 mt-1">Manage your accounts and organizations</p>
+          <p className="text-sm text-white/50 mt-1">Manage your accounts and prospects</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={exportCompanies}>
-            <Download className="w-4 h-4 mr-2" />Export
-          </Button>
-          <Dialog open={dialogOpen} onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) { setEditingCompany(null); resetForm(); }
-          }}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />Add Company
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
-              <DialogHeader><DialogTitle>{editingCompany ? "Edit Company" : "Add New Company"}</DialogTitle></DialogHeader>
-              <form onSubmit={saveCompany} className="space-y-4 pt-4">
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Plus className="w-4 h-4 mr-2" />Add Company
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-card border-border text-foreground">
+            <DialogHeader><DialogTitle>{editingCompany ? "Edit Company" : "Add Company"}</DialogTitle></DialogHeader>
+            <form onSubmit={saveCompany} className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label className="text-white/70">Company Name</Label>
+                <Input required value={form.name} onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))} className="bg-muted border-border text-foreground" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Company Name</Label>
-                  <Input required value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white/70">Industry</Label>
-                    <Input value={form.industry} onChange={(e) => setForm((p) => ({ ...p, industry: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., SaaS" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white/70">Company Size</Label>
-                    <Input value={form.size} onChange={(e) => setForm((p) => ({ ...p, size: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., 50-200" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white/70">Location</Label>
-                    <Input value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., San Francisco" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white/70">Website</Label>
-                    <Input value={form.website} onChange={(e) => setForm((p) => ({ ...p, website: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="https://..." />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white/70">Annual Revenue</Label>
-                    <Input value={form.revenue} onChange={(e) => setForm((p) => ({ ...p, revenue: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., $10M" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white/70">Health Score</Label>
-                    <Input type="number" min="0" max="100" value={form.health} onChange={(e) => setForm((p) => ({ ...p, health: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
-                  </div>
+                  <Label className="text-white/70">Industry</Label>
+                  <Input value={form.industry} onChange={(e) => setForm(p => ({ ...p, industry: e.target.value }))} className="bg-muted border-border text-foreground" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Status</Label>
-                  <Select value={form.status} onValueChange={(v) => setForm((p) => ({ ...p, status: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                      <SelectItem value="Lead">Lead</SelectItem>
-                      <SelectItem value="Prospect">Prospect</SelectItem>
-                      <SelectItem value="Customer">Customer</SelectItem>
-                      <SelectItem value="At Risk">At Risk</SelectItem>
+                  <Label className="text-white/70">Size</Label>
+                  <Select value={form.size} onValueChange={(v) => setForm(p => ({ ...p, size: v }))}>
+                    <SelectTrigger className="bg-muted border-border text-foreground"><SelectValue placeholder="Select size" /></SelectTrigger>
+                    <SelectContent className="bg-popover border-border text-foreground">
+                      <SelectItem value="1-10">1-10</SelectItem>
+                      <SelectItem value="11-50">11-50</SelectItem>
+                      <SelectItem value="51-200">51-200</SelectItem>
+                      <SelectItem value="201-500">201-500</SelectItem>
+                      <SelectItem value="501-1000">501-1000</SelectItem>
+                      <SelectItem value="1000+">1000+</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Notes</Label>
-                  <Input value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Additional notes..." />
+                  <Label className="text-white/70">Location</Label>
+                  <Input value={form.location} onChange={(e) => setForm(p => ({ ...p, location: e.target.value }))} className="bg-muted border-border text-foreground" />
                 </div>
-                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">
-                  {editingCompany ? "Update Company" : "Create Company"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+                <div className="space-y-2">
+                  <Label className="text-white/70">Website</Label>
+                  <Input value={form.website} onChange={(e) => setForm(p => ({ ...p, website: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="https://..." />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-white/70">Annual Revenue</Label>
+                  <Input value={form.revenue} onChange={(e) => setForm(p => ({ ...p, revenue: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="$1M" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-white/70">Health Score</Label>
+                  <Input type="number" min="0" max="100" value={form.health} onChange={(e) => setForm(p => ({ ...p, health: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white/70">Status</Label>
+                <Select value={form.status} onValueChange={(v) => setForm(p => ({ ...p, status: v }))}>
+                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectItem value="Lead">Lead</SelectItem>
+                    <SelectItem value="Prospect">Prospect</SelectItem>
+                    <SelectItem value="Customer">Customer</SelectItem>
+                    <SelectItem value="At Risk">At Risk</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white/70">Notes</Label>
+                <Input value={form.notes} onChange={(e) => setForm(p => ({ ...p, notes: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+              </div>
+              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">{editingCompany ? "Update" : "Create"}</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Input placeholder="Search companies..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 bg-card border-border text-foreground placeholder:text-muted-foreground" />
         </div>
       </div>
 
-      {/* Bulk Actions */}
       {selected.length > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-expo-lg bg-expo-blue/10 border border-expo-blue/20">
+        <div className="flex items-center gap-2 p-3 bg-[#6452db]/10 border border-[#6452db]/20 rounded-lg">
           <span className="text-sm text-white">{selected.length} selected</span>
+          <Button variant="ghost" size="sm" onClick={() => setSelected([])} className="text-white/70 hover:text-white">Clear</Button>
           <div className="flex-1" />
-          <Select onValueChange={bulkUpdateStatus}>
-            <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white w-40 h-8 text-xs">
-              <SelectValue placeholder="Change status" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-              <SelectItem value="Lead">Lead</SelectItem>
-              <SelectItem value="Prospect">Prospect</SelectItem>
-              <SelectItem value="Customer">Customer</SelectItem>
-              <SelectItem value="At Risk">At Risk</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={bulkDelete}>
-            <Trash2 className="w-4 h-4 mr-1" />Delete
-          </Button>
-          <Button variant="ghost" size="sm" className="text-white/50 hover:text-white h-8" onClick={() => setSelected([])}>
-            Clear
-          </Button>
+          <Button variant="ghost" size="sm" onClick={() => bulkUpdateStatus("Lead")} className="text-white/70 hover:text-white">Mark as Lead</Button>
+          <Button variant="ghost" size="sm" onClick={() => bulkUpdateStatus("Customer")} className="text-white/70 hover:text-white">Mark as Customer</Button>
+          <Button variant="ghost" size="sm" onClick={bulkDelete} className="text-[#be6464] hover:text-[#be6464]">Delete</Button>
         </div>
       )}
 
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-          <input type="text" placeholder="Search companies..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-card border border-border rounded-expo-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50" />
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
         </div>
-        <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Filter className="w-4 h-4 mr-2" />Filters</Button>
-        <Button variant="ghost" size="sm" className="text-white/50 hover:text-white"><ArrowUpDown className="w-4 h-4 mr-2" />Sort</Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map((company) => (
-          <Card key={company.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    className="rounded border-white/20 bg-transparent"
-                    checked={selected.includes(company.id)}
-                    onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, company.id] : prev.filter((id) => id !== company.id))}
-                  />
-                  <div className="w-10 h-10 rounded-expo-lg bg-expo-blue/15 flex items-center justify-center">
-                    <Building2 className="w-5 h-5 text-[#6452db]" />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map(company => (
+            <Card key={company.id} className="bg-card border-border hover:border-border/80 transition-colors">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-[#6452db]" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-white">{company.name}</h3>
+                      {company.industry && <p className="text-xs text-white/50">{company.industry}</p>}
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
                   <Badge variant="secondary" className={`text-xs ${statusColors[company.status] || statusColors.Prospect}`}>{company.status}</Badge>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white hover:bg-white/5"><MoreHorizontal className="w-4 h-4" /></Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-[#1f2126] border-white/10 text-white">
-                      <DropdownMenuItem className="hover:bg-white/5 focus:bg-white/5" onClick={() => editCompany(company)}>
-                        <Pencil className="w-4 h-4 mr-2" />Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="hover:bg-white/5 focus:bg-white/5 text-[#be6464]" onClick={() => deleteCompany(company.id)}>
-                        <Trash2 className="w-4 h-4 mr-2" />Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
-              </div>
-              <h3 className="text-base font-semibold text-white mb-1">{company.name}</h3>
-              <p className="text-sm text-white/50 mb-4">{company.industry || "No industry"}</p>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-white/40">Account Health</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">{company.health}%</span>
-                    <TrendingUp className="w-4 h-4 text-[#8dc572]" />
+                <div className="mt-4 space-y-2">
+                  {company.location && (
+                    <div className="flex items-center gap-2 text-sm text-white/60">
+                      <MapPin className="w-3.5 h-3.5 text-white/30" />
+                      {company.location}
+                    </div>
+                  )}
+                  {company.website && (
+                    <div className="flex items-center gap-2 text-sm text-white/60">
+                      <Globe className="w-3.5 h-3.5 text-white/30" />
+                      {company.website}
+                    </div>
+                  )}
+                  {company.size && (
+                    <div className="flex items-center gap-2 text-sm text-white/60">
+                      <Users className="w-3.5 h-3.5 text-white/30" />
+                      {company.size} employees
+                    </div>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-white/50">Health</span>
+                    <span className="text-xs text-white/50">{company.health || 0}%</span>
                   </div>
+                  <Progress value={company.health || 0} className="h-1.5 bg-white/10" />
                 </div>
-                <Progress value={company.health} className="h-1.5 bg-white/10" />
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="flex items-center gap-2 text-sm text-white/50"><Users className="w-4 h-4" /><span>{company.size || "-"}</span></div>
-                  <div className="flex items-center gap-2 text-sm text-white/50"><Globe className="w-4 h-4" /><span className="truncate">{company.website || "-"}</span></div>
-                  <div className="flex items-center gap-2 text-sm text-white/50"><MapPin className="w-4 h-4" /><span>{company.location || "-"}</span></div>
-                  <div className="flex items-center gap-2 text-sm text-white/50"><Building2 className="w-4 h-4" /><span>{company.revenue || "-"}</span></div>
+                <div className="mt-4 flex items-center justify-end gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => openEdit(company)} className="text-white/70 hover:text-white">
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => deleteCompany(company.id)} className="text-[#be6464] hover:text-[#be6464]">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {filtered.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-            <Building2 className="w-12 h-12 text-white/20 mb-4" />
-            <h3 className="text-lg font-medium text-white mb-1">
-              {search ? "No companies match your search" : "No companies yet"}
-            </h3>
-            <p className="text-sm text-white/50 mb-4">
-              {search ? "Try adjusting your search terms" : "Add your first company to start tracking accounts"}
-            </p>
-            {!search && (
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90" onClick={() => setDialogOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />Add Company
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+          {filtered.length === 0 && (
+            <div className="col-span-full text-center py-12 text-sm text-white/40">No companies found. Add your first company!</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

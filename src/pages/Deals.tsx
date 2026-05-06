@@ -56,7 +56,7 @@ export default function Deals() {
   });
   const [contacts, setContacts] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
 
-  useEffect(() => { fetchPipelineAndDeals(); fetchContactsForSelect(); }, []);
+  useEffect(() => { fetchPipelineAndDeals(); fetchContactsForSelect(); }, [organizationId]);
   useRealtimeTable("deals", fetchPipelineAndDeals);
   useRealtimeTable("contacts", fetchContactsForSelect);
 
@@ -75,9 +75,13 @@ export default function Deals() {
       ];
       setStages(parsedStages);
 
-      const { data: dealsData, error: dealsError } = await supabase
+      let query = supabase
         .from("deals").select(`*, contacts:contact_id (first_name, last_name, company)`)
         .order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data: dealsData, error: dealsError } = await query;
       if (dealsError) throw dealsError;
       setDeals((dealsData || []).map((d: any) => ({ ...d, contacts: d.contacts?.[0] ?? null })));
     } catch (error: any) {
@@ -88,7 +92,11 @@ export default function Deals() {
   }
 
   async function fetchContactsForSelect() {
-    const { data } = await supabase.from("contacts").select("id, first_name, last_name").order("first_name");
+    let query = supabase.from("contacts").select("id, first_name, last_name").order("first_name");
+    if (organizationId) {
+      query = query.eq("organization_id", organizationId);
+    }
+    const { data } = await query;
     setContacts(data || []);
   }
 
@@ -122,169 +130,158 @@ export default function Deals() {
 
   async function updateDealStage(dealId: string, newStage: string) {
     try {
-      const { error } = await supabase.from("deals").update({ stage: newStage, updated_at: new Date().toISOString() }).eq("id", dealId);
+      const { error } = await supabase.from("deals").update({ stage: newStage }).eq("id", dealId);
       if (error) throw error;
-      setDeals((prev) => prev.map((d) => (d.id === dealId ? { ...d, stage: newStage } : d)));
-      toast.success("Deal moved to " + stages.find((s) => s.id === newStage)?.name);
+      toast.success("Deal moved to " + newStage);
+      fetchPipelineAndDeals();
     } catch (error: any) {
-      toast.error("Failed to update deal: " + error.message);
+      toast.error("Failed to move deal: " + error.message);
     }
   }
 
-  const filteredDeals = deals.filter((d) =>
+  async function deleteDeal(id: string) {
+    try {
+      const { error } = await supabase.from("deals").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Deal deleted");
+      fetchPipelineAndDeals();
+    } catch (error: any) {
+      toast.error("Failed to delete deal: " + error.message);
+    }
+  }
+
+  const filtered = deals.filter(d =>
     d.name.toLowerCase().includes(search.toLowerCase()) ||
-    (d.contacts?.company?.toLowerCase() || "").includes(search.toLowerCase())
+    (d.contacts?.company && d.contacts.company.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const getStageDeals = (stageId: string) => filteredDeals.filter((d) => d.stage === stageId);
-  const stageTotal = (stageId: string) => getStageDeals(stageId).reduce((sum, d) => sum + (d.value || 0), 0);
-  const formatValue = (v: number) => `$${(v || 0).toLocaleString()}`;
-
-  const handleDragStart = (deal: Deal) => setDraggedDeal(deal);
-  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
-  const handleDrop = (e: React.DragEvent, stageId: string) => {
-    e.preventDefault();
-    if (draggedDeal && draggedDeal.stage !== stageId) {
-      updateDealStage(draggedDeal.id, stageId);
-      setDraggedDeal(null);
-    }
-  };
-
-  const openDetail = (dealId: string) => { setDetailDealId(dealId); setDetailOpen(true); };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
-      </div>
-    );
-  }
+  const dealsByStage = stages.map(stage => ({
+    ...stage,
+    deals: filtered.filter(d => d.stage === stage.id),
+  }));
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Deals Pipeline</h1>
-          <p className="text-sm text-muted-foreground mt-1">Track and manage your sales pipeline</p>
+          <h1 className="text-2xl font-semibold text-white tracking-tight">Deals</h1>
+          <p className="text-sm text-white/50 mt-1">Manage your sales pipeline</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input type="text" placeholder="Search deals..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-64 bg-card border border-border rounded-expo-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50" />
-          </div>
-          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => {
-            const exportData = deals.map(d => ({
-              "Deal Name": d.name,
-              "Value": d.value,
-              "Probability": d.probability,
-              "Stage": d.stage,
-              "Status": d.status,
-              "Source": d.source || "",
-              "Expected Close": d.expected_close_date,
-              "Company": d.contacts?.company || "",
-              "Contact": d.contacts ? `${d.contacts.first_name} ${d.contacts.last_name}` : "",
-            }));
-            import("@/lib/export").then(({ exportToCSV }) => {
-              exportToCSV(exportData, "deals");
-            });
-          }}>
-            <Download className="w-4 h-4 mr-2" />Export
-          </Button>
-          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent"><Filter className="w-4 h-4 mr-2" />Filter</Button>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm"><Plus className="w-4 h-4 mr-2" />New Deal</Button>
-            </DialogTrigger>
-            <DialogContent className="bg-card border-border text-card-foreground max-w-lg">
-              <DialogHeader><DialogTitle>Create New Deal</DialogTitle></DialogHeader>
-              <form onSubmit={createDeal} className="space-y-4 pt-4">
-                <div className="space-y-2"><Label>Deal Name</Label><Input required value={newDeal.name} onChange={(e) => setNewDeal((p) => ({ ...p, name: e.target.value }))} className="bg-muted border-border" placeholder="Enterprise License Renewal" /></div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Value ($)</Label><Input type="number" required value={newDeal.value} onChange={(e) => setNewDeal((p) => ({ ...p, value: e.target.value }))} className="bg-muted border-border" placeholder="125000" /></div>
-                  <div className="space-y-2"><Label>Probability (%)</Label><Input type="number" min="0" max="100" value={newDeal.probability} onChange={(e) => setNewDeal((p) => ({ ...p, probability: e.target.value }))} className="bg-muted border-border" /></div>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Plus className="w-4 h-4 mr-2" />Add Deal
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-[#18191b] border-white/10 text-white">
+            <DialogHeader><DialogTitle>Add Deal</DialogTitle></DialogHeader>
+            <form onSubmit={createDeal} className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label className="text-white/70">Deal Name</Label>
+                <Input required value={newDeal.name} onChange={(e) => setNewDeal(p => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-white/70">Value ($)</Label>
+                  <Input type="number" required value={newDeal.value} onChange={(e) => setNewDeal(p => ({ ...p, value: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Stage</Label>
-                    <Select value={newDeal.stage} onValueChange={(v) => setNewDeal((p) => ({ ...p, stage: v }))}>
-                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select stage" /></SelectTrigger>
-                      <SelectContent className="bg-card border-border">
-                        {stages.map((s) => (<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2"><Label>Close Date</Label><Input type="date" value={newDeal.expected_close_date} onChange={(e) => setNewDeal((p) => ({ ...p, expected_close_date: e.target.value }))} className="bg-muted border-border" /></div>
+                <div className="space-y-2">
+                  <Label className="text-white/70">Probability (%)</Label>
+                  <Input type="number" min="0" max="100" value={newDeal.probability} onChange={(e) => setNewDeal(p => ({ ...p, probability: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Contact</Label>
-                    <Select value={newDeal.contact_id} onValueChange={(v) => setNewDeal((p) => ({ ...p, contact_id: v }))}>
-                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select contact" /></SelectTrigger>
-                      <SelectContent className="bg-card border-border">
-                        {contacts.map((c) => (<SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Source</Label>
-                    <Select value={newDeal.source} onValueChange={(v) => setNewDeal((p) => ({ ...p, source: v }))}>
-                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select source" /></SelectTrigger>
-                      <SelectContent className="bg-card border-border">
-                        {sourceOptions.map((s) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <Button type="submit" className="w-full">Create Deal</Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white/70">Stage</Label>
+                <Select value={newDeal.stage} onValueChange={(v) => setNewDeal(p => ({ ...p, stage: v }))}>
+                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    {stages.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white/70">Contact</Label>
+                <Select value={newDeal.contact_id} onValueChange={(v) => setNewDeal(p => ({ ...p, contact_id: v }))}>
+                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select contact" /></SelectTrigger>
+                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white/70">Expected Close Date</Label>
+                <Input type="date" value={newDeal.expected_close_date} onChange={(e) => setNewDeal(p => ({ ...p, expected_close_date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white/70">Source</Label>
+                <Select value={newDeal.source} onValueChange={(v) => setNewDeal(p => ({ ...p, source: v }))}>
+                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select source" /></SelectTrigger>
+                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    {sourceOptions.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Deal</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Input placeholder="Search deals..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 bg-[#18191b] border-white/10 text-white placeholder:text-white/30" />
         </div>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-2">
-        {stages.map((stage) => {
-          const stageDeals = getStageDeals(stage.id);
-          const total = stageTotal(stage.id);
-          return (
-            <div key={stage.id} className="flex-shrink-0 w-80" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, stage.id)}>
-              <div className="flex items-center justify-between mb-3">
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {dealsByStage.map(stage => (
+            <div key={stage.id} className="space-y-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: stage.color }} />
-                  <h3 className="text-sm font-medium text-foreground">{stage.name}</h3>
-                  <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">{stageDeals.length}</Badge>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stage.color }} />
+                  <span className="text-sm font-medium text-white">{stage.name}</span>
                 </div>
-                <span className="text-sm font-medium text-muted-foreground">{formatValue(total)}</span>
+                <Badge variant="secondary" className="text-xs bg-white/10 text-white/50">{stage.deals.length}</Badge>
               </div>
-              <div className="space-y-3 min-h-[100px]">
-                {stageDeals.length === 0 && <div className="text-center py-8 text-xs text-muted-foreground border border-dashed border-border rounded-md">Drop deals here</div>}
-                {stageDeals.map((deal) => (
-                  <Card key={deal.id} draggable onDragStart={() => handleDragStart(deal)} onClick={() => openDetail(deal.id)} className="bg-card border-border cursor-grab active:cursor-grabbing hover:border-expo-blue/20 transition-colors">
+              <div className="space-y-2">
+                {stage.deals.map(deal => (
+                  <Card key={deal.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors cursor-pointer" draggable onDragStart={() => setDraggedDeal(deal)} onClick={() => { setDetailDealId(deal.id); setDetailOpen(true); }}>
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="text-sm font-medium text-foreground">{deal.name}</h4>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-accent -mr-2 -mt-2"><MoreHorizontal className="w-3 h-3" /></Button>
+                      <h3 className="text-sm font-medium text-white">{deal.name}</h3>
+                      <p className="text-sm text-white/50 mt-1">${(deal.value || 0).toLocaleString()}</p>
+                      <div className="mt-2">
+                        <Progress value={deal.probability || 0} className="h-1 bg-white/10" />
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-xs text-white/40">{deal.probability || 0}%</span>
+                          {deal.expected_close_date && <span className="text-xs text-white/40">{new Date(deal.expected_close_date).toLocaleDateString()}</span>}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 mb-3"><Building2 className="w-3 h-3 text-muted-foreground/50" /><span className="text-xs text-muted-foreground">{deal.contacts?.company || "No company"}</span></div>
-                      {deal.source && (
-                        <Badge variant="outline" className="text-[10px] border-border text-muted-foreground mb-2">{deal.source}</Badge>
+                      {deal.contacts && (
+                        <div className="flex items-center gap-2 mt-2 text-xs text-white/50">
+                          <User className="w-3 h-3" />
+                          {deal.contacts.first_name} {deal.contacts.last_name}
+                        </div>
                       )}
-                      <div className="flex items-center justify-between mb-3"><span className="text-lg font-semibold text-foreground">{formatValue(deal.value)}</span></div>
-                      <Progress value={deal.probability || 0} className="h-1 bg-muted mb-3" />
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1"><User className="w-3 h-3" /><span>{deal.contacts ? `${deal.contacts.first_name} ${deal.contacts.last_name}` : "Unassigned"}</span></div>
-                        <div className="flex items-center gap-1"><Calendar className="w-3 h-3" /><span>{deal.expected_close_date ? new Date(deal.expected_close_date).toLocaleDateString() : "No date"}</span></div>
-                      </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
-      <DealDetail dealId={detailDealId} open={detailOpen} onClose={() => setDetailOpen(false)} onUpdate={fetchPipelineAndDeals} />
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-w-2xl bg-[#18191b] border-white/10 text-white">
+          {detailDealId && <DealDetail dealId={detailDealId} open={true} onClose={() => setDetailOpen(false)} />}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -120,7 +120,7 @@ export default function ModuleGrid() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
                   whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  className="group relative p-5 rounded-xl bg-[#18191b] border border-white/5 hover:border-white/15 transition-colors cursor-default"
+                  className="group relative p-5 rounded-xl bg-card border border-border hover:border-border/80 transition-colors cursor-default"
                 >
                   {/* Glow on hover */}
                   <div

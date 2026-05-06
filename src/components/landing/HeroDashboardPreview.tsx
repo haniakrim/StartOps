@@ -84,7 +84,7 @@ export default function HeroDashboardPreview() {
       <div className="absolute -inset-4 bg-gradient-to-r from-[#0066B1]/20 via-[#E63946]/10 to-[#00BFFF]/20 rounded-3xl blur-2xl animate-pulse-glow" />
 
       {/* Dashboard card */}
-      <div className="relative bg-[#0A1628] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="relative bg-background border border-border rounded-2xl overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
           <div className="flex gap-1.5">
@@ -115,7 +115,7 @@ export default function HeroDashboardPreview() {
                 {statCards.map((stat) => (
                   <div
                     key={stat.title}
-                    className="p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-colors"
+                    className="p-3 rounded-xl bg-muted/50 border border-border hover:border-border/80 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <stat.icon className="w-4 h-4" style={{ color: stat.color }} />
@@ -162,7 +162,7 @@ export default function HeroDashboardPreview() {
                       initial={{ height: 0 }}
                       animate={{ height: `${height}%` }}
                       transition={{ duration: 0.5, delay: i * 0.05 }}
-                      className="flex-1 rounded-t-sm bg-gradient-to-t from-[#0066B1] to-[#E63946]/60"
+                      className="flex-1 rounded-t-sm bg-gradient-to-t from-primary to-destructive/60"
                     />
                   ))}
                 </div>
@@ -240,7 +240,7 @@ export default function HeroDashboardPreview() {
                     transition={{ delay: i * 0.1 }}
                     className="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0066B1] to-[#E63946] flex items-center justify-center text-xs font-bold text-white">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-destructive flex items-center justify-center text-xs font-bold text-primary-foreground">
                       {contact.name.split(" ").map((n) => n[0]).join("")}
                     </div>
                     <div className="flex-1 min-w-0">
