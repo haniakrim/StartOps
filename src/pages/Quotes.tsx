@@ -60,8 +60,8 @@ export default function Quotes() {
       const { data, error } = await supabase
         .from("quotes")
         .select(`
-          id, quote_number, title, status, subtotal, total, valid_until, created_at,
-          contacts:contact_id (first_name, last_name, company),
+          id, quote_number, title, status, subtotal, tax_rate, tax_amount, total, valid_until, notes, terms, created_at,
+          contacts:contact_id (first_name, last_name, company, email),
           deals:deal_id (name)
         `)
         .order("created_at", { ascending: false });
