@@ -26,9 +26,9 @@ interface ActivityBoardProps {
 }
 
 const columns = [
-  { id: "pending", label: "To Do", color: "#5683da", icon: Clock },
-  { id: "in_progress", label: "In Progress", color: "#f0ad4e", icon: AlertCircle },
-  { id: "completed", label: "Done", color: "#8dc572", icon: CheckCircle2 },
+  { id: "pending", label: "To Do", color: "#0066B1", icon: Clock },
+  { id: "in_progress", label: "In Progress", color: "#00BFFF", icon: AlertCircle },
+  { id: "completed", label: "Done", color: "#0066B1", icon: CheckCircle2 },
 ];
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -36,13 +36,13 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 const typeColors: Record<string, string> = {
-  email: "#6452db", call: "#8dc572", meeting: "#f0ad4e", task: "#5683da", note: "#ff8964",
+  email: "#0066B1", call: "#0066B1", meeting: "#00BFFF", task: "#00BFFF", note: "#E63946",
 };
 
 const priorityColors: Record<string, string> = {
-  high: "bg-[#be6464]/20 text-[#be6464]",
-  medium: "bg-[#f0ad4e]/20 text-[#f0ad4e]",
-  low: "bg-[#8dc572]/20 text-[#8dc572]",
+  high: "bg-[#E63946]/20 text-[#E63946]",
+  medium: "bg-[#00BFFF]/20 text-[#00BFFF]",
+  low: "bg-[#0066B1]/20 text-[#0066B1]",
 };
 
 export function ActivityBoard({ activities, onUpdate }: ActivityBoardProps) {
@@ -106,7 +106,7 @@ export function ActivityBoard({ activities, onUpdate }: ActivityBoardProps) {
         return (
           <div
             key={col.id}
-            className="bg-[#0b0d10] rounded-lg border border-white/5 p-3 min-h-[400px]"
+            className="bg-[#0A1628] rounded-lg border border-white/5 p-3 min-h-[400px]"
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, col.id)}
           >
@@ -124,14 +124,14 @@ export function ActivityBoard({ activities, onUpdate }: ActivityBoardProps) {
               )}
               {items.map((activity) => {
                 const TypeIcon = typeIcons[activity.type] || Activity;
-                const color = typeColors[activity.type] || "#5683da";
+                const color = typeColors[activity.type] || "#0066B1";
 
                 return (
                   <Card
                     key={activity.id}
                     draggable
                     onDragStart={() => handleDragStart(activity)}
-                    className="bg-[#18191b] border-white/10 cursor-grab active:cursor-grabbing hover:border-white/20 transition-colors"
+                    className="bg-[#1A2332] border-white/10 cursor-grab active:cursor-grabbing hover:border-white/20 transition-colors"
                   >
                     <CardContent className="p-3">
                       <div className="flex items-start justify-between mb-2">

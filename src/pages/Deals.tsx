@@ -155,7 +155,7 @@ export default function Deals() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -164,15 +164,15 @@ export default function Deals() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Deals Pipeline</h1>
-          <p className="text-sm text-white/50 mt-1">Track and manage your sales pipeline</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Deals Pipeline</h1>
+          <p className="text-sm text-muted-foreground mt-1">Track and manage your sales pipeline</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-            <input type="text" placeholder="Search deals..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-64 bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input type="text" placeholder="Search deals..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-64 bg-card border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50" />
           </div>
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => {
             const exportData = deals.map(d => ({
               "Deal Name": d.name,
               "Value": d.value,
@@ -190,52 +190,52 @@ export default function Deals() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Filter className="w-4 h-4 mr-2" />Filter</Button>
+          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent"><Filter className="w-4 h-4 mr-2" />Filter</Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90"><Plus className="w-4 h-4 mr-2" />New Deal</Button>
+              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" />New Deal</Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-lg">
+            <DialogContent className="bg-card border-border text-card-foreground max-w-lg">
               <DialogHeader><DialogTitle>Create New Deal</DialogTitle></DialogHeader>
               <form onSubmit={createDeal} className="space-y-4 pt-4">
-                <div className="space-y-2"><Label className="text-white/70">Deal Name</Label><Input required value={newDeal.name} onChange={(e) => setNewDeal((p) => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Enterprise License Renewal" /></div>
+                <div className="space-y-2"><Label>Deal Name</Label><Input required value={newDeal.name} onChange={(e) => setNewDeal((p) => ({ ...p, name: e.target.value }))} className="bg-muted border-border" placeholder="Enterprise License Renewal" /></div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label className="text-white/70">Value ($)</Label><Input type="number" required value={newDeal.value} onChange={(e) => setNewDeal((p) => ({ ...p, value: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="125000" /></div>
-                  <div className="space-y-2"><Label className="text-white/70">Probability (%)</Label><Input type="number" min="0" max="100" value={newDeal.probability} onChange={(e) => setNewDeal((p) => ({ ...p, probability: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+                  <div className="space-y-2"><Label>Value ($)</Label><Input type="number" required value={newDeal.value} onChange={(e) => setNewDeal((p) => ({ ...p, value: e.target.value }))} className="bg-muted border-border" placeholder="125000" /></div>
+                  <div className="space-y-2"><Label>Probability (%)</Label><Input type="number" min="0" max="100" value={newDeal.probability} onChange={(e) => setNewDeal((p) => ({ ...p, probability: e.target.value }))} className="bg-muted border-border" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">Stage</Label>
+                    <Label>Stage</Label>
                     <Select value={newDeal.stage} onValueChange={(v) => setNewDeal((p) => ({ ...p, stage: v }))}>
-                      <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select stage" /></SelectTrigger>
-                      <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select stage" /></SelectTrigger>
+                      <SelectContent className="bg-card border-border">
                         {stages.map((s) => (<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>))}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2"><Label className="text-white/70">Close Date</Label><Input type="date" value={newDeal.expected_close_date} onChange={(e) => setNewDeal((p) => ({ ...p, expected_close_date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+                  <div className="space-y-2"><Label>Close Date</Label><Input type="date" value={newDeal.expected_close_date} onChange={(e) => setNewDeal((p) => ({ ...p, expected_close_date: e.target.value }))} className="bg-muted border-border" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">Contact</Label>
+                    <Label>Contact</Label>
                     <Select value={newDeal.contact_id} onValueChange={(v) => setNewDeal((p) => ({ ...p, contact_id: v }))}>
-                      <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select contact" /></SelectTrigger>
-                      <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select contact" /></SelectTrigger>
+                      <SelectContent className="bg-card border-border">
                         {contacts.map((c) => (<SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Source</Label>
+                    <Label>Source</Label>
                     <Select value={newDeal.source} onValueChange={(v) => setNewDeal((p) => ({ ...p, source: v }))}>
-                      <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select source" /></SelectTrigger>
-                      <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select source" /></SelectTrigger>
+                      <SelectContent className="bg-card border-border">
                         {sourceOptions.map((s) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
-                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Deal</Button>
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Deal</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -251,27 +251,27 @@ export default function Deals() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: stage.color }} />
-                  <h3 className="text-sm font-medium text-white">{stage.name}</h3>
-                  <Badge variant="secondary" className="bg-white/10 text-white/50 text-xs">{stageDeals.length}</Badge>
+                  <h3 className="text-sm font-medium text-foreground">{stage.name}</h3>
+                  <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">{stageDeals.length}</Badge>
                 </div>
-                <span className="text-sm font-medium text-white/50">{formatValue(total)}</span>
+                <span className="text-sm font-medium text-muted-foreground">{formatValue(total)}</span>
               </div>
               <div className="space-y-3 min-h-[100px]">
-                {stageDeals.length === 0 && <div className="text-center py-8 text-xs text-white/20 border border-dashed border-white/10 rounded-md">Drop deals here</div>}
+                {stageDeals.length === 0 && <div className="text-center py-8 text-xs text-muted-foreground border border-dashed border-border rounded-md">Drop deals here</div>}
                 {stageDeals.map((deal) => (
-                  <Card key={deal.id} draggable onDragStart={() => handleDragStart(deal)} onClick={() => openDetail(deal.id)} className="bg-[#18191b] border-white/10 cursor-grab active:cursor-grabbing hover:border-white/20 transition-colors">
+                  <Card key={deal.id} draggable onDragStart={() => handleDragStart(deal)} onClick={() => openDetail(deal.id)} className="bg-card border-border cursor-grab active:cursor-grabbing hover:border-primary/20 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
-                        <h4 className="text-sm font-medium text-white">{deal.name}</h4>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-white/40 hover:text-white hover:bg-white/5 -mr-2 -mt-2"><MoreHorizontal className="w-3 h-3" /></Button>
+                        <h4 className="text-sm font-medium text-foreground">{deal.name}</h4>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-accent -mr-2 -mt-2"><MoreHorizontal className="w-3 h-3" /></Button>
                       </div>
-                      <div className="flex items-center gap-2 mb-3"><Building2 className="w-3 h-3 text-white/30" /><span className="text-xs text-white/50">{deal.contacts?.company || "No company"}</span></div>
+                      <div className="flex items-center gap-2 mb-3"><Building2 className="w-3 h-3 text-muted-foreground/50" /><span className="text-xs text-muted-foreground">{deal.contacts?.company || "No company"}</span></div>
                       {deal.source && (
-                        <Badge variant="outline" className="text-[10px] border-white/10 text-white/40 mb-2">{deal.source}</Badge>
+                        <Badge variant="outline" className="text-[10px] border-border text-muted-foreground mb-2">{deal.source}</Badge>
                       )}
-                      <div className="flex items-center justify-between mb-3"><span className="text-lg font-semibold text-white">{formatValue(deal.value)}</span></div>
-                      <Progress value={deal.probability || 0} className="h-1 bg-white/10 mb-3" />
-                      <div className="flex items-center justify-between text-xs text-white/40">
+                      <div className="flex items-center justify-between mb-3"><span className="text-lg font-semibold text-foreground">{formatValue(deal.value)}</span></div>
+                      <Progress value={deal.probability || 0} className="h-1 bg-muted mb-3" />
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <div className="flex items-center gap-1"><User className="w-3 h-3" /><span>{deal.contacts ? `${deal.contacts.first_name} ${deal.contacts.last_name}` : "Unassigned"}</span></div>
                         <div className="flex items-center gap-1"><Calendar className="w-3 h-3" /><span>{deal.expected_close_date ? new Date(deal.expected_close_date).toLocaleDateString() : "No date"}</span></div>
                       </div>

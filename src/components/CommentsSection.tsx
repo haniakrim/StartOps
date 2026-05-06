@@ -90,7 +90,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-5 h-5 text-[#6452db] animate-spin" />
+        <Loader2 className="w-5 h-5 text-primary animate-spin" />
       </div>
     );
   }
@@ -101,39 +101,39 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
         {comments.map((comment) => (
           <div
             key={comment.id}
-            className="flex items-start gap-3 p-3 rounded-lg bg-[#0b0d10] border border-white/5 group"
+            className="flex items-start gap-3 p-3 rounded-lg bg-muted border border-border group"
           >
-            <Avatar className="w-8 h-8 bg-[#6452db]">
-              <AvatarFallback className="bg-[#6452db] text-white text-xs">
+            <Avatar className="w-8 h-8 bg-primary">
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                 {comment.author_name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-white">
+                  <span className="text-sm font-medium text-foreground">
                     {comment.author_name}
                   </span>
-                  <span className="text-xs text-white/30 flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {new Date(comment.created_at).toLocaleString()}
                   </span>
                 </div>
                 <button
                   onClick={() => deleteComment(comment.id)}
-                  className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-[#be6464] transition-opacity p-1"
+                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity p-1"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <p className="text-sm text-white/70 whitespace-pre-wrap">
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                 {comment.text}
               </p>
             </div>
           </div>
         ))}
         {comments.length === 0 && (
-          <p className="text-sm text-white/40 text-center py-6">
+          <p className="text-sm text-muted-foreground text-center py-6">
             No comments yet. Start the conversation!
           </p>
         )}
@@ -143,14 +143,14 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Add a comment..."
-          className="bg-[#0b0d10] border-white/10 text-white"
+          className="bg-muted border-border"
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && addComment()}
         />
         <Button
           onClick={addComment}
           size="sm"
           disabled={!newComment.trim()}
-          className="bg-[#6452db] text-white hover:bg-[#6452db]/90 h-9 w-9 p-0"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 w-9 p-0"
         >
           <Send className="w-4 h-4" />
         </Button>

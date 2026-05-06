@@ -62,6 +62,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // BMW M brand colors
+        bmw: {
+          dark: "#0A1628",
+          blue: "#0066B1",
+          light: "#00BFFF",
+          red: "#E63946",
+          gray: "#1A2332",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

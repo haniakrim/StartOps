@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Mail, Phone, Building2, Tag, Loader2, Pencil, Trash2, DollarSign, GitBranch, MessageSquare, Clock, BrainCircuit, TrendingUp, TrendingDown, Minus, Plus, Calendar, CheckCircle2 } from "lucide-react";
+import { Mail, Phone, Building2, Tag, Loader2, Pencil, Trash2, DollarSign, GitBranch, MessageSquare, Clock, BrainCircuit, TrendingUp, TrendingDown, Minus, Calendar, CheckCircle2 } from "lucide-react";
 import { CommentsSection } from "@/components/CommentsSection";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -144,12 +144,15 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
   }
 
   const statusColors: Record<string, string> = {
-    Active: "bg-[#8dc572]/20 text-[#8dc572]", Prospect: "bg-[#5683da]/20 text-[#5683da]",
-    Inactive: "bg-white/10 text-white/50", Lead: "bg-[#6452db]/20 text-[#6452db]", Customer: "bg-[#8dc572]/20 text-[#8dc572]",
+    Active: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+    Prospect: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+    Inactive: "bg-muted text-muted-foreground",
+    Lead: "bg-primary/15 text-primary",
+    Customer: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
   };
 
   const sentimentColors: Record<string, string> = {
-    positive: "text-[#8dc572]", negative: "text-[#be6464]", neutral: "text-[#5683da]",
+    positive: "text-emerald-500", negative: "text-red-500", neutral: "text-blue-500",
   };
 
   const sentimentIcons: Record<string, React.ElementType> = {
@@ -158,46 +161,46 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border text-card-foreground max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-white">{loading ? "Loading..." : `${contact?.first_name || ""} ${contact?.last_name || ""}`}</DialogTitle>
+            <DialogTitle>{loading ? "Loading..." : `${contact?.first_name || ""} ${contact?.last_name || ""}`}</DialogTitle>
             {!loading && contact && (
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white" onClick={() => setEditing(!editing)}><Pencil className="w-4 h-4" /></Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-[#be6464]" onClick={deleteContact}><Trash2 className="w-4 h-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => setEditing(!editing)}><Pencil className="w-4 h-4" /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={deleteContact}><Trash2 className="w-4 h-4" /></Button>
               </div>
             )}
           </div>
         </DialogHeader>
 
         {loading ? (
-          <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 text-[#6452db] animate-spin" /></div>
+          <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 text-primary animate-spin" /></div>
         ) : contact ? (
           <div className="space-y-6 pt-2">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[#6452db] flex items-center justify-center text-white font-semibold text-lg">
+              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-lg">
                 {contact.first_name?.[0]}{contact.last_name?.[0]}
               </div>
               <div>
-                <h3 className="text-base font-semibold text-white">{contact.first_name} {contact.last_name}</h3>
-                <p className="text-sm text-white/50">{contact.title || "No title"} · {contact.company || "No company"}</p>
+                <h3 className="text-base font-semibold text-foreground">{contact.first_name} {contact.last_name}</h3>
+                <p className="text-sm text-muted-foreground">{contact.title || "No title"} · {contact.company || "No company"}</p>
               </div>
             </div>
 
             {/* Quick Actions */}
             {!editing && (
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => logCommunication("email")}>
+                <Button size="sm" variant="outline" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => logCommunication("email")}>
                   <Mail className="w-3.5 h-3.5 mr-1.5" />Log Email
                 </Button>
-                <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => logCommunication("call")}>
+                <Button size="sm" variant="outline" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => logCommunication("call")}>
                   <Phone className="w-3.5 h-3.5 mr-1.5" />Log Call
                 </Button>
-                <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => setActivityDialogOpen(true)}>
+                <Button size="sm" variant="outline" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => setActivityDialogOpen(true)}>
                   <Calendar className="w-3.5 h-3.5 mr-1.5" />Add Task
                 </Button>
-                <Button size="sm" variant="outline" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => setDealDialogOpen(true)}>
+                <Button size="sm" variant="outline" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => setDealDialogOpen(true)}>
                   <DollarSign className="w-3.5 h-3.5 mr-1.5" />Add Deal
                 </Button>
               </div>
@@ -206,51 +209,52 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
             {editing ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label className="text-white/70">First Name</Label><Input value={contact.first_name} onChange={(e) => setContact({ ...contact, first_name: e.target.value })} className="bg-[#0b0d10] border-white/10 text-white" /></div>
-                  <div className="space-y-2"><Label className="text-white/70">Last Name</Label><Input value={contact.last_name} onChange={(e) => setContact({ ...contact, last_name: e.target.value })} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+                  <div className="space-y-2"><Label>First Name</Label><Input value={contact.first_name} onChange={(e) => setContact({ ...contact, first_name: e.target.value })} className="bg-muted border-border" /></div>
+                  <div className="space-y-2"><Label>Last Name</Label><Input value={contact.last_name} onChange={(e) => setContact({ ...contact, last_name: e.target.value })} className="bg-muted border-border" /></div>
                 </div>
-                <div className="space-y-2"><Label className="text-white/70">Email</Label><Input value={contact.email || ""} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="bg-[#0b0d10] border-white/10 text-white" /></div>
-                <div className="space-y-2"><Label className="text-white/70">Phone</Label><Input value={contact.phone || ""} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="bg-[#0b0d10] border-white/10 text-white" /></div>
-                <div className="space-y-2"><Label className="text-white/70">Company</Label><Input value={contact.company || ""} onChange={(e) => setContact({ ...contact, company: e.target.value })} className="bg-[#0b0d10] border-white/10 text-white" /></div>
-                <div className="space-y-2"><Label className="text-white/70">Title</Label><Input value={contact.title || ""} onChange={(e) => setContact({ ...contact, title: e.target.value })} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+                <div className="space-y-2"><Label>Email</Label><Input value={contact.email || ""} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="bg-muted border-border" /></div>
+                <div className="space-y-2"><Label>Phone</Label><Input value={contact.phone || ""} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="bg-muted border-border" /></div>
+                <div className="space-y-2"><Label>Company</Label><Input value={contact.company || ""} onChange={(e) => setContact({ ...contact, company: e.target.value })} className="bg-muted border-border" /></div>
+                <div className="space-y-2"><Label>Title</Label><Input value={contact.title || ""} onChange={(e) => setContact({ ...contact, title: e.target.value })} className="bg-muted border-border" /></div>
                 <div className="flex gap-2">
-                  <Button onClick={saveChanges} className="bg-[#6452db] text-white hover:bg-[#6452db]/90">Save Changes</Button>
-                  <Button variant="ghost" onClick={() => setEditing(false)} className="text-white/70 hover:text-white">Cancel</Button>
+                  <Button onClick={saveChanges} className="bg-primary text-primary-foreground hover:bg-primary/90">Save Changes</Button>
+                  <Button variant="ghost" onClick={() => setEditing(false)} className="text-muted-foreground hover:text-foreground">Cancel</Button>
                 </div>
               </div>
             ) : (
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="bg-[#0b0d10] border border-white/10">
-                  <TabsTrigger value="overview" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Overview</TabsTrigger>
-                  <TabsTrigger value="timeline" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Timeline</TabsTrigger>
-                  <TabsTrigger value="deals" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Deals ({deals.length})</TabsTrigger>
-                  <TabsTrigger value="communications" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Comms ({communications.length})</TabsTrigger>
-                  <TabsTrigger value="comments" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Comments</TabsTrigger>
+                <TabsList className="bg-muted border border-border">
+                  <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Overview</TabsTrigger>
+                  <TabsTrigger value="timeline" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Timeline</TabsTrigger>
+                  <TabsTrigger value="deals" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Deals ({deals.length})</TabsTrigger>
+                  <TabsTrigger value="communications" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Comms ({communications.length})</TabsTrigger>
+                  <TabsTrigger value="comments" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Comments</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="mt-4 space-y-4">
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="secondary" className={`text-xs ${statusColors[contact.status || "Lead"] || statusColors.Lead}`}>{contact.status || "Lead"}</Badge>
-                    {(contact.tags || []).map((tag: string) => (<Badge key={tag} variant="outline" className="text-xs border-white/10 text-white/50">{tag}</Badge>))}
+                    {(contact.tags || []).map((tag: string) => (<Badge key={tag} variant="outline" className="text-xs border-border text-muted-foreground">{tag}</Badge>
+                    ))}
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3 text-sm text-white/70"><Mail className="w-4 h-4 text-white/30" /><span>{contact.email || "No email"}</span></div>
-                    <div className="flex items-center gap-3 text-sm text-white/70"><Phone className="w-4 h-4 text-white/30" /><span>{contact.phone || "No phone"}</span></div>
-                    <div className="flex items-center gap-3 text-sm text-white/70"><Building2 className="w-4 h-4 text-white/30" /><span>{contact.company || "No company"}</span></div>
-                    <div className="flex items-center gap-3 text-sm text-white/70"><Tag className="w-4 h-4 text-white/30" /><span>{contact.title || "No title"}</span></div>
+                    <div className="flex items-center gap-3 text-sm text-foreground"><Mail className="w-4 h-4 text-muted-foreground" /><span>{contact.email || "No email"}</span></div>
+                    <div className="flex items-center gap-3 text-sm text-foreground"><Phone className="w-4 h-4 text-muted-foreground" /><span>{contact.phone || "No phone"}</span></div>
+                    <div className="flex items-center gap-3 text-sm text-foreground"><Building2 className="w-4 h-4 text-muted-foreground" /><span>{contact.company || "No company"}</span></div>
+                    <div className="flex items-center gap-3 text-sm text-foreground"><Tag className="w-4 h-4 text-muted-foreground" /><span>{contact.title || "No title"}</span></div>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5 text-center">
-                      <p className="text-lg font-semibold text-white">{deals.length}</p>
-                      <p className="text-xs text-white/40">Deals</p>
+                    <div className="p-3 rounded-lg bg-muted border border-border text-center">
+                      <p className="text-lg font-semibold text-foreground">{deals.length}</p>
+                      <p className="text-xs text-muted-foreground">Deals</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5 text-center">
-                      <p className="text-lg font-semibold text-white">{communications.length}</p>
-                      <p className="text-xs text-white/40">Comms</p>
+                    <div className="p-3 rounded-lg bg-muted border border-border text-center">
+                      <p className="text-lg font-semibold text-foreground">{communications.length}</p>
+                      <p className="text-xs text-muted-foreground">Comms</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5 text-center">
-                      <p className="text-lg font-semibold text-white">{activities.length}</p>
-                      <p className="text-xs text-white/40">Activities</p>
+                    <div className="p-3 rounded-lg bg-muted border border-border text-center">
+                      <p className="text-lg font-semibold text-foreground">{activities.length}</p>
+                      <p className="text-xs text-muted-foreground">Activities</p>
                     </div>
                   </div>
                 </TabsContent>
@@ -261,19 +265,19 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                       const isComm = item.type === "email" || item.type === "call" || item.type === "meeting" || item.type === "note";
                       const date = new Date(item.occurred_at || item.created_at || item.due_date);
                       return (
-                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                            {isComm ? <MessageSquare className="w-4 h-4 text-white/40" /> : <Clock className="w-4 h-4 text-white/40" />}
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted border border-border">
+                          <div className="w-8 h-8 rounded-lg bg-muted-foreground/10 flex items-center justify-center flex-shrink-0">
+                            {isComm ? <MessageSquare className="w-4 h-4 text-muted-foreground" /> : <Clock className="w-4 h-4 text-muted-foreground" />}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-white">{item.subject || item.summary || "Activity"}</p>
-                            <p className="text-xs text-white/40 mt-0.5">{item.type} · {date.toLocaleDateString()}</p>
+                            <p className="text-sm text-foreground">{item.subject || item.summary || "Activity"}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{item.type} · {date.toLocaleDateString()}</p>
                           </div>
                         </div>
                       );
                     })}
                     {communications.length === 0 && activities.length === 0 && (
-                      <p className="text-sm text-white/40 text-center py-8">No timeline activity yet</p>
+                      <p className="text-sm text-muted-foreground text-center py-8">No timeline activity yet</p>
                     )}
                   </div>
                 </TabsContent>
@@ -281,18 +285,18 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                 <TabsContent value="deals" className="mt-4">
                   <div className="space-y-3">
                     {deals.map((deal) => (
-                      <div key={deal.id} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                      <div key={deal.id} className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border">
                         <div className="flex items-center gap-3">
-                          <GitBranch className="w-4 h-4 text-white/30" />
+                          <GitBranch className="w-4 h-4 text-muted-foreground" />
                           <div>
-                            <p className="text-sm text-white">{deal.name}</p>
-                            <p className="text-xs text-white/40">{deal.stage} · {deal.probability || 0}% probability</p>
+                            <p className="text-sm text-foreground">{deal.name}</p>
+                            <p className="text-xs text-muted-foreground">{deal.stage} · {deal.probability || 0}% probability</p>
                           </div>
                         </div>
-                        <span className="text-sm font-medium text-white flex items-center gap-1"><DollarSign className="w-3 h-3" />{(deal.value || 0).toLocaleString()}</span>
+                        <span className="text-sm font-medium text-foreground flex items-center gap-1"><DollarSign className="w-3 h-3" />{(deal.value || 0).toLocaleString()}</span>
                       </div>
                     ))}
-                    {deals.length === 0 && <p className="text-sm text-white/40 text-center py-8">No deals associated</p>}
+                    {deals.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No deals associated</p>}
                   </div>
                 </TabsContent>
 
@@ -305,23 +309,23 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                     {communications.map((comm) => {
                       const SentimentIcon = sentimentIcons[comm.sentiment || "neutral"] || Minus;
                       return (
-                        <div key={comm.id} className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                        <div key={comm.id} className="p-3 rounded-lg bg-muted border border-border">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-white">{comm.subject || "No subject"}</span>
+                            <span className="text-sm font-medium text-foreground">{comm.subject || "No subject"}</span>
                             <div className={`flex items-center gap-1 ${sentimentColors[comm.sentiment || "neutral"]}`}>
                               <SentimentIcon className="w-3 h-3" />
                               <span className="text-xs capitalize">{comm.sentiment || "neutral"}</span>
                             </div>
                           </div>
-                          {comm.summary && <p className="text-xs text-white/50 mb-2">{comm.summary}</p>}
-                          <div className="flex items-center gap-2 text-xs text-white/30">
+                          {comm.summary && <p className="text-xs text-muted-foreground mb-2">{comm.summary}</p>}
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <BrainCircuit className="w-3 h-3" />
                             <span>AI analyzed · {new Date(comm.occurred_at).toLocaleDateString()}</span>
                           </div>
                         </div>
                       );
                     })}
-                    {communications.length === 0 && <p className="text-sm text-white/40 text-center py-8">No communications logged</p>}
+                    {communications.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No communications logged</p>}
                   </div>
                 </TabsContent>
               </Tabs>
@@ -332,14 +336,14 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
 
       {/* Activity Dialog */}
       <Dialog open={activityDialogOpen} onOpenChange={setActivityDialogOpen}>
-        <DialogContent className="bg-[#18191b] border-white/10 text-white">
+        <DialogContent className="bg-card border-border text-card-foreground">
           <DialogHeader><DialogTitle>Add Activity</DialogTitle></DialogHeader>
           <form onSubmit={createActivity} className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label className="text-white/70">Type</Label>
+              <Label>Type</Label>
               <Select value={newActivity.type} onValueChange={(v) => setNewActivity(p => ({ ...p, type: v }))}>
-                <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-card border-border">
                   <SelectItem value="task">Task</SelectItem>
                   <SelectItem value="call">Call</SelectItem>
                   <SelectItem value="meeting">Meeting</SelectItem>
@@ -347,15 +351,15 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2"><Label className="text-white/70">Subject</Label><Input required value={newActivity.subject} onChange={(e) => setNewActivity(p => ({ ...p, subject: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
-            <div className="space-y-2"><Label className="text-white/70">Description</Label><Input value={newActivity.description} onChange={(e) => setNewActivity(p => ({ ...p, description: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+            <div className="space-y-2"><Label>Subject</Label><Input required value={newActivity.subject} onChange={(e) => setNewActivity(p => ({ ...p, subject: e.target.value }))} className="bg-muted border-border" /></div>
+            <div className="space-y-2"><Label>Description</Label><Input value={newActivity.description} onChange={(e) => setNewActivity(p => ({ ...p, description: e.target.value }))} className="bg-muted border-border" /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-white/70">Due Date</Label><Input type="datetime-local" value={newActivity.due_date} onChange={(e) => setNewActivity(p => ({ ...p, due_date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+              <div className="space-y-2"><Label>Due Date</Label><Input type="datetime-local" value={newActivity.due_date} onChange={(e) => setNewActivity(p => ({ ...p, due_date: e.target.value }))} className="bg-muted border-border" /></div>
               <div className="space-y-2">
-                <Label className="text-white/70">Priority</Label>
+                <Label>Priority</Label>
                 <Select value={newActivity.priority} onValueChange={(v) => setNewActivity(p => ({ ...p, priority: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-card border-border">
                     <SelectItem value="low">Low</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="high">High</SelectItem>
@@ -363,27 +367,27 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                 </Select>
               </div>
             </div>
-            <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Activity</Button>
+            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Activity</Button>
           </form>
         </DialogContent>
       </Dialog>
 
       {/* Deal Dialog */}
       <Dialog open={dealDialogOpen} onOpenChange={setDealDialogOpen}>
-        <DialogContent className="bg-[#18191b] border-white/10 text-white">
+        <DialogContent className="bg-card border-border text-card-foreground">
           <DialogHeader><DialogTitle>Add Deal</DialogTitle></DialogHeader>
           <form onSubmit={createDeal} className="space-y-4 pt-4">
-            <div className="space-y-2"><Label className="text-white/70">Deal Name</Label><Input required value={newDeal.name} onChange={(e) => setNewDeal(p => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+            <div className="space-y-2"><Label>Deal Name</Label><Input required value={newDeal.name} onChange={(e) => setNewDeal(p => ({ ...p, name: e.target.value }))} className="bg-muted border-border" /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-white/70">Value ($)</Label><Input type="number" required value={newDeal.value} onChange={(e) => setNewDeal(p => ({ ...p, value: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
-              <div className="space-y-2"><Label className="text-white/70">Probability (%)</Label><Input type="number" min="0" max="100" value={newDeal.probability} onChange={(e) => setNewDeal(p => ({ ...p, probability: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+              <div className="space-y-2"><Label>Value ($)</Label><Input type="number" required value={newDeal.value} onChange={(e) => setNewDeal(p => ({ ...p, value: e.target.value }))} className="bg-muted border-border" /></div>
+              <div className="space-y-2"><Label>Probability (%)</Label><Input type="number" min="0" max="100" value={newDeal.probability} onChange={(e) => setNewDeal(p => ({ ...p, probability: e.target.value }))} className="bg-muted border-border" /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-white/70">Stage</Label>
+                <Label>Stage</Label>
                 <Select value={newDeal.stage} onValueChange={(v) => setNewDeal(p => ({ ...p, stage: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-card border-border">
                     <SelectItem value="lead">Lead</SelectItem>
                     <SelectItem value="qualified">Qualified</SelectItem>
                     <SelectItem value="proposal">Proposal</SelectItem>
@@ -391,9 +395,9 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2"><Label className="text-white/70">Close Date</Label><Input type="date" value={newDeal.expected_close_date} onChange={(e) => setNewDeal(p => ({ ...p, expected_close_date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+              <div className="space-y-2"><Label>Close Date</Label><Input type="date" value={newDeal.expected_close_date} onChange={(e) => setNewDeal(p => ({ ...p, expected_close_date: e.target.value }))} className="bg-muted border-border" /></div>
             </div>
-            <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Deal</Button>
+            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Deal</Button>
           </form>
         </DialogContent>
       </Dialog>
