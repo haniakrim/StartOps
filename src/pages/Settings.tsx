@@ -8,9 +8,13 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [orgId, setOrgId] = useState<string | null>(null);
   const [org, setOrg] = useState({
     name: "StartOps",
     slug: "startops",
@@ -25,16 +29,105 @@ export default function SettingsPage() {
     dark_mode: true,
   });
 
+  useEffect(() => {
+    fetchSettings();
+  }, [user]);
+
+  async function fetchSettings() {
+    try {
+      setLoading(true);
+      if (!user) return;
+
+      // Get user's organization membership
+      const { data: membership, error: memError } = await supabase
+        .from("organization_members")
+        .select("organization_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (memError) throw memError;
+
+      if (membership?.organization_id) {
+        setOrgId(membership.organization_id);
+
+        // Fetch organization details
+        const { data: orgData, error: orgError } = await supabase
+          .from("organizations")
+          .select("*")
+          .eq("id", membership.organization_id)
+          .maybeSingle();
+
+        if (orgError) throw orgError;
+
+        if (orgData) {
+          setOrg({
+            name: orgData.name || "StartOps",
+            slug: orgData.slug || "startops",
+            domain: orgData.domain || "",
+            primary_color: orgData.primary_color || "#6452db",
+            secondary_color: orgData.secondary_color || "#ff8964",
+          });
+        }
+      }
+
+      // Load preferences from localStorage for now
+      try {
+        const raw = localStorage.getItem("startops_preferences");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          setPreferences((p) => ({ ...p, ...parsed }));
+        }
+      } catch {
+        // ignore
+      }
+    } catch (error: any) {
+      toast.error("Failed to load settings: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function saveOrg(e: React.FormEvent) {
     e.preventDefault();
     try {
       setSaving(true);
-      toast.success("Organization settings saved");
+
+      if (!orgId) {
+        toast.error("No organization found");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("organizations")
+        .update({
+          name: org.name,
+          slug: org.slug,
+          domain: org.domain || null,
+          primary_color: org.primary_color,
+          secondary_color: org.secondary_color,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", orgId);
+
+      if (error) throw error;
+
+      // Save preferences to localStorage
+      localStorage.setItem("startops_preferences", JSON.stringify(preferences));
+
+      toast.success("Settings saved successfully");
     } catch (error: any) {
-      toast.error("Failed to save settings");
+      toast.error("Failed to save settings: " + error.message);
     } finally {
       setSaving(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -101,6 +194,11 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+              <div className="flex justify-end pt-2">
+                <Button onClick={saveOrg} disabled={saving} className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}Save Changes
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -118,6 +216,11 @@ export default function SettingsPage() {
                   <Switch checked={(preferences as any)[item.key]} onCheckedChange={(v) => setPreferences((p) => ({ ...p, [item.key]: v }))} className="data-[state=checked]:bg-[#6452db]" />
                 </div>
               ))}
+              <div className="flex justify-end pt-2">
+                <Button onClick={saveOrg} disabled={saving} className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}Save Changes
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Product {
   id: string;
@@ -34,6 +35,7 @@ interface QuoteBuilderProps {
 }
 
 export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: QuoteBuilderProps) {
+  const { organizationId } = useOrganization();
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [contacts, setContacts] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
@@ -139,6 +141,7 @@ export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: Qu
           valid_until: validUntil || null,
           notes: notes || null,
           terms: terms || null,
+          organization_id: organizationId,
         })
         .select()
         .single();
@@ -153,6 +156,7 @@ export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: Qu
         unit_price: item.unit_price,
         discount_percent: item.discount_percent,
         total: calculateItemTotal(item),
+        organization_id: organizationId,
       }));
 
       const { error: itemsError } = await supabase.from("quote_items").insert(quoteItems);

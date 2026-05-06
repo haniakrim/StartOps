@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-import { Send, Clock, Trash2 } from "lucide-react";
+import { Send, Clock, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Comment {
   id: string;
   text: string;
-  author: string;
-  createdAt: string;
+  author_name: string;
+  user_id: string | null;
+  created_at: string;
 }
 
 interface CommentsSectionProps {
@@ -18,48 +21,79 @@ interface CommentsSectionProps {
 }
 
 export function CommentsSection({ entityType, entityId }: CommentsSectionProps) {
+  const { user, profile } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const storageKey = entityId ? `startops_comments_${entityType}_${entityId}` : "";
+  const authorName = profile
+    ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || "You"
+    : "You";
 
   useEffect(() => {
-    if (!storageKey) return;
-    const raw = localStorage.getItem(storageKey);
-    if (raw) {
-      try {
-        setComments(JSON.parse(raw));
-      } catch {
-        setComments([]);
-      }
-    } else {
-      setComments([]);
-    }
-  }, [storageKey]);
+    if (entityId) fetchComments();
+  }, [entityId]);
 
-  function addComment() {
-    if (!newComment.trim() || !storageKey) return;
-    const comment: Comment = {
-      id: crypto.randomUUID(),
-      text: newComment.trim(),
-      author: "You",
-      createdAt: new Date().toISOString(),
-    };
-    const updated = [...comments, comment];
-    setComments(updated);
-    localStorage.setItem(storageKey, JSON.stringify(updated));
-    setNewComment("");
-    toast.success("Comment added");
+  async function fetchComments() {
+    if (!entityId) return;
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("comments")
+        .select("*")
+        .eq("entity_type", entityType)
+        .eq("entity_id", entityId)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      setComments(data || []);
+    } catch (error: any) {
+      toast.error("Failed to load comments: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function deleteComment(id: string) {
-    const updated = comments.filter((c) => c.id !== id);
-    setComments(updated);
-    localStorage.setItem(storageKey, JSON.stringify(updated));
-    toast.success("Comment deleted");
+  async function addComment() {
+    if (!newComment.trim() || !entityId) return;
+    try {
+      const { error } = await supabase.from("comments").insert({
+        entity_type: entityType,
+        entity_id: entityId,
+        text: newComment.trim(),
+        author_name: authorName,
+        user_id: user?.id || null,
+      });
+
+      if (error) throw error;
+      setNewComment("");
+      toast.success("Comment added");
+      fetchComments();
+    } catch (error: any) {
+      toast.error("Failed to add comment: " + error.message);
+    }
+  }
+
+  async function deleteComment(id: string) {
+    try {
+      const { error } = await supabase.from("comments").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Comment deleted");
+      fetchComments();
+    } catch (error: any) {
+      toast.error("Failed to delete comment: " + error.message);
+    }
   }
 
   if (!entityId) return null;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="w-5 h-5 text-[#6452db] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -71,18 +105,18 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
           >
             <Avatar className="w-8 h-8 bg-[#6452db]">
               <AvatarFallback className="bg-[#6452db] text-white text-xs">
-                {comment.author[0]}
+                {comment.author_name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-white">
-                    {comment.author}
+                    {comment.author_name}
                   </span>
                   <span className="text-xs text-white/30 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {new Date(comment.createdAt).toLocaleString()}
+                    {new Date(comment.created_at).toLocaleString()}
                   </span>
                 </div>
                 <button

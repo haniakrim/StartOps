@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DealDetail } from "@/components/DealDetail";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Deal {
   id: string;
@@ -34,6 +35,7 @@ interface PipelineStage {
 }
 
 export default function Deals() {
+  const { organizationId } = useOrganization();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,6 +86,10 @@ export default function Deals() {
   async function createDeal(e: React.FormEvent) {
     e.preventDefault();
     try {
+      if (!organizationId) {
+        toast.error("No organization found. Please sign out and sign in again.");
+        return;
+      }
       const { error } = await supabase.from("deals").insert({
         name: newDeal.name,
         value: parseFloat(newDeal.value) || 0,
@@ -92,6 +98,7 @@ export default function Deals() {
         expected_close_date: newDeal.expected_close_date || null,
         contact_id: newDeal.contact_id || null,
         status: "open",
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Deal created successfully");

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Search, Filter, Plus, MoreHorizontal, Building2, Globe, Users, MapPin, ArrowUpDown, Download, TrendingUp, Loader2,
+  Search, Filter, Plus, MoreHorizontal, Building2, Globe, Users, MapPin, ArrowUpDown, Download, TrendingUp, Loader2, Pencil, Trash2
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface Company {
+  id: string;
   name: string;
   industry: string | null;
   size: string | null;
@@ -22,8 +24,8 @@ interface Company {
   revenue: string | null;
   health: number;
   status: string;
-  contactCount: number;
-  dealValue: number;
+  notes: string | null;
+  created_at: string;
 }
 
 const statusColors: Record<string, string> = {
@@ -38,8 +40,9 @@ export default function Companies() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newCompany, setNewCompany] = useState({
-    name: "", industry: "", size: "", location: "", website: "", revenue: "", health: "80", status: "Prospect",
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [form, setForm] = useState({
+    name: "", industry: "", size: "", location: "", website: "", revenue: "", health: "80", status: "Prospect", notes: "",
   });
 
   useEffect(() => { fetchCompanies(); }, []);
@@ -47,51 +50,13 @@ export default function Companies() {
   async function fetchCompanies() {
     try {
       setLoading(true);
-      
-      // Derive companies from contacts and deals since companies table doesn't exist
-      const { data: contactsData, error: contactsError } = await supabase
-        .from("contacts")
-        .select("company, title, status");
-      if (contactsError) throw contactsError;
+      const { data, error } = await supabase
+        .from("companies")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      const { data: dealsData, error: dealsError } = await supabase
-        .from("deals")
-        .select("value, contact_id, contacts:contact_id (company)");
-      if (dealsError) throw dealsError;
-
-      // Aggregate by company name
-      const companyMap: Record<string, Company> = {};
-      
-      (contactsData || []).forEach((c: any) => {
-        const name = c.company;
-        if (!name) return;
-        if (!companyMap[name]) {
-          companyMap[name] = {
-            name,
-            industry: null,
-            size: null,
-            location: null,
-            website: null,
-            revenue: null,
-            health: 80,
-            status: c.status === "Customer" ? "Customer" : "Prospect",
-            contactCount: 0,
-            dealValue: 0,
-          };
-        }
-        companyMap[name].contactCount++;
-      });
-
-      (dealsData || []).forEach((d: any) => {
-        const companyName = d.contacts?.[0]?.company;
-        if (!companyName || !companyMap[companyName]) return;
-        companyMap[companyName].dealValue += (d.value || 0);
-        if (companyMap[companyName].status !== "Customer") {
-          companyMap[companyName].status = "Prospect";
-        }
-      });
-
-      setCompanies(Object.values(companyMap));
+      if (error) throw error;
+      setCompanies(data || []);
     } catch (error: any) {
       toast.error("Failed to load companies: " + error.message);
     } finally {
@@ -99,9 +64,75 @@ export default function Companies() {
     }
   }
 
+  async function saveCompany(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      const payload = {
+        name: form.name,
+        industry: form.industry || null,
+        size: form.size || null,
+        location: form.location || null,
+        website: form.website || null,
+        revenue: form.revenue || null,
+        health: parseInt(form.health) || 80,
+        status: form.status,
+        notes: form.notes || null,
+      };
+
+      if (editingCompany) {
+        const { error } = await supabase.from("companies").update(payload).eq("id", editingCompany.id);
+        if (error) throw error;
+        toast.success("Company updated");
+      } else {
+        const { error } = await supabase.from("companies").insert(payload);
+        if (error) throw error;
+        toast.success("Company created");
+      }
+
+      setDialogOpen(false);
+      setEditingCompany(null);
+      resetForm();
+      fetchCompanies();
+    } catch (error: any) {
+      toast.error("Failed to save company: " + error.message);
+    }
+  }
+
+  async function deleteCompany(id: string) {
+    try {
+      const { error } = await supabase.from("companies").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Company deleted");
+      fetchCompanies();
+    } catch (error: any) {
+      toast.error("Failed to delete company: " + error.message);
+    }
+  }
+
+  function editCompany(company: Company) {
+    setEditingCompany(company);
+    setForm({
+      name: company.name,
+      industry: company.industry || "",
+      size: company.size || "",
+      location: company.location || "",
+      website: company.website || "",
+      revenue: company.revenue || "",
+      health: company.health?.toString() || "80",
+      status: company.status || "Prospect",
+      notes: company.notes || "",
+    });
+    setDialogOpen(true);
+  }
+
+  function resetForm() {
+    setForm({ name: "", industry: "", size: "", location: "", website: "", revenue: "", health: "80", status: "Prospect", notes: "" });
+  }
+
   const filtered = companies.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
-    (c.industry?.toLowerCase() || "").includes(search.toLowerCase())
+    (c.industry?.toLowerCase() || "").includes(search.toLowerCase()) ||
+    (c.location?.toLowerCase() || "").includes(search.toLowerCase())
   );
 
   if (loading) {
@@ -123,40 +154,73 @@ export default function Companies() {
           <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5">
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <Dialog open={dialogOpen} onOpenChange={(open) => {
+            setDialogOpen(open);
+            if (!open) { setEditingCompany(null); resetForm(); }
+          }}>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
                 <Plus className="w-4 h-4 mr-2" />Add Company
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#18191b] border-white/10 text-white">
-              <DialogHeader><DialogTitle>Add New Company</DialogTitle></DialogHeader>
-              <form onSubmit={(e) => { e.preventDefault(); toast.info("Company table not yet created. Add company name to a contact instead."); setDialogOpen(false); }} className="space-y-4 pt-4">
+            <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader><DialogTitle>{editingCompany ? "Edit Company" : "Add New Company"}</DialogTitle></DialogHeader>
+              <form onSubmit={saveCompany} className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label className="text-white/70">Company Name</Label>
-                  <Input required value={newCompany.name} onChange={(e) => setNewCompany((p) => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Input required value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-white/70">Industry</Label>
-                    <Input value={newCompany.industry} onChange={(e) => setNewCompany((p) => ({ ...p, industry: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Input value={form.industry} onChange={(e) => setForm((p) => ({ ...p, industry: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., SaaS" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-white/70">Company Size</Label>
-                    <Input value={newCompany.size} onChange={(e) => setNewCompany((p) => ({ ...p, size: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Input value={form.size} onChange={(e) => setForm((p) => ({ ...p, size: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., 50-200" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-white/70">Location</Label>
-                    <Input value={newCompany.location} onChange={(e) => setNewCompany((p) => ({ ...p, location: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Input value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., San Francisco" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-white/70">Website</Label>
-                    <Input value={newCompany.website} onChange={(e) => setNewCompany((p) => ({ ...p, website: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Input value={form.website} onChange={(e) => setForm((p) => ({ ...p, website: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="https://..." />
                   </div>
                 </div>
-                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Company</Button>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Annual Revenue</Label>
+                    <Input value={form.revenue} onChange={(e) => setForm((p) => ({ ...p, revenue: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., $10M" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Health Score</Label>
+                    <Input type="number" min="0" max="100" value={form.health} onChange={(e) => setForm((p) => ({ ...p, health: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-white/70">Status</Label>
+                  <Select value={form.status} onValueChange={(v) => setForm((p) => ({ ...p, status: v }))}>
+                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                      <SelectItem value="Lead">Lead</SelectItem>
+                      <SelectItem value="Prospect">Prospect</SelectItem>
+                      <SelectItem value="Customer">Customer</SelectItem>
+                      <SelectItem value="At Risk">At Risk</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-white/70">Notes</Label>
+                  <Input value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Additional notes..." />
+                </div>
+                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                  {editingCompany ? "Update Company" : "Create Company"}
+                </Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -174,7 +238,7 @@ export default function Companies() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((company) => (
-          <Card key={company.name} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
+          <Card key={company.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
             <CardContent className="p-5">
               <div className="flex items-start justify-between mb-4">
                 <div className="w-10 h-10 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
@@ -187,8 +251,12 @@ export default function Companies() {
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white hover:bg-white/5"><MoreHorizontal className="w-4 h-4" /></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-[#1f2126] border-white/10 text-white">
-                      <DropdownMenuItem className="hover:bg-white/5 focus:bg-white/5">View Details</DropdownMenuItem>
-                      <DropdownMenuItem className="hover:bg-white/5 focus:bg-white/5">Edit Company</DropdownMenuItem>
+                      <DropdownMenuItem className="hover:bg-white/5 focus:bg-white/5" onClick={() => editCompany(company)}>
+                        <Pencil className="w-4 h-4 mr-2" />Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="hover:bg-white/5 focus:bg-white/5 text-[#be6464]" onClick={() => deleteCompany(company.id)}>
+                        <Trash2 className="w-4 h-4 mr-2" />Delete
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -205,24 +273,18 @@ export default function Companies() {
                 </div>
                 <Progress value={company.health} className="h-1.5 bg-white/10" />
                 <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="flex items-center gap-2 text-sm text-white/50"><Users className="w-4 h-4" /><span>{company.contactCount} contacts</span></div>
-                  <div className="flex items-center gap-2 text-sm text-white/50"><Globe className="w-4 h-4" /><span>{company.website || "-"}</span></div>
+                  <div className="flex items-center gap-2 text-sm text-white/50"><Users className="w-4 h-4" /><span>{company.size || "-"}</span></div>
+                  <div className="flex items-center gap-2 text-sm text-white/50"><Globe className="w-4 h-4" /><span className="truncate">{company.website || "-"}</span></div>
                   <div className="flex items-center gap-2 text-sm text-white/50"><MapPin className="w-4 h-4" /><span>{company.location || "-"}</span></div>
                   <div className="flex items-center gap-2 text-sm text-white/50"><Building2 className="w-4 h-4" /><span>{company.revenue || "-"}</span></div>
                 </div>
-                {company.dealValue > 0 && (
-                  <div className="pt-2 border-t border-white/5">
-                    <p className="text-xs text-white/40">Pipeline Value</p>
-                    <p className="text-sm font-medium text-white">${company.dealValue.toLocaleString()}</p>
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>
         ))}
         {filtered.length === 0 && (
           <div className="col-span-full text-center py-12 text-sm text-white/40">
-            {search ? "No companies match your search" : "No companies yet. Add a company field to your contacts!"}
+            {search ? "No companies match your search" : "No companies yet. Add your first one!"}
           </div>
         )}
       </div>

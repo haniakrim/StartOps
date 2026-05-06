@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ContactDetail } from "@/components/ContactDetail";
+import { useAuth } from "@/contexts/AuthContext";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Contact {
   id: string;
@@ -34,6 +36,8 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Contacts() {
+  const { user } = useAuth();
+  const { organizationId } = useOrganization();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -66,10 +70,14 @@ export default function Contacts() {
   async function createContact(e: React.FormEvent) {
     e.preventDefault();
     try {
+      if (!organizationId) {
+        toast.error("No organization found. Please sign out and sign in again.");
+        return;
+      }
       const { error } = await supabase.from("contacts").insert({
         first_name: newContact.first_name, last_name: newContact.last_name, email: newContact.email || null,
         company: newContact.company || null, title: newContact.title || null, phone: newContact.phone || null,
-        status: "Lead", organization_id: (await supabase.auth.getUser()).data.user?.id,
+        status: "Lead", organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Contact created successfully");
@@ -132,8 +140,10 @@ export default function Contacts() {
       setImporting(true);
       const text = await importFile.text();
       const parsed = parseCSV(text);
-      const { data: userData } = await supabase.auth.getUser();
-      const userId = userData.user?.id;
+      if (!organizationId) {
+        toast.error("No organization found. Please sign out and sign in again.");
+        return;
+      }
       const contactsToInsert = parsed.map(row => ({
         first_name: row.first_name || row.firstname || row['first name'] || '',
         last_name: row.last_name || row.lastname || row['last name'] || '',
@@ -142,7 +152,7 @@ export default function Contacts() {
         company: row.company || null,
         title: row.title || null,
         status: row.status || 'Lead',
-        organization_id: userId,
+        organization_id: organizationId,
       })).filter(c => c.first_name || c.last_name);
       if (contactsToInsert.length === 0) {
         toast.error("No valid contacts found in CSV");

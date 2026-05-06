@@ -61,13 +61,22 @@ export default function Communications() {
   const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
 
   useEffect(() => {
+    fetchEmailTemplates();
+  }, []);
+
+  async function fetchEmailTemplates() {
     try {
-      const raw = localStorage.getItem("startops_email_templates");
-      if (raw) setEmailTemplates(JSON.parse(raw));
-    } catch {
+      const { data, error } = await supabase
+        .from("email_templates")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setEmailTemplates(data || []);
+    } catch (error: any) {
+      // Silently fail - templates are optional
       setEmailTemplates([]);
     }
-  }, []);
+  }
 
   useEffect(() => {
     fetchCommunications();
@@ -236,20 +245,21 @@ export default function Communications() {
                   <Label className="text-white/70">Template</Label>
                   <Select
                     value=""
-                    onValueChange={(v) => {
+                    onValueChange={async (v) => {
                       const template = emailTemplates.find((t) => t.id === v);
                       if (template) {
-                        const updated = emailTemplates.map((t) =>
-                          t.id === v ? { ...t, usageCount: (t.usageCount || 0) + 1 } : t
-                        );
-                        setEmailTemplates(updated);
-                        localStorage.setItem("startops_email_templates", JSON.stringify(updated));
+                        // Update usage count in DB
+                        await supabase
+                          .from("email_templates")
+                          .update({ usage_count: (template.usage_count || 0) + 1 })
+                          .eq("id", template.id);
                         setNewComm((p) => ({
                           ...p,
                           subject: template.subject,
                           content: template.body,
                         }));
                         toast.success(`Applied template: ${template.name}`);
+                        fetchEmailTemplates();
                       }
                     }}
                   >

@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ReferenceLine } from "recharts";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Forecast {
   id: string;
@@ -30,6 +31,7 @@ interface Forecast {
 }
 
 export default function Forecasts() {
+  const { organizationId } = useOrganization();
   const [forecasts, setForecasts] = useState<Forecast[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -148,7 +150,7 @@ export default function Forecasts() {
         weighted_revenue: weighted,
         confidence_low: Math.max(0, weighted - stdDev * 1.5),
         confidence_high: weighted + stdDev * 1.5,
-        organization_id: userId,
+        organization_id: organizationId,
         factors: [
           { name: "Pipeline Value", value: totalValue },
           { name: "Win Probability", value: deals?.length ? Math.round(deals.reduce((s, d) => s + (d.probability || 0), 0) / deals.length) : 0 },

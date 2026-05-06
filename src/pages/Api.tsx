@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface WebhookItem {
   id: string;
@@ -21,6 +22,7 @@ interface WebhookItem {
 }
 
 export default function Api() {
+  const { organizationId } = useOrganization();
   const [webhooks, setWebhooks] = useState<WebhookItem[]>([]);
   const [apiKeys, setApiKeys] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,12 +58,16 @@ export default function Api() {
   async function createWebhook(e: React.FormEvent) {
     e.preventDefault();
     try {
+      if (!organizationId) {
+        toast.error("No organization found. Please sign out and sign in again.");
+        return;
+      }
       const { error } = await supabase.from("webhooks").insert({
         name: newWebhook.name,
         url: newWebhook.url,
         events: [newWebhook.events],
         user_id: (await supabase.auth.getUser()).data.user?.id,
-        organization_id: (await supabase.auth.getUser()).data.user?.id,
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Webhook created");

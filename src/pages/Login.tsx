@@ -46,6 +46,29 @@ export default function Login() {
         
         // If session is returned, email confirmation is disabled — auto-login
         if (data.session) {
+          // Create default organization for new user
+          const { data: orgData, error: orgError } = await supabase
+            .from("organizations")
+            .insert({
+              name: `${firstName || email.split("@")[0]}'s Organization`,
+              slug: `org-${Date.now()}`,
+            })
+            .select()
+            .single();
+
+          if (orgError) throw orgError;
+
+          // Create organization membership
+          const { error: memError } = await supabase
+            .from("organization_members")
+            .insert({
+              organization_id: orgData.id,
+              user_id: data.user!.id,
+              role: "admin",
+            });
+
+          if (memError) throw memError;
+
           toast.success("Account created! Welcome, admin.");
           navigate("/dashboard");
         } else {

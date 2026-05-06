@@ -16,9 +16,9 @@ interface EmailTemplate {
   category: string;
   subject: string;
   body: string;
-  usageCount: number;
-  createdAt: string;
-  updatedAt: string;
+  usage_count: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface EmailTemplateFormProps {

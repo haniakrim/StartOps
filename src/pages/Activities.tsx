@@ -33,6 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ActivityBoard } from "@/components/activities/ActivityBoard";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface ActivityItem {
   id: string;
@@ -71,6 +72,7 @@ const priorityColors: Record<string, string> = {
 };
 
 export default function Activities() {
+  const { organizationId } = useOrganization();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -87,10 +89,7 @@ export default function Activities() {
     deal_id: "",
   });
 
-  useEffect(() => {
-    fetchActivities();
-    fetchContactsAndDeals();
-  }, []);
+  useEffect(() => { fetchActivities(); fetchContactsAndDeals(); }, []);
 
   async function fetchActivities() {
     try {
@@ -135,6 +134,10 @@ export default function Activities() {
   async function createActivity(e: React.FormEvent) {
     e.preventDefault();
     try {
+      if (!organizationId) {
+        toast.error("No organization found. Please sign out and sign in again.");
+        return;
+      }
       const { error } = await supabase.from("activities").insert({
         type: newActivity.type,
         subject: newActivity.subject,
@@ -144,6 +147,7 @@ export default function Activities() {
         contact_id: newActivity.contact_id || null,
         deal_id: newActivity.deal_id || null,
         status: "pending",
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Activity created");

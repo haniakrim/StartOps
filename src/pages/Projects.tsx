@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ProjectBoard } from "@/components/projects/ProjectBoard";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Project {
   id: string;
@@ -60,6 +61,7 @@ const priorityColors: Record<string, string> = {
 };
 
 export default function Projects() {
+  const { organizationId } = useOrganization();
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<ProjectTask[]>([]);
   const [loading, setLoading] = useState(true);

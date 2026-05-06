@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EmailTemplateForm } from "@/components/email-templates/EmailTemplateForm";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface EmailTemplate {
@@ -29,12 +30,10 @@ interface EmailTemplate {
   category: string;
   subject: string;
   body: string;
-  usageCount: number;
-  createdAt: string;
-  updatedAt: string;
+  usage_count: number;
+  created_at: string;
+  updated_at: string;
 }
-
-const STORAGE_KEY = "startops_email_templates";
 
 const categoryColors: Record<string, string> = {
   Sales: "bg-[#8dc572]/20 text-[#8dc572]",
@@ -44,132 +43,122 @@ const categoryColors: Record<string, string> = {
   General: "bg-white/10 text-white/50",
 };
 
-function loadTemplates(): EmailTemplate[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return getDefaultTemplates();
-    return JSON.parse(raw);
-  } catch {
-    return getDefaultTemplates();
-  }
-}
-
-function saveTemplates(templates: EmailTemplate[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
-}
-
-function getDefaultTemplates(): EmailTemplate[] {
-  return [
-    {
-      id: crypto.randomUUID(),
-      name: "Initial Outreach",
-      category: "Sales",
-      subject: "Following up on your interest",
-      body: "Hi {{first_name}},\n\nI hope this email finds you well. I wanted to follow up on your recent interest in our solutions.\n\nWould you be available for a quick call next week?\n\nBest regards,\nYour Name",
-      usageCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: crypto.randomUUID(),
-      name: "Demo Follow-up",
-      category: "Sales",
-      subject: "Thanks for attending the demo",
-      body: "Hi {{first_name}},\n\nThank you for taking the time to attend our demo today. It was great learning more about {{company}}'s needs.\n\nAs discussed, I've attached the proposal for your review.\n\nLet me know if you have any questions!\n\nBest,\nYour Name",
-      usageCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: crypto.randomUUID(),
-      name: "Welcome Email",
-      category: "Onboarding",
-      subject: "Welcome to the team!",
-      body: "Hi {{first_name}},\n\nWelcome aboard! We're excited to have {{company}} as a partner.\n\nYour account manager will reach out shortly to kick off the onboarding process.\n\nCheers,\nThe Team",
-      usageCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ];
-}
-
 export default function EmailTemplates() {
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(
-    null,
-  );
-  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(
-    null,
-  );
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
 
-  useEffect(() => {
-    const saved = loadTemplates();
-    setTemplates(saved);
-    setLoading(false);
-  }, []);
+  useEffect(() => { fetchTemplates(); }, []);
 
-  function createTemplate(data: {
-    name: string;
-    category: string;
-    subject: string;
-    body: string;
-  }) {
-    const newTemplate: EmailTemplate = {
-      id: crypto.randomUUID(),
-      ...data,
-      usageCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    const updated = [newTemplate, ...templates];
-    setTemplates(updated);
-    saveTemplates(updated);
-    toast.success("Template created");
-    setDialogOpen(false);
+  async function fetchTemplates() {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("email_templates")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Seed defaults if empty
+      if (!data || data.length === 0) {
+        await seedDefaults();
+        const { data: seeded } = await supabase
+          .from("email_templates")
+          .select("*")
+          .order("created_at", { ascending: false });
+        setTemplates(seeded || []);
+      } else {
+        setTemplates(data);
+      }
+    } catch (error: any) {
+      toast.error("Failed to load templates: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function updateTemplate(data: {
-    name: string;
-    category: string;
-    subject: string;
-    body: string;
-  }) {
+  async function seedDefaults() {
+    const defaults = [
+      {
+        name: "Initial Outreach",
+        category: "Sales",
+        subject: "Following up on your interest",
+        body: "Hi {{first_name}},\n\nI hope this email finds you well. I wanted to follow up on your recent interest in our solutions.\n\nWould you be available for a quick call next week?\n\nBest regards,\nYour Name",
+      },
+      {
+        name: "Demo Follow-up",
+        category: "Sales",
+        subject: "Thanks for attending the demo",
+        body: "Hi {{first_name}},\n\nThank you for taking the time to attend our demo today. It was great learning more about {{company}}'s needs.\n\nAs discussed, I've attached the proposal for your review.\n\nLet me know if you have any questions!\n\nBest,\nYour Name",
+      },
+      {
+        name: "Welcome Email",
+        category: "Onboarding",
+        subject: "Welcome to the team!",
+        body: "Hi {{first_name}},\n\nWelcome aboard! We're excited to have {{company}} as a partner.\n\nYour account manager will reach out shortly to kick off the onboarding process.\n\nCheers,\nThe Team",
+      },
+    ];
+
+    for (const t of defaults) {
+      await supabase.from("email_templates").insert(t);
+    }
+  }
+
+  async function createTemplate(data: { name: string; category: string; subject: string; body: string }) {
+    try {
+      const { error } = await supabase.from("email_templates").insert(data);
+      if (error) throw error;
+      toast.success("Template created");
+      setDialogOpen(false);
+      fetchTemplates();
+    } catch (error: any) {
+      toast.error("Failed to create template: " + error.message);
+    }
+  }
+
+  async function updateTemplate(data: { name: string; category: string; subject: string; body: string }) {
     if (!editingTemplate) return;
-    const updated = templates.map((t) =>
-      t.id === editingTemplate.id
-        ? { ...t, ...data, updatedAt: new Date().toISOString() }
-        : t,
-    );
-    setTemplates(updated);
-    saveTemplates(updated);
-    toast.success("Template updated");
-    setDialogOpen(false);
-    setEditingTemplate(null);
+    try {
+      const { error } = await supabase.from("email_templates").update(data).eq("id", editingTemplate.id);
+      if (error) throw error;
+      toast.success("Template updated");
+      setDialogOpen(false);
+      setEditingTemplate(null);
+      fetchTemplates();
+    } catch (error: any) {
+      toast.error("Failed to update template: " + error.message);
+    }
   }
 
-  function deleteTemplate(id: string) {
-    const updated = templates.filter((t) => t.id !== id);
-    setTemplates(updated);
-    saveTemplates(updated);
-    toast.success("Template deleted");
+  async function deleteTemplate(id: string) {
+    try {
+      const { error } = await supabase.from("email_templates").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Template deleted");
+      fetchTemplates();
+    } catch (error: any) {
+      toast.error("Failed to delete template: " + error.message);
+    }
   }
 
-  function duplicateTemplate(template: EmailTemplate) {
-    const duplicated: EmailTemplate = {
-      ...template,
-      id: crypto.randomUUID(),
-      name: `${template.name} (Copy)`,
-      usageCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    const updated = [duplicated, ...templates];
-    setTemplates(updated);
-    saveTemplates(updated);
-    toast.success("Template duplicated");
+  async function duplicateTemplate(template: EmailTemplate) {
+    try {
+      const { error } = await supabase.from("email_templates").insert({
+        name: `${template.name} (Copy)`,
+        category: template.category,
+        subject: template.subject,
+        body: template.body,
+      });
+      if (error) throw error;
+      toast.success("Template duplicated");
+      fetchTemplates();
+    } catch (error: any) {
+      toast.error("Failed to duplicate template: " + error.message);
+    }
   }
 
   function openEdit(template: EmailTemplate) {
@@ -234,7 +223,7 @@ export default function EmailTemplates() {
           <CardContent className="p-5">
             <Mail className="w-5 h-5 text-[#8dc572] mb-3" />
             <p className="text-2xl font-semibold text-white">
-              {templates.reduce((s, t) => s + t.usageCount, 0)}
+              {templates.reduce((s, t) => s + (t.usage_count || 0), 0)}
             </p>
             <p className="text-sm text-white/50">Times Used</p>
           </CardContent>
@@ -327,9 +316,9 @@ export default function EmailTemplates() {
               </div>
 
               <div className="flex items-center justify-between mt-3 text-xs text-white/30">
-                <span>Used {template.usageCount} times</span>
+                <span>Used {template.usage_count || 0} times</span>
                 <span>
-                  Updated {new Date(template.updatedAt).toLocaleDateString()}
+                  Updated {new Date(template.updated_at).toLocaleDateString()}
                 </span>
               </div>
             </CardContent>
@@ -405,7 +394,7 @@ export default function EmailTemplates() {
                 {previewTemplate?.category}
               </Badge>
               <span className="text-xs text-white/30">
-                Used {previewTemplate?.usageCount || 0} times
+                Used {previewTemplate?.usage_count || 0} times
               </span>
             </div>
           </div>

@@ -1,0 +1,2 @@
+ALTER TABLE public.quotes ADD COLUMN organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE;
+ALTER TABLE public.quote_items ADD COLUMN organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE;
