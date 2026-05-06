@@ -10,6 +10,22 @@ import { GoalChart } from "@/components/goals/GoalChart";
 import { GoalCard, type Goal, type KeyResult } from "@/components/goals/GoalCard";
 import { GoalForm } from "@/components/goals/GoalForm";
 
+const STORAGE_KEY = "startops_goals";
+
+function loadLocalGoals(): Goal[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalGoals(goals: Goal[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
+}
+
 export default function Goals() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +52,7 @@ export default function Goals() {
           goalsError.code === "PGRST116"
         ) {
           setDbReady(false);
-          setGoals([]);
+          setGoals(loadLocalGoals());
           return;
         }
         throw goalsError;
@@ -55,8 +71,10 @@ export default function Goals() {
       );
 
       setGoals(goalsWithKRs);
+      saveLocalGoals(goalsWithKRs);
     } catch (error: any) {
       toast.error("Failed to load goals: " + error.message);
+      setGoals(loadLocalGoals());
     } finally {
       setLoading(false);
     }
@@ -69,6 +87,36 @@ export default function Goals() {
     status: string;
     key_results: { name: string; current_value: string; target_value: string; unit: string }[];
   }) {
+    if (!dbReady) {
+      const newGoal: Goal = {
+        id: crypto.randomUUID(),
+        name: data.name,
+        description: data.description || null,
+        period: data.period,
+        status: data.status,
+        progress: 0,
+        owner_id: null,
+        created_at: new Date().toISOString(),
+        key_results: data.key_results.map((kr) => ({
+          id: crypto.randomUUID(),
+          goal_id: "",
+          name: kr.name,
+          current_value: parseFloat(kr.current_value) || 0,
+          target_value: parseFloat(kr.target_value) || 100,
+          unit: kr.unit,
+          status: "on_track",
+          progress: 0,
+        })),
+      };
+      newGoal.key_results.forEach((kr) => (kr.goal_id = newGoal.id));
+      const updated = [newGoal, ...goals];
+      setGoals(updated);
+      saveLocalGoals(updated);
+      toast.success("Goal created locally (database unavailable)");
+      setDialogOpen(false);
+      return;
+    }
+
     try {
       const { data: goalData, error: goalError } = await supabase
         .from("goals")
@@ -108,28 +156,44 @@ export default function Goals() {
   }
 
   async function updateGoalProgress(goalId: string, krId: string, newCurrent: number) {
+    const goal = goals.find((g) => g.id === goalId);
+    if (!goal) return;
+
+    const kr = goal.key_results.find((k) => k.id === krId);
+    if (!kr) return;
+
+    const progress = kr.target_value > 0 ? Math.min(100, (newCurrent / kr.target_value) * 100) : 0;
+    const status = progress >= 100 ? "completed" : progress >= 70 ? "on_track" : progress >= 40 ? "at_risk" : "behind";
+
+    const updatedGoals = goals.map((g) => {
+      if (g.id !== goalId) return g;
+      const updatedKRs = g.key_results.map((k) =>
+        k.id === krId ? { ...k, current_value: newCurrent, progress, status } : k
+      );
+      const avgProgress = updatedKRs.reduce((sum, k) => sum + (k.target_value > 0 ? Math.min(100, (k.current_value / k.target_value) * 100) : 0), 0) / (updatedKRs.length || 1);
+      const goalStatus = avgProgress >= 100 ? "completed" : avgProgress >= 70 ? "on_track" : avgProgress >= 40 ? "at_risk" : "behind";
+      return { ...g, key_results: updatedKRs, progress: Math.round(avgProgress), status: goalStatus };
+    });
+
+    setGoals(updatedGoals);
+    saveLocalGoals(updatedGoals);
+
+    if (!dbReady) {
+      toast.success("Progress updated locally");
+      return;
+    }
+
     try {
-      const goal = goals.find((g) => g.id === goalId);
-      if (!goal) return;
-
-      const kr = goal.key_results.find((k) => k.id === krId);
-      if (!kr) return;
-
-      const progress = kr.target_value > 0 ? Math.min(100, (newCurrent / kr.target_value) * 100) : 0;
-      const status = progress >= 100 ? "completed" : progress >= 70 ? "on_track" : progress >= 40 ? "at_risk" : "behind";
-
       const { error } = await supabase
         .from("key_results")
         .update({ current_value: newCurrent, progress, status })
         .eq("id", krId);
-
       if (error) throw error;
 
-      const avgProgress =
-        goal.key_results.reduce((sum, k) => {
-          if (k.id === krId) return sum + progress;
-          return sum + (k.target_value > 0 ? Math.min(100, (k.current_value / k.target_value) * 100) : 0);
-        }, 0) / (goal.key_results.length || 1);
+      const avgProgress = goal.key_results.reduce((sum, k) => {
+        if (k.id === krId) return sum + progress;
+        return sum + (k.target_value > 0 ? Math.min(100, (k.current_value / k.target_value) * 100) : 0);
+      }, 0) / (goal.key_results.length || 1);
 
       const goalStatus = avgProgress >= 100 ? "completed" : avgProgress >= 70 ? "on_track" : avgProgress >= 40 ? "at_risk" : "behind";
 
@@ -139,18 +203,25 @@ export default function Goals() {
         .eq("id", goalId);
 
       toast.success("Progress updated");
-      fetchGoals();
     } catch (error: any) {
-      toast.error("Failed to update progress: " + error.message);
+      toast.error("Failed to sync progress: " + error.message);
     }
   }
 
   async function deleteGoal(id: string) {
+    const updated = goals.filter((g) => g.id !== id);
+    setGoals(updated);
+    saveLocalGoals(updated);
+
+    if (!dbReady) {
+      toast.success("Goal deleted locally");
+      return;
+    }
+
     try {
       const { error } = await supabase.from("goals").delete().eq("id", id);
       if (error) throw error;
       toast.success("Goal deleted");
-      fetchGoals();
     } catch (error: any) {
       toast.error("Failed to delete goal: " + error.message);
     }
@@ -206,7 +277,7 @@ export default function Goals() {
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90" disabled={!dbReady}>
+            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />
               New Goal
             </Button>
@@ -270,7 +341,7 @@ export default function Goals() {
         />
       </div>
 
-      {dbReady && <GoalChart data={chartData} />}
+      <GoalChart data={chartData} />
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
@@ -286,7 +357,7 @@ export default function Goals() {
       </div>
 
       <div className="space-y-4">
-        {filtered.length === 0 && dbReady && (
+        {filtered.length === 0 && (
           <div className="text-center py-12 text-sm text-white/40">
             No goals yet. Create your first OKR to start tracking objectives.
           </div>
