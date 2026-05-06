@@ -162,7 +162,7 @@ export function AnomalyDetection() {
           )}
           {anomalies.map((anomaly) => {
             const Icon = anomaly.severity === "high" ? AlertTriangle : anomaly.severity === "medium" ? TrendingDown : TrendingUp;
-            const color = anomaly.severity === "high" ? "#E63946" : anomaly.severity === "medium" ? "#00BFFF" : "#0066B1";
+            const color = anomaly.severity === "high" ? "#be6464" : anomaly.severity === "medium" ? "#f0ad4e" : "#5683da";
             return (
               <div key={anomaly.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${color}15` }}>

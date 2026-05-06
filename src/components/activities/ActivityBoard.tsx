@@ -36,7 +36,7 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 const typeColors: Record<string, string> = {
-  email: "#0066B1", call: "#0066B1", meeting: "#00BFFF", task: "#00BFFF", note: "#E63946",
+  email: "#6452db", call: "#8dc572", meeting: "#f0ad4e", task: "#5683da", note: "#ff8964",
 };
 
 const priorityColors: Record<string, string> = {
@@ -124,7 +124,7 @@ export function ActivityBoard({ activities, onUpdate }: ActivityBoardProps) {
               )}
               {items.map((activity) => {
                 const TypeIcon = typeIcons[activity.type] || Activity;
-                const color = typeColors[activity.type] || "#0066B1";
+                const color = typeColors[activity.type] || "#5683da";
 
                 return (
                   <Card

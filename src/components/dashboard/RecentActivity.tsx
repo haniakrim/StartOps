@@ -8,7 +8,7 @@ const activityIcons: Record<string, React.ElementType> = {
 };
 
 const activityColors: Record<string, string> = {
-  email: "#0066B1", call: "#0066B1", meeting: "#00BFFF", task: "#00BFFF", note: "#E63946",
+  email: "#6452db", call: "#8dc572", meeting: "#f0ad4e", task: "#5683da", note: "#ff8964",
 };
 
 function formatTimeAgo(date: string) {
@@ -38,7 +38,7 @@ export function RecentActivity({ items }: RecentActivityProps) {
           {items.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No recent activity. Start engaging with your contacts!</p>}
           {items.map((activity) => {
             const Icon = activityIcons[activity.type] || Activity;
-            const color = activityColors[activity.type] || "#0066B1";
+            const color = activityColors[activity.type] || "#5683da";
             return (
               <div key={activity.id} className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: `${color}15` }}>

@@ -31,9 +31,9 @@ interface ProjectBoardProps {
 }
 
 const columnConfig = [
-  { id: "todo", label: "To Do", color: "#0066B1" },
-  { id: "in_progress", label: "In Progress", color: "#00BFFF" },
-  { id: "done", label: "Done", color: "#0066B1" },
+  { id: "todo", label: "To Do", color: "#5683da" },
+  { id: "in_progress", label: "In Progress", color: "#f0ad4e" },
+  { id: "done", label: "Done", color: "#8dc572" },
 ];
 
 const priorityColors: Record<string, string> = {

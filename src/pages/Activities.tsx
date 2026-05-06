@@ -60,17 +60,17 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 const typeColors: Record<string, string> = {
-  email: "#0066B1",
-  call: "#0066B1",
-  meeting: "#00BFFF",
-  task: "#00BFFF",
-  note: "#E63946",
+  email: "#6452db",
+  call: "#8dc572",
+  meeting: "#f0ad4e",
+  task: "#5683da",
+  note: "#ff8964",
 };
 
 const priorityColors: Record<string, string> = {
-  high: "bg-[#E63946]/20 text-[#E63946]",
-  medium: "bg-[#00BFFF]/20 text-[#00BFFF]",
-  low: "bg-[#0066B1]/20 text-[#0066B1]",
+  high: "bg-red-500/15 text-red-600 dark:text-red-400",
+  medium: "bg-orange-500/15 text-orange-600 dark:text-orange-400",
+  low: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
 };
 
 export default function Activities() {
@@ -217,7 +217,7 @@ export default function Activities() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#0066B1] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -226,15 +226,15 @@ export default function Activities() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">
             Activities
           </h1>
-          <p className="text-sm text-white/50 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Manage tasks, calls, meetings, and emails
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => {
             const exportData = activities.map(a => ({
               "Subject": a.subject,
               "Type": a.type,
@@ -255,30 +255,30 @@ export default function Activities() {
           <DialogTrigger asChild>
             <Button
               size="sm"
-              className="bg-[#0066B1] text-white hover:bg-[#0066B1]/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Activity
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0A1628] border-white/10 text-white max-w-lg">
+          <DialogContent className="bg-card border-border text-card-foreground max-w-lg">
             <DialogHeader>
               <DialogTitle>Create New Activity</DialogTitle>
             </DialogHeader>
             <form onSubmit={createActivity} className="space-y-4 pt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Type</Label>
+                  <Label>Type</Label>
                   <Select
                     value={newActivity.type}
                     onValueChange={(v) =>
                       setNewActivity((p) => ({ ...p, type: v }))
                     }
                   >
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                    <SelectTrigger className="bg-muted border-border">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectContent className="bg-card border-border">
                       <SelectItem value="task">Task</SelectItem>
                       <SelectItem value="call">Call</SelectItem>
                       <SelectItem value="meeting">Meeting</SelectItem>
@@ -288,17 +288,17 @@ export default function Activities() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Priority</Label>
+                  <Label>Priority</Label>
                   <Select
                     value={newActivity.priority}
                     onValueChange={(v) =>
                       setNewActivity((p) => ({ ...p, priority: v }))
                     }
                   >
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                    <SelectTrigger className="bg-muted border-border">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectContent className="bg-card border-border">
                       <SelectItem value="high">High</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="low">Low</SelectItem>
@@ -307,19 +307,19 @@ export default function Activities() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Subject</Label>
+                <Label>Subject</Label>
                 <Input
                   required
                   value={newActivity.subject}
                   onChange={(e) =>
                     setNewActivity((p) => ({ ...p, subject: e.target.value }))
                   }
-                  className="bg-[#0b0d10] border-white/10 text-white"
+                  className="bg-muted border-border"
                   placeholder="Follow up with Acme Corp"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Description</Label>
+                <Label>Description</Label>
                 <Input
                   value={newActivity.description}
                   onChange={(e) =>
@@ -328,34 +328,34 @@ export default function Activities() {
                       description: e.target.value,
                     }))
                   }
-                  className="bg-[#0b0d10] border-white/10 text-white"
+                  className="bg-muted border-border"
                   placeholder="Additional details..."
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Due Date</Label>
+                <Label>Due Date</Label>
                 <Input
                   type="datetime-local"
                   value={newActivity.due_date}
                   onChange={(e) =>
                     setNewActivity((p) => ({ ...p, due_date: e.target.value }))
                   }
-                  className="bg-[#0b0d10] border-white/10 text-white"
+                  className="bg-muted border-border"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Contact</Label>
+                  <Label>Contact</Label>
                   <Select
                     value={newActivity.contact_id}
                     onValueChange={(v) =>
                       setNewActivity((p) => ({ ...p, contact_id: v }))
                     }
                   >
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                    <SelectTrigger className="bg-muted border-border">
                       <SelectValue placeholder="Select contact" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectContent className="bg-card border-border">
                       {contacts.map((c) => (
                         <SelectItem key={c.id} value={c.id}>
                           {c.first_name} {c.last_name}
@@ -365,17 +365,17 @@ export default function Activities() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Deal</Label>
+                  <Label>Deal</Label>
                   <Select
                     value={newActivity.deal_id}
                     onValueChange={(v) =>
                       setNewActivity((p) => ({ ...p, deal_id: v }))
                     }
                   >
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                    <SelectTrigger className="bg-muted border-border">
                       <SelectValue placeholder="Select deal" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectContent className="bg-card border-border">
                       {deals.map((d) => (
                         <SelectItem key={d.id} value={d.id}>
                           {d.name}
@@ -387,7 +387,7 @@ export default function Activities() {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 Create Activity
               </Button>
@@ -398,10 +398,10 @@ export default function Activities() {
       </div>
 
       {selected.length > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#0066B1]/10 border border-[#0066B1]/20">
-          <span className="text-sm text-white">{selected.length} selected</span>
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
+          <span className="text-sm text-foreground">{selected.length} selected</span>
           <div className="flex-1" />
-          <Button variant="ghost" size="sm" className="text-[#0066B1] hover:text-[#0066B1] hover:bg-[#0066B1]/10 h-8" onClick={async () => {
+          <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10 h-8" onClick={async () => {
             try {
               const { error } = await supabase.from("activities").update({ status: "completed", completed_at: new Date().toISOString() }).in("id", selected);
               if (error) throw error;
@@ -414,7 +414,7 @@ export default function Activities() {
           }}>
             <Check className="w-4 h-4 mr-1" />Complete
           </Button>
-          <Button variant="ghost" size="sm" className="text-[#E63946] hover:text-[#E63946] hover:bg-[#E63946]/10 h-8" onClick={async () => {
+          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8" onClick={async () => {
             try {
               const { error } = await supabase.from("activities").delete().in("id", selected);
               if (error) throw error;
@@ -427,37 +427,37 @@ export default function Activities() {
           }}>
             <Trash2 className="w-4 h-4 mr-1" />Delete
           </Button>
-          <Button variant="ghost" size="sm" className="text-white/50 hover:text-white h-8" onClick={() => setSelected([])}>Clear</Button>
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground h-8" onClick={() => setSelected([])}>Clear</Button>
         </div>
       )}
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search activities..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50"
+            className="w-full bg-card border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+          <SelectTrigger className="bg-card border-border text-foreground w-36 h-9 text-xs">
             <Filter className="w-3 h-3 mr-2" />
             <SelectValue placeholder="Status" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+          <SelectContent className="bg-card border-border">
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+          <SelectTrigger className="bg-card border-border text-foreground w-36 h-9 text-xs">
             <SelectValue placeholder="Type" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+          <SelectContent className="bg-card border-border">
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="task">Task</SelectItem>
             <SelectItem value="call">Call</SelectItem>
@@ -469,31 +469,31 @@ export default function Activities() {
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="bg-[#18191b] border border-white/10">
+        <TabsList className="bg-card border border-border">
           <TabsTrigger
             value="pending"
-            className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <Clock className="w-4 h-4 mr-2" />
             Pending ({pending.length})
           </TabsTrigger>
           <TabsTrigger
             value="completed"
-            className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <Check className="w-4 h-4 mr-2" />
             Completed ({completed.length})
           </TabsTrigger>
           <TabsTrigger
             value="all"
-            className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <Activity className="w-4 h-4 mr-2" />
             All ({filtered.length})
           </TabsTrigger>
           <TabsTrigger
             value="board"
-            className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <LayoutGrid className="w-4 h-4 mr-2" />
             Board
@@ -521,13 +521,13 @@ export default function Activities() {
                   return (
                     <Card
                       key={activity.id}
-                      className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors"
+                      className="bg-card border-border hover:border-primary/20 transition-colors"
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
                           <input
                             type="checkbox"
-                            className="mt-0.5 rounded border-white/20 bg-transparent"
+                            className="mt-0.5 rounded border-border bg-transparent"
                             checked={selected.includes(activity.id)}
                             onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, activity.id] : prev.filter((id) => id !== activity.id))}
                           />
@@ -537,8 +537,8 @@ export default function Activities() {
                             }
                             className={`mt-0.5 w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
                               activity.status === "completed"
-                                ? "bg-[#8dc572] border-[#8dc572]"
-                                : "border-white/20 hover:border-[#8dc572]"
+                                ? "bg-emerald-500 border-emerald-500"
+                                : "border-border hover:border-emerald-500"
                             }`}
                           >
                             {activity.status === "completed" && (
@@ -555,8 +555,8 @@ export default function Activities() {
                               <span
                                 className={`text-sm font-medium ${
                                   activity.status === "completed"
-                                    ? "text-white/40 line-through"
-                                    : "text-white"
+                                    ? "text-muted-foreground line-through"
+                                    : "text-foreground"
                                 }`}
                               >
                                 {activity.subject}
@@ -571,11 +571,11 @@ export default function Activities() {
                               </Badge>
                             </div>
                             {activity.description && (
-                              <p className="text-xs text-white/40 mb-2">
+                              <p className="text-xs text-muted-foreground mb-2">
                                 {activity.description}
                               </p>
                             )}
-                            <div className="flex items-center gap-3 text-xs text-white/30">
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
                               {activity.contacts && (
                                 <span>
                                   {activity.contacts.first_name}{" "}
@@ -598,7 +598,7 @@ export default function Activities() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-white/30 hover:text-[#be6464] hover:bg-white/5"
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-accent"
                             onClick={() => deleteActivity(activity.id)}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -609,7 +609,7 @@ export default function Activities() {
                   );
                 })}
                 {items.length === 0 && (
-                  <p className="text-sm text-white/40 text-center py-12">
+                  <p className="text-sm text-muted-foreground text-center py-12">
                     No {tab} activities
                   </p>
                 )}

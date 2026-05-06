@@ -52,7 +52,7 @@ export function GoalChart({ data }: GoalChartProps) {
               }}
             />
             <Bar dataKey="goals" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Total Goals" />
-            <Bar dataKey="completed" fill="#00BFFF" radius={[4, 4, 0, 0]} name="Completed" />
+            <Bar dataKey="completed" fill="#8dc572" radius={[4, 4, 0, 0]} name="Completed" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

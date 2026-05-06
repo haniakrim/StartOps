@@ -24,36 +24,36 @@ interface CommandItem {
 }
 
 const navItems = [
-  { path: "/dashboard", icon: TrendingUp, label: "Dashboard", color: "#0066B1" },
-  { path: "/contacts", icon: User, label: "Contacts", color: "#00BFFF" },
-  { path: "/companies", icon: Building2, label: "Companies", color: "#E63946" },
-  { path: "/deals", icon: GitBranch, label: "Deals", color: "#0066B1" },
-  { path: "/activities", icon: Activity, label: "Activities", color: "#00BFFF" },
-  { path: "/projects", icon: FolderKanban, label: "Projects", color: "#0066B1" },
-  { path: "/finance", icon: DollarSign, label: "Finance", color: "#0066B1" },
-  { path: "/inventory", icon: Package, label: "Inventory", color: "#E63946" },
-  { path: "/employees", icon: Briefcase, label: "People", color: "#00BFFF" },
-  { path: "/communications", icon: Mail, label: "Communications", color: "#0066B1" },
-  { path: "/calendar", icon: Calendar, label: "Calendar", color: "#00BFFF" },
-  { path: "/forecasts", icon: Target, label: "Forecasts", color: "#0066B1" },
-  { path: "/timesheets", icon: Clock, label: "Timesheets", color: "#E63946" },
-  { path: "/goals", icon: CheckCircle2, label: "Goals", color: "#0066B1" },
-  { path: "/analytics", icon: BarChart3, label: "Analytics", color: "#00BFFF" },
-  { path: "/reports", icon: FileText, label: "Reports", color: "#00BFFF" },
-  { path: "/workflows", icon: Zap, label: "Workflows", color: "#0066B1" },
-  { path: "/assistant", icon: Sparkles, label: "AI Assistant", color: "#E63946" },
-  { path: "/settings", icon: Settings, label: "Settings", color: "#0066B1" },
-  { path: "/security", icon: Shield, label: "Security", color: "#00BFFF" },
-  { path: "/support", icon: LifeBuoy, label: "Support", color: "#00BFFF" },
+  { path: "/dashboard", icon: TrendingUp, label: "Dashboard", color: "#6452db" },
+  { path: "/contacts", icon: User, label: "Contacts", color: "#5683da" },
+  { path: "/companies", icon: Building2, label: "Companies", color: "#ff8964" },
+  { path: "/deals", icon: GitBranch, label: "Deals", color: "#8dc572" },
+  { path: "/activities", icon: Activity, label: "Activities", color: "#f0ad4e" },
+  { path: "/projects", icon: FolderKanban, label: "Projects", color: "#6452db" },
+  { path: "/finance", icon: DollarSign, label: "Finance", color: "#8dc572" },
+  { path: "/inventory", icon: Package, label: "Inventory", color: "#ff8964" },
+  { path: "/employees", icon: Briefcase, label: "People", color: "#5683da" },
+  { path: "/communications", icon: Mail, label: "Communications", color: "#6452db" },
+  { path: "/calendar", icon: Calendar, label: "Calendar", color: "#f0ad4e" },
+  { path: "/forecasts", icon: Target, label: "Forecasts", color: "#8dc572" },
+  { path: "/timesheets", icon: Clock, label: "Timesheets", color: "#ff8964" },
+  { path: "/goals", icon: CheckCircle2, label: "Goals", color: "#6452db" },
+  { path: "/analytics", icon: BarChart3, label: "Analytics", color: "#5683da" },
+  { path: "/reports", icon: FileText, label: "Reports", color: "#f0ad4e" },
+  { path: "/workflows", icon: Zap, label: "Workflows", color: "#8dc572" },
+  { path: "/assistant", icon: Sparkles, label: "AI Assistant", color: "#ff8964" },
+  { path: "/settings", icon: Settings, label: "Settings", color: "#6452db" },
+  { path: "/security", icon: Shield, label: "Security", color: "#5683da" },
+  { path: "/support", icon: LifeBuoy, label: "Support", color: "#f0ad4e" },
 ];
 
 const createActions = [
-  { type: "contact", title: "New Contact", subtitle: "Add a new contact to your CRM", icon: User, color: "#00BFFF", path: "/contacts" },
-  { type: "deal", title: "New Deal", subtitle: "Create a new sales opportunity", icon: GitBranch, color: "#0066B1", path: "/deals" },
-  { type: "activity", title: "New Activity", subtitle: "Log a task, call, or meeting", icon: Activity, color: "#00BFFF", path: "/activities" },
-  { type: "project", title: "New Project", subtitle: "Start a new project", icon: FolderKanban, color: "#0066B1", path: "/projects" },
-  { type: "invoice", title: "New Invoice", subtitle: "Create a customer invoice", icon: DollarSign, color: "#0066B1", path: "/finance" },
-  { type: "goal", title: "New Goal", subtitle: "Set an OKR objective", icon: CheckCircle2, color: "#E63946", path: "/goals" },
+  { type: "contact", title: "New Contact", subtitle: "Add a new contact to your CRM", icon: User, color: "#5683da", path: "/contacts" },
+  { type: "deal", title: "New Deal", subtitle: "Create a new sales opportunity", icon: GitBranch, color: "#8dc572", path: "/deals" },
+  { type: "activity", title: "New Activity", subtitle: "Log a task, call, or meeting", icon: Activity, color: "#f0ad4e", path: "/activities" },
+  { type: "project", title: "New Project", subtitle: "Start a new project", icon: FolderKanban, color: "#6452db", path: "/projects" },
+  { type: "invoice", title: "New Invoice", subtitle: "Create a customer invoice", icon: DollarSign, color: "#8dc572", path: "/finance" },
+  { type: "goal", title: "New Goal", subtitle: "Set an OKR objective", icon: CheckCircle2, color: "#ff8964", path: "/goals" },
 ];
 
 export function CommandPalette() {
@@ -74,7 +74,7 @@ export function CommandPalette() {
         title: item.title,
         subtitle: item.subtitle,
         icon: navItems.find((n) => n.path === item.path)?.icon || ArrowRight,
-        iconColor: navItems.find((n) => n.path === item.path)?.color || "#0066B1",
+        iconColor: navItems.find((n) => n.path === item.path)?.color || "#6452db",
         action: () => navigate(item.path),
       }));
     } catch {
@@ -119,7 +119,7 @@ export function CommandPalette() {
       title: "Refresh Data",
       subtitle: "Reload all dashboard data",
       icon: TrendingUp,
-      iconColor: "#0066B1",
+      iconColor: "#6452db",
       action: () => {
         window.location.reload();
         setOpen(false);
@@ -131,7 +131,7 @@ export function CommandPalette() {
       title: "Open Profile",
       subtitle: "View your account settings",
       icon: User,
-      iconColor: "#00BFFF",
+      iconColor: "#5683da",
       action: () => {
         navigate("/profile");
         setOpen(false);

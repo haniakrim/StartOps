@@ -39,7 +39,6 @@ import {
   ChevronRight,
   FolderOpen,
   type LucideIcon,
-  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -282,8 +281,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
 
-  const isDemoUser = user?.email === 'demo@example.com';
-
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => {
       const next = new Set(prev);
@@ -380,7 +377,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </button>
 
           {/* User profile */}
-          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-accent transition-colors group">
+          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-sidebar-accent transition-colors group">
             <Avatar className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 ring-2 ring-border">
               <AvatarFallback className="bg-transparent text-primary-foreground text-xs font-medium">
                 {userInitials}
@@ -395,7 +392,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   <p className="text-sm font-medium text-sidebar-foreground/90 truncate group-hover:text-sidebar-foreground transition-colors">
                     {userName}
                   </p>
-                  <p className="text-[11px] text-muted-foreground truncate capitalize">
+                  <p className="text-[11px] text-sidebar-foreground/50 truncate capitalize">
                     {userRole}
                   </p>
                 </button>
@@ -415,39 +412,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         <CommandPalette />
-
-        {/* Demo mode banner */}
-        {isDemoUser && (
-          <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800/50 px-6 py-2 flex items-center justify-between flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                Demo Mode — data resets periodically
-              </span>
-            </div>
-            <button
-              onClick={async () => {
-                try {
-                  const res = await fetch('https://dtrwtbmxvscrfkzdpsqt.supabase.co/functions/v1/seed-demo', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                  });
-                  const data = await res.json();
-                  if (data.success) {
-                    window.location.reload();
-                  } else {
-                    alert('Reset failed: ' + (data.error || 'Unknown error'));
-                  }
-                } catch (e: any) {
-                  alert('Reset failed: ' + e.message);
-                }
-              }}
-              className="text-xs font-medium text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 underline underline-offset-2"
-            >
-              Reset Demo Data
-            </button>
-          </div>
-        )}
 
         {/* Header */}
         <header className="h-16 flex items-center gap-4 px-6 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-30">
