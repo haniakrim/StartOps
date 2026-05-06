@@ -22,7 +22,7 @@ interface Quote {
   notes: string | null;
   terms: string | null;
   created_at: string;
-  contacts: { first_name: string; last_name: string; company: string | null } | null;
+  contacts: { first_name: string; last_name: string; company: string | null; email: string | null } | null;
   deals: { name: string } | null;
 }
 
