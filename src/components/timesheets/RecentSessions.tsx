@@ -33,10 +33,7 @@ export function RecentSessions({ sessions }: RecentSessionsProps) {
             <p className="text-sm text-white/40 text-center py-6">No sessions yet. Start the timer above!</p>
           )}
           {recent.map((session) => (
-            <div
-              key={session.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5"
-            >
+            <div key={session.id} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-[#6452db]/20 flex items-center justify-center flex-shrink-0">
                   <Clock className="w-4 h-4 text-[#6452db]" />
@@ -45,37 +42,20 @@ export function RecentSessions({ sessions }: RecentSessionsProps) {
                   <p className="text-sm text-white truncate">{session.description || "Untitled session"}</p>
                   <div className="flex items-center gap-2 text-xs text-white/40 mt-0.5">
                     {session.projects && (
-                      <span className="flex items-center gap-1">
-                        <Briefcase className="w-3 h-3" />
-                        {session.projects.name}
-                      </span>
+                      <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{session.projects.name}</span>
                     )}
                     {session.project_tasks && (
-                      <span className="flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
-                        {session.project_tasks.name}
-                      </span>
+                      <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" />{session.project_tasks.name}</span>
                     )}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0 ml-3">
-                <Badge
-                  variant="secondary"
-                  className={`text-xs ${
-                    session.billable
-                      ? "bg-[#8dc572]/20 text-[#8dc572]"
-                      : "bg-white/10 text-white/50"
-                  }`}
-                >
-                  {session.billable ? (
-                    <DollarSign className="w-3 h-3 mr-1" />
-                  ) : null}
+                <Badge variant="secondary" className={`text-xs ${session.billable ? "bg-[#8dc572]/20 text-[#8dc572]" : "bg-white/10 text-white/50"}`}>
+                  {session.billable ? <DollarSign className="w-3 h-3 mr-1" /> : null}
                   {session.billable ? "Billable" : "Non-bill"}
                 </Badge>
-                <span className="text-sm font-mono font-medium text-white">
-                  {session.hours.toFixed(2)}h
-                </span>
+                <span className="text-sm font-mono font-medium text-white">{session.hours.toFixed(2)}h</span>
               </div>
             </div>
           ))}

@@ -13,6 +13,7 @@ import {
   Loader2,
   Pencil,
   Trash2,
+  LayoutGrid,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { ActivityBoard } from "@/components/activities/ActivityBoard";
 
 interface ActivityItem {
   id: string;
@@ -406,9 +408,16 @@ export default function Activities() {
             <Activity className="w-4 h-4 mr-2" />
             All ({filtered.length})
           </TabsTrigger>
+          <TabsTrigger
+            value="board"
+            className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"
+          >
+            <LayoutGrid className="w-4 h-4 mr-2" />
+            Board
+          </TabsTrigger>
         </TabsList>
 
-        {(["pending", "completed", "all"] as const).map((tab) => {
+        {(["pending", "completed", "all", "board"] as const).map((tab) => {
           const items =
             tab === "all"
               ? filtered
@@ -417,6 +426,9 @@ export default function Activities() {
                 : completed;
           return (
             <TabsContent key={tab} value={tab} className="mt-6">
+              {tab === "board" ? (
+                <ActivityBoard activities={filtered} onUpdate={fetchActivities} />
+              ) : (
               <div className="space-y-3">
                 {items.map((activity) => {
                   const Icon = typeIcons[activity.type] || Activity;
@@ -511,7 +523,8 @@ export default function Activities() {
                   </p>
                 )}
               </div>
-            </TabsContent>
+            )}
+          </TabsContent>
           );
         })}
       </Tabs>
