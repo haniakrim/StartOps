@@ -33,7 +33,7 @@ export default function Analytics() {
     try {
       setLoading(true);
 
-      const { data: dealsData, error: dealsError } = await supabase.from("deals").select("value, stage, status, created_at, expected_close_date");
+      const { data: dealsData, error: dealsError } = await supabase.from("deals").select("value, stage, status, created_at, expected_close_date, source");
       if (dealsError) throw dealsError;
 
       const totalRevenue = dealsData?.reduce((sum, d) => sum + (d.value || 0), 0) || 0;
@@ -82,8 +82,23 @@ export default function Analytics() {
       ];
       setFunnelData(funnel);
 
-      // Source breakdown - deals table doesn't have source column yet
-      setSourceData([]);
+      // Source breakdown - now using actual source data
+      const sourceMap: Record<string, { count: number; value: number; won: number }> = {};
+      dealsData?.forEach((d) => {
+        const source = d.source || "Unknown";
+        if (!sourceMap[source]) sourceMap[source] = { count: 0, value: 0, won: 0 };
+        sourceMap[source].count++;
+        sourceMap[source].value += d.value || 0;
+        if (d.stage === "closed-won") sourceMap[source].won++;
+      });
+      const sourceBreakdown = Object.entries(sourceMap).map(([name, data]) => ({
+        name,
+        value: data.count,
+        totalValue: data.value,
+        won: data.won,
+        conversionRate: data.count > 0 ? Math.round((data.won / data.count) * 100) : 0,
+      })).sort((a, b) => b.value - a.value);
+      setSourceData(sourceBreakdown);
 
       // Cohort analysis (simplified - deals by creation month and close outcome)
       const cohorts: Record<string, { created: number; won: number; lost: number }> = {};
@@ -460,23 +475,18 @@ export default function Analytics() {
               <CardContent>
                 {sourceData.length > 0 ? (
                   <div className="space-y-3">
-                    {sourceData.map((source: any) => {
-                      const totalValue = source.deals?.reduce((s: number, d: any) => s + (d.value || 0), 0) || 0;
-                      const wonCount = source.deals?.filter((d: any) => d.stage === "closed-won").length || 0;
-                      const conversionRate = source.deals?.length > 0 ? Math.round((wonCount / source.deals.length) * 100) : 0;
-                      return (
-                        <div key={source.name} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-                          <div>
-                            <p className="text-sm font-medium text-white">{source.name}</p>
-                            <p className="text-xs text-white/40">{source.value} deals · ${totalValue.toLocaleString()} total</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-white">{conversionRate}%</p>
-                            <p className="text-xs text-white/40">conversion</p>
-                          </div>
+                    {sourceData.map((source: any) => (
+                      <div key={source.name} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                        <div>
+                          <p className="text-sm font-medium text-white">{source.name}</p>
+                          <p className="text-xs text-white/40">{source.value} deals · ${source.totalValue.toLocaleString()} total</p>
                         </div>
-                      );
-                    })}
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-white">{source.conversionRate}%</p>
+                          <p className="text-xs text-white/40">conversion</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="text-center py-12">

@@ -24,6 +24,7 @@ interface Deal {
   status: string;
   expected_close_date: string | null;
   contact_id: string | null;
+  source: string | null;
   contacts?: { first_name: string; last_name: string; company: string | null } | null;
 }
 
@@ -33,6 +34,11 @@ interface PipelineStage {
   color: string;
   order: number;
 }
+
+const sourceOptions = [
+  "Website", "Referral", "Cold Call", "Email Campaign", "Social Media",
+  "Trade Show", "Partner", "Advertisement", "Direct", "Other"
+];
 
 export default function Deals() {
   const { organizationId } = useOrganization();
@@ -45,7 +51,7 @@ export default function Deals() {
   const [detailDealId, setDetailDealId] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [newDeal, setNewDeal] = useState({
-    name: "", value: "", probability: "50", stage: "lead", expected_close_date: "", contact_id: "",
+    name: "", value: "", probability: "50", stage: "lead", expected_close_date: "", contact_id: "", source: "",
   });
   const [contacts, setContacts] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
 
@@ -97,13 +103,14 @@ export default function Deals() {
         stage: newDeal.stage,
         expected_close_date: newDeal.expected_close_date || null,
         contact_id: newDeal.contact_id || null,
+        source: newDeal.source || null,
         status: "open",
         organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Deal created successfully");
       setDialogOpen(false);
-      setNewDeal({ name: "", value: "", probability: "50", stage: "lead", expected_close_date: "", contact_id: "" });
+      setNewDeal({ name: "", value: "", probability: "50", stage: "lead", expected_close_date: "", contact_id: "", source: "" });
       fetchPipelineAndDeals();
     } catch (error: any) {
       toast.error("Failed to create deal: " + error.message);
@@ -169,6 +176,7 @@ export default function Deals() {
               "Probability": d.probability,
               "Stage": d.stage,
               "Status": d.status,
+              "Source": d.source || "",
               "Expected Close": d.expected_close_date,
               "Company": d.contacts?.company || "",
               "Contact": d.contacts ? `${d.contacts.first_name} ${d.contacts.last_name}` : "",
@@ -204,14 +212,25 @@ export default function Deals() {
                   </div>
                   <div className="space-y-2"><Label className="text-white/70">Close Date</Label><Input type="date" value={newDeal.expected_close_date} onChange={(e) => setNewDeal((p) => ({ ...p, expected_close_date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-white/70">Contact</Label>
-                  <Select value={newDeal.contact_id} onValueChange={(v) => setNewDeal((p) => ({ ...p, contact_id: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select contact" /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                      {contacts.map((c) => (<SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Contact</Label>
+                    <Select value={newDeal.contact_id} onValueChange={(v) => setNewDeal((p) => ({ ...p, contact_id: v }))}>
+                      <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select contact" /></SelectTrigger>
+                      <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                        {contacts.map((c) => (<SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white/70">Source</Label>
+                    <Select value={newDeal.source} onValueChange={(v) => setNewDeal((p) => ({ ...p, source: v }))}>
+                      <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select source" /></SelectTrigger>
+                      <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                        {sourceOptions.map((s) => (<SelectItem key={s} value={s}>{s}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Deal</Button>
               </form>
@@ -244,6 +263,9 @@ export default function Deals() {
                         <Button variant="ghost" size="icon" className="h-6 w-6 text-white/40 hover:text-white hover:bg-white/5 -mr-2 -mt-2"><MoreHorizontal className="w-3 h-3" /></Button>
                       </div>
                       <div className="flex items-center gap-2 mb-3"><Building2 className="w-3 h-3 text-white/30" /><span className="text-xs text-white/50">{deal.contacts?.company || "No company"}</span></div>
+                      {deal.source && (
+                        <Badge variant="outline" className="text-[10px] border-white/10 text-white/40 mb-2">{deal.source}</Badge>
+                      )}
                       <div className="flex items-center justify-between mb-3"><span className="text-lg font-semibold text-white">{formatValue(deal.value)}</span></div>
                       <Progress value={deal.probability || 0} className="h-1 bg-white/10 mb-3" />
                       <div className="flex items-center justify-between text-xs text-white/40">

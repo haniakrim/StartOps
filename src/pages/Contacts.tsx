@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Search, Filter, Plus, MoreHorizontal, Mail, Phone, Building2, MapPin, ArrowUpDown, Download, Upload, Star, Loader2,
+  Search, Filter, Plus, MoreHorizontal, Mail, Phone, Building2, MapPin, ArrowUpDown, Download, Upload, Star, Loader2, Zap,
 } from "lucide-react";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,12 +28,32 @@ interface Contact {
   status: string | null;
   tags: string[] | null;
   created_at: string;
+  lead_score?: number;
 }
 
 const statusColors: Record<string, string> = {
   Active: "bg-[#8dc572]/20 text-[#8dc572]", Prospect: "bg-[#5683da]/20 text-[#5683da]",
   Inactive: "bg-white/10 text-white/50", Lead: "bg-[#6452db]/20 text-[#6452db]", Customer: "bg-[#8dc572]/20 text-[#8dc572]",
 };
+
+function calculateLeadScore(contact: Contact): number {
+  let score = 0;
+  if (contact.email) score += 20;
+  if (contact.phone) score += 15;
+  if (contact.company) score += 15;
+  if (contact.title) score += 10;
+  if (contact.status === "Customer") score += 30;
+  if (contact.status === "Active") score += 20;
+  if (contact.status === "Prospect") score += 10;
+  if (contact.tags && contact.tags.length > 0) score += contact.tags.length * 5;
+  return Math.min(score, 100);
+}
+
+function getLeadScoreColor(score: number): string {
+  if (score >= 80) return "text-[#8dc572]";
+  if (score >= 50) return "text-[#f0ad4e]";
+  return "text-white/40";
+}
 
 export default function Contacts() {
   const { user } = useAuth();
@@ -59,7 +79,8 @@ export default function Contacts() {
       setLoading(true);
       const { data, error } = await supabase.from("contacts").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      setContacts(data || []);
+      const withScores = (data || []).map(c => ({ ...c, lead_score: calculateLeadScore(c) }));
+      setContacts(withScores);
     } catch (error: any) {
       toast.error("Failed to load contacts: " + error.message);
     } finally {
@@ -212,6 +233,7 @@ export default function Contacts() {
               "Title": c.title,
               "Status": c.status,
               "Tags": (c.tags || []).join(", "),
+              "Lead Score": c.lead_score,
               "Created": c.created_at,
             }));
             import("@/lib/export").then(({ exportToCSV }) => {
@@ -312,9 +334,9 @@ export default function Contacts() {
         onExport={() => {
           const selectedContacts = contacts.filter((c) => selected.includes(c.id));
           const csv = [
-            ["First Name", "Last Name", "Email", "Phone", "Company", "Title", "Status"].join(","),
+            ["First Name", "Last Name", "Email", "Phone", "Company", "Title", "Status", "Lead Score"].join(","),
             ...selectedContacts.map((c) =>
-              [c.first_name, c.last_name, c.email || "", c.phone || "", c.company || "", c.title || "", c.status || ""].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")
+              [c.first_name, c.last_name, c.email || "", c.phone || "", c.company || "", c.title || "", c.status || "", c.lead_score || 0].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")
             ),
           ].join("\n");
           const blob = new Blob([csv], { type: "text/csv" });
@@ -369,13 +391,14 @@ export default function Contacts() {
                   <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase tracking-wider">Company</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase tracking-wider">Status</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase tracking-wider">Tags</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase tracking-wider">Lead Score</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase tracking-wider">Last Contact</th>
                   <th className="w-10"></th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={7} className="py-12 text-center text-sm text-white/40">{search ? "No contacts match your search" : "No contacts yet. Add your first contact!"}</td></tr>
+                  <tr><td colSpan={8} className="py-12 text-center text-sm text-white/40">{search ? "No contacts match your search" : "No contacts yet. Add your first contact!"}</td></tr>
                 ) : (
                   filtered.map((contact) => (
                     <tr key={contact.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => openDetail(contact.id)}>
@@ -402,6 +425,12 @@ export default function Contacts() {
                         <div className="flex flex-wrap gap-1">
                           {(contact.tags || []).map((tag) => (<Badge key={tag} variant="outline" className="text-xs border-white/10 text-white/50">{tag}</Badge>))}
                           {(!contact.tags || contact.tags.length === 0) && <span className="text-xs text-white/20">-</span>}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <Zap className={`w-3.5 h-3.5 ${getLeadScoreColor(contact.lead_score || 0)}`} />
+                          <span className={`text-sm font-medium ${getLeadScoreColor(contact.lead_score || 0)}`}>{contact.lead_score || 0}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4 text-sm text-white/50">{contact.created_at ? new Date(contact.created_at).toLocaleDateString() : "-"}</td>
