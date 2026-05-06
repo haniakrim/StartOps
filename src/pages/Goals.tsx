@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Target, TrendingUp, CheckCircle2, Zap, Search, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GoalStatCard } from "@/components/goals/GoalStatCard";
@@ -14,6 +15,7 @@ export default function Goals() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dbReady, setDbReady] = useState(true);
 
   useEffect(() => {
     fetchGoals();
@@ -26,7 +28,21 @@ export default function Goals() {
         .from("goals")
         .select("*")
         .order("created_at", { ascending: false });
-      if (goalsError) throw goalsError;
+
+      if (goalsError) {
+        if (
+          goalsError.message?.includes("Could not find the table") ||
+          goalsError.message?.includes("relation") ||
+          goalsError.code === "PGRST116"
+        ) {
+          setDbReady(false);
+          setGoals([]);
+          return;
+        }
+        throw goalsError;
+      }
+
+      setDbReady(true);
 
       const goalsWithKRs = await Promise.all(
         (goalsData || []).map(async (goal: any) => {
@@ -190,7 +206,7 @@ export default function Goals() {
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90" disabled={!dbReady}>
               <Plus className="w-4 h-4 mr-2" />
               New Goal
             </Button>
@@ -206,6 +222,24 @@ export default function Goals() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {!dbReady && (
+        <Card className="bg-[#f0ad4e]/5 border-[#f0ad4e]/20">
+          <CardContent className="p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[#f0ad4e]/20 flex items-center justify-center flex-shrink-0">
+                <Target className="w-5 h-5 text-[#f0ad4e]" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-white">Database Setup Required</h3>
+                <p className="text-xs text-white/50 mt-1">
+                  The goals and key_results tables need to be created in Supabase. Run the SQL provided in the chat to enable OKR tracking.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <GoalStatCard
@@ -236,7 +270,7 @@ export default function Goals() {
         />
       </div>
 
-      <GoalChart data={chartData} />
+      {dbReady && <GoalChart data={chartData} />}
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
@@ -252,7 +286,7 @@ export default function Goals() {
       </div>
 
       <div className="space-y-4">
-        {filtered.length === 0 && (
+        {filtered.length === 0 && dbReady && (
           <div className="text-center py-12 text-sm text-white/40">
             No goals yet. Create your first OKR to start tracking objectives.
           </div>
