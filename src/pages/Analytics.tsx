@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
-const COLORS = ["#0066B1", "#E63946", "#00BFFF", "#0066B1", "#00BFFF", "#E63946"];
+const COLORS = ["hsl(var(--primary))", "#8dc572", "#ff8964", "#5683da", "#f0ad4e", "#be6464"];
 
 export default function Analytics() {
   const [loading, setLoading] = useState(true);
@@ -74,15 +74,15 @@ export default function Analytics() {
 
       // Conversion funnel
       const funnel = [
-        { name: "Leads", value: dealsData?.filter(d => d.stage === "lead").length || 0, color: "#0066B1" },
-        { name: "Qualified", value: dealsData?.filter(d => d.stage === "qualified").length || 0, color: "#00BFFF" },
-        { name: "Proposal", value: dealsData?.filter(d => d.stage === "proposal").length || 0, color: "#E63946" },
-        { name: "Negotiation", value: dealsData?.filter(d => d.stage === "negotiation").length || 0, color: "#00BFFF" },
-        { name: "Closed Won", value: wonDeals, color: "#0066B1" },
+        { name: "Leads", value: dealsData?.filter(d => d.stage === "lead").length || 0, color: "hsl(var(--primary))" },
+        { name: "Qualified", value: dealsData?.filter(d => d.stage === "qualified").length || 0, color: "#5683da" },
+        { name: "Proposal", value: dealsData?.filter(d => d.stage === "proposal").length || 0, color: "#ff8964" },
+        { name: "Negotiation", value: dealsData?.filter(d => d.stage === "negotiation").length || 0, color: "#f0ad4e" },
+        { name: "Closed Won", value: wonDeals, color: "#8dc572" },
       ];
       setFunnelData(funnel);
 
-      // Source breakdown - now using actual source data
+      // Source breakdown
       const sourceMap: Record<string, { count: number; value: number; won: number }> = {};
       dealsData?.forEach((d) => {
         const source = d.source || "Unknown";
@@ -100,7 +100,7 @@ export default function Analytics() {
       })).sort((a, b) => b.value - a.value);
       setSourceData(sourceBreakdown);
 
-      // Cohort analysis (simplified - deals by creation month and close outcome)
+      // Cohort analysis
       const cohorts: Record<string, { created: number; won: number; lost: number }> = {};
       dealsData?.forEach((d) => {
         const month = new Date(d.created_at).toLocaleString("default", { month: "short", year: "2-digit" });
@@ -134,7 +134,7 @@ export default function Analytics() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -143,22 +143,22 @@ export default function Analytics() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Analytics</h1>
-          <p className="text-white/50 mt-1">Performance metrics and AI-powered insights from live data</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Analytics</h1>
+          <p className="text-muted-foreground mt-1">Performance metrics and AI-powered insights from live data</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-32">
+            <SelectTrigger className="bg-card border-border text-foreground w-32">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectContent className="bg-card border-border">
               <SelectItem value="week">This Week</SelectItem>
               <SelectItem value="month">This Month</SelectItem>
               <SelectItem value="quarter">This Quarter</SelectItem>
               <SelectItem value="year">This Year</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5">
+          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent">
             <Filter className="w-4 h-4 mr-2" />Filter
           </Button>
         </div>
@@ -166,36 +166,36 @@ export default function Analytics() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat) => (
-          <Card key={stat.label} className="bg-[#18191b] border-white/10">
+          <Card key={stat.label} className="bg-card border-border">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <stat.icon className="w-5 h-5 text-white/40" />
-                <span className={`flex items-center gap-1 text-xs font-medium ${stat.up ? "text-[#8dc572]" : "text-[#eb5757]"}`}>
+                <stat.icon className="w-5 h-5 text-muted-foreground" />
+                <span className={`flex items-center gap-1 text-xs font-medium ${stat.up ? "text-emerald-500" : "text-red-500"}`}>
                   {stat.up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}{stat.change}
                 </span>
               </div>
-              <p className="text-2xl font-semibold text-white mt-3">{stat.value}</p>
-              <p className="text-sm text-white/40 mt-1">{stat.label}</p>
+              <p className="text-2xl font-semibold text-foreground mt-3">{stat.value}</p>
+              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="bg-[#18191b] border border-white/10">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><BarChart3 className="w-4 h-4 mr-2" />Overview</TabsTrigger>
-          <TabsTrigger value="funnel" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Filter className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
-          <TabsTrigger value="cohorts" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Users className="w-4 h-4 mr-2" />Cohorts</TabsTrigger>
-          <TabsTrigger value="sources" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><GitBranch className="w-4 h-4 mr-2" />Sources</TabsTrigger>
+        <TabsList className="bg-card border border-border">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><BarChart3 className="w-4 h-4 mr-2" />Overview</TabsTrigger>
+          <TabsTrigger value="funnel" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Filter className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
+          <TabsTrigger value="cohorts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Users className="w-4 h-4 mr-2" />Cohorts</TabsTrigger>
+          <TabsTrigger value="sources" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><GitBranch className="w-4 h-4 mr-2" />Sources</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Card className="lg:col-span-2 bg-[#18191b] border-white/10">
+            <Card className="lg:col-span-2 bg-card border-border">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-white text-base font-medium">Revenue Overview</CardTitle>
-                  <Badge variant="outline" className="border-white/10 text-white/50 text-xs"><TrendingUp className="w-3 h-3 mr-1 text-[#8dc572]" />Live Data</Badge>
+                  <CardTitle className="text-foreground text-base font-medium">Revenue Overview</CardTitle>
+                  <Badge variant="outline" className="border-border text-muted-foreground text-xs"><TrendingUp className="w-3 h-3 mr-1 text-emerald-500" />Live Data</Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -203,30 +203,30 @@ export default function Analytics() {
                   <AreaChart data={revenueData}>
                     <defs>
                       <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6452db" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#6452db" stopOpacity={0} />
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
-                    <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]} />
-                    <Area type="monotone" dataKey="value" stroke="#6452db" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
+                    <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--card-foreground))" }} formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]} />
+                    <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#18191b] border-white/10">
-              <CardHeader className="pb-2"><CardTitle className="text-white text-base font-medium">Pipeline Distribution</CardTitle></CardHeader>
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2"><CardTitle className="text-foreground text-base font-medium">Pipeline Distribution</CardTitle></CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={pipelineData} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-                    <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} />
-                    <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.6)", fontSize: 12 }} width={80} />
-                    <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} />
-                    <Bar dataKey="value" fill="#5683da" radius={[0, 4, 4, 0]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+                    <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                    <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={80} />
+                    <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--card-foreground))" }} />
+                    <Bar dataKey="value" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -234,54 +234,54 @@ export default function Analytics() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="bg-[#18191b] border-white/10">
-              <CardHeader className="pb-2"><CardTitle className="text-white text-base font-medium">Key Metrics</CardTitle></CardHeader>
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2"><CardTitle className="text-foreground text-base font-medium">Key Metrics</CardTitle></CardHeader>
               <CardContent className="p-6 pt-0">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg bg-[#0b0d10] border border-white/5">
-                    <p className="text-xs text-white/40 mb-1">Average Deal Size</p>
-                    <p className="text-xl font-semibold text-white">${stats.avgDealSize.toLocaleString()}</p>
+                  <div className="p-4 rounded-lg bg-muted border border-border">
+                    <p className="text-xs text-muted-foreground mb-1">Average Deal Size</p>
+                    <p className="text-xl font-semibold text-foreground">${stats.avgDealSize.toLocaleString()}</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-[#0b0d10] border border-white/5">
-                    <p className="text-xs text-white/40 mb-1">Total Companies</p>
-                    <p className="text-xl font-semibold text-white">{stats.totalCompanies}</p>
+                  <div className="p-4 rounded-lg bg-muted border border-border">
+                    <p className="text-xs text-muted-foreground mb-1">Total Companies</p>
+                    <p className="text-xl font-semibold text-foreground">{stats.totalCompanies}</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-[#0b0d10] border border-white/5">
-                    <p className="text-xs text-white/40 mb-1">Won Deals</p>
-                    <p className="text-xl font-semibold text-white">{pipelineData.find((d) => d.name === "closed-won")?.value || 0}</p>
+                  <div className="p-4 rounded-lg bg-muted border border-border">
+                    <p className="text-xs text-muted-foreground mb-1">Won Deals</p>
+                    <p className="text-xl font-semibold text-foreground">{pipelineData.find((d) => d.name === "closed-won")?.value || 0}</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-[#0b0d10] border border-white/5">
-                    <p className="text-xs text-white/40 mb-1">Lost Deals</p>
-                    <p className="text-xl font-semibold text-white">{pipelineData.find((d) => d.name === "closed-lost")?.value || 0}</p>
+                  <div className="p-4 rounded-lg bg-muted border border-border">
+                    <p className="text-xs text-muted-foreground mb-1">Lost Deals</p>
+                    <p className="text-xl font-semibold text-foreground">{pipelineData.find((d) => d.name === "closed-lost")?.value || 0}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#18191b] border-white/10">
-              <CardHeader className="pb-2"><CardTitle className="text-white text-base font-medium">Performance Summary</CardTitle></CardHeader>
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2"><CardTitle className="text-foreground text-base font-medium">Performance Summary</CardTitle></CardHeader>
               <CardContent className="p-6 pt-0">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#6452db]/20 flex items-center justify-center"><GitBranch className="w-4 h-4 text-[#6452db]" /></div>
-                      <div><p className="text-sm text-white">Pipeline Coverage</p><p className="text-xs text-white/40">Active deals vs target</p></div>
+                      <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center"><GitBranch className="w-4 h-4 text-primary" /></div>
+                      <div><p className="text-sm text-foreground">Pipeline Coverage</p><p className="text-xs text-muted-foreground">Active deals vs target</p></div>
                     </div>
-                    <span className="text-sm font-medium text-white">{stats.activeDeals} deals</span>
+                    <span className="text-sm font-medium text-foreground">{stats.activeDeals} deals</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#ff8964]/20 flex items-center justify-center"><DollarSign className="w-4 h-4 text-[#ff8964]" /></div>
-                      <div><p className="text-sm text-white">Revenue per Contact</p><p className="text-xs text-white/40">Total revenue divided by contacts</p></div>
+                      <div className="w-8 h-8 rounded-lg bg-orange-500/15 flex items-center justify-center"><DollarSign className="w-4 h-4 text-orange-500" /></div>
+                      <div><p className="text-sm text-foreground">Revenue per Contact</p><p className="text-xs text-muted-foreground">Total revenue divided by contacts</p></div>
                     </div>
-                    <span className="text-sm font-medium text-white">${stats.totalContacts > 0 ? Math.round(stats.totalRevenue / stats.totalContacts).toLocaleString() : "0"}</span>
+                    <span className="text-sm font-medium text-foreground">${stats.totalContacts > 0 ? Math.round(stats.totalRevenue / stats.totalContacts).toLocaleString() : "0"}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#8dc572]/20 flex items-center justify-center"><Calendar className="w-4 h-4 text-[#8dc572]" /></div>
-                      <div><p className="text-sm text-white">Avg Time to Close</p><p className="text-xs text-white/40">Based on won deals</p></div>
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center"><Calendar className="w-4 h-4 text-emerald-500" /></div>
+                      <div><p className="text-sm text-foreground">Avg Time to Close</p><p className="text-xs text-muted-foreground">Based on won deals</p></div>
                     </div>
-                    <span className="text-sm font-medium text-white">45 days</span>
+                    <span className="text-sm font-medium text-foreground">45 days</span>
                   </div>
                 </div>
               </CardContent>
@@ -291,10 +291,10 @@ export default function Analytics() {
 
         <TabsContent value="funnel" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="bg-[#18191b] border-white/10">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-[#6452db]" />
+                <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-primary" />
                   Deal Conversion Funnel
                 </CardTitle>
               </CardHeader>
@@ -307,13 +307,13 @@ export default function Analytics() {
                     return (
                       <div key={stage.name}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-white">{stage.name}</span>
+                          <span className="text-sm text-foreground">{stage.name}</span>
                           <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-white">{stage.value}</span>
-                            {i > 0 && <span className="text-xs text-white/40">{conversion}% conv.</span>}
+                            <span className="text-sm font-medium text-foreground">{stage.value}</span>
+                            {i > 0 && <span className="text-xs text-muted-foreground">{conversion}% conv.</span>}
                           </div>
                         </div>
-                        <div className="h-8 bg-[#0b0d10] rounded-md overflow-hidden">
+                        <div className="h-8 bg-muted rounded-md overflow-hidden">
                           <div
                             className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
                             style={{ width: `${Math.max(width, 5)}%`, backgroundColor: stage.color }}
@@ -328,9 +328,9 @@ export default function Analytics() {
               </CardContent>
             </Card>
 
-            <Card className="bg-[#18191b] border-white/10">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-white text-base font-medium">Stage Drop-off Analysis</CardTitle>
+                <CardTitle className="text-foreground text-base font-medium">Stage Drop-off Analysis</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={250}>
@@ -339,17 +339,17 @@ export default function Analytics() {
                     const dropoff = nextStage ? Math.max(0, stage.value - nextStage.value) : 0;
                     return { name: stage.name, dropoff, retained: nextStage?.value || 0 };
                   })}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} />
-                    <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                    <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--card-foreground))" }} />
                     <Bar dataKey="retained" stackId="a" fill="#8dc572" radius={[0, 0, 4, 4]} />
                     <Bar dataKey="dropoff" stackId="a" fill="#be6464" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
                 <div className="flex items-center justify-center gap-4 mt-2">
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-[#8dc572]" /><span className="text-xs text-white/50">Retained</span></div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-[#be6464]" /><span className="text-xs text-white/50">Drop-off</span></div>
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-emerald-500" /><span className="text-xs text-muted-foreground">Retained</span></div>
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-red-500" /><span className="text-xs text-muted-foreground">Drop-off</span></div>
                 </div>
               </CardContent>
             </Card>
@@ -357,10 +357,10 @@ export default function Analytics() {
         </TabsContent>
 
         <TabsContent value="cohorts" className="mt-6">
-          <Card className="bg-[#18191b] border-white/10">
+          <Card className="bg-card border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-                <BrainCircuit className="w-4 h-4 text-[#ff8964]" />
+              <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+                <BrainCircuit className="w-4 h-4 text-orange-500" />
                 Cohort Analysis
               </CardTitle>
             </CardHeader>
@@ -368,43 +368,43 @@ export default function Analytics() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Cohort</th>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Deals Created</th>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Won</th>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Lost</th>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Win Rate</th>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Trend</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Cohort</th>
+                      <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Deals Created</th>
+                      <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Won</th>
+                      <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Lost</th>
+                      <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Win Rate</th>
+                      <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Trend</th>
                     </tr>
                   </thead>
                   <tbody>
                     {cohortData.map((cohort) => (
-                      <tr key={cohort.month} className="border-b border-white/5 hover:bg-white/[0.02]">
-                        <td className="py-3 px-4 text-sm text-white font-medium">{cohort.month}</td>
-                        <td className="py-3 px-4 text-sm text-white">{cohort.created}</td>
-                        <td className="py-3 px-4 text-sm text-[#8dc572]">{cohort.won}</td>
-                        <td className="py-3 px-4 text-sm text-[#be6464]">{cohort.lost}</td>
+                      <tr key={cohort.month} className="border-b border-border/50 hover:bg-accent/50">
+                        <td className="py-3 px-4 text-sm text-foreground font-medium">{cohort.month}</td>
+                        <td className="py-3 px-4 text-sm text-foreground">{cohort.created}</td>
+                        <td className="py-3 px-4 text-sm text-emerald-500">{cohort.won}</td>
+                        <td className="py-3 px-4 text-sm text-red-500">{cohort.lost}</td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
-                              <div className="h-full bg-[#6452db] rounded-full" style={{ width: `${cohort.rate}%` }} />
+                            <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-primary rounded-full" style={{ width: `${cohort.rate}%` }} />
                             </div>
-                            <span className="text-sm text-white">{cohort.rate}%</span>
+                            <span className="text-sm text-foreground">{cohort.rate}%</span>
                           </div>
                         </td>
                         <td className="py-3 px-4">
                           {parseInt(cohort.rate) >= 50 ? (
-                            <TrendingUp className="w-4 h-4 text-[#8dc572]" />
+                            <TrendingUp className="w-4 h-4 text-emerald-500" />
                           ) : parseInt(cohort.rate) >= 30 ? (
-                            <ArrowUpRight className="w-4 h-4 text-[#f0ad4e]" />
+                            <ArrowUpRight className="w-4 h-4 text-orange-500" />
                           ) : (
-                            <TrendingDown className="w-4 h-4 text-[#be6464]" />
+                            <TrendingDown className="w-4 h-4 text-red-500" />
                           )}
                         </td>
                       </tr>
                     ))}
                     {cohortData.length === 0 && (
-                      <tr><td colSpan={6} className="py-12 text-center text-sm text-white/40">No cohort data available yet</td></tr>
+                      <tr><td colSpan={6} className="py-12 text-center text-sm text-muted-foreground">No cohort data available yet</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -415,10 +415,10 @@ export default function Analytics() {
 
         <TabsContent value="sources" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="bg-[#18191b] border-white/10">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-                  <GitBranch className="w-4 h-4 text-[#6452db]" />
+                <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+                  <GitBranch className="w-4 h-4 text-primary" />
                   Lead Sources
                 </CardTitle>
               </CardHeader>
@@ -440,7 +440,7 @@ export default function Analytics() {
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} />
+                        <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--card-foreground))" }} />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="space-y-2 mt-2">
@@ -448,27 +448,27 @@ export default function Analytics() {
                         <div key={entry.name} className="flex items-center justify-between text-xs">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                            <span className="text-white/60">{entry.name}</span>
+                            <span className="text-muted-foreground">{entry.name}</span>
                           </div>
-                          <span className="text-white">{entry.value} deals</span>
+                          <span className="text-foreground">{entry.value} deals</span>
                         </div>
                       ))}
                     </div>
                   </>
                 ) : (
                   <div className="text-center py-12">
-                    <GitBranch className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                    <p className="text-sm text-white/40">No source data yet</p>
-                    <p className="text-xs text-white/30 mt-1">Add a source when creating deals to track lead origins</p>
+                    <GitBranch className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-sm text-muted-foreground">No source data yet</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">Add a source when creating deals to track lead origins</p>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            <Card className="bg-[#18191b] border-white/10">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-[#ff8964]" />
+                <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-orange-500" />
                   Source Performance
                 </CardTitle>
               </CardHeader>
@@ -476,22 +476,22 @@ export default function Analytics() {
                 {sourceData.length > 0 ? (
                   <div className="space-y-3">
                     {sourceData.map((source: any) => (
-                      <div key={source.name} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                      <div key={source.name} className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border">
                         <div>
-                          <p className="text-sm font-medium text-white">{source.name}</p>
-                          <p className="text-xs text-white/40">{source.value} deals · ${source.totalValue.toLocaleString()} total</p>
+                          <p className="text-sm font-medium text-foreground">{source.name}</p>
+                          <p className="text-xs text-muted-foreground">{source.value} deals · ${source.totalValue.toLocaleString()} total</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-medium text-white">{source.conversionRate}%</p>
-                          <p className="text-xs text-white/40">conversion</p>
+                          <p className="text-sm font-medium text-foreground">{source.conversionRate}%</p>
+                          <p className="text-xs text-muted-foreground">conversion</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <BarChart3 className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                    <p className="text-sm text-white/40">No source performance data</p>
+                    <BarChart3 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-sm text-muted-foreground">No source performance data</p>
                   </div>
                 )}
               </CardContent>

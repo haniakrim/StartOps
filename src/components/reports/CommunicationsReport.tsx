@@ -85,7 +85,7 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-[#0066B1] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -95,19 +95,19 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <ReportStatCard
           icon={Mail}
-          iconColor="#0066B1"
+          iconColor="hsl(var(--primary))"
           value={stats.totalComms.toString()}
           label="Total Communications"
         />
         <ReportStatCard
           icon={TrendingUp}
-          iconColor="#00BFFF"
+          iconColor="#8dc572"
           value={stats.positive.toString()}
           label="Positive"
         />
         <ReportStatCard
           icon={MessageSquare}
-          iconColor="#00BFFF"
+          iconColor="#5683da"
           value={stats.neutral.toString()}
           label="Neutral"
         />
@@ -120,9 +120,9 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 bg-[#18191b] border-white/10">
+        <Card className="lg:col-span-2 bg-card border-border">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
-            <CardTitle className="text-white text-base font-medium">
+            <CardTitle className="text-foreground text-base font-medium">
               Communications by Type
             </CardTitle>
             <Button
@@ -134,7 +134,7 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
                   "communications-by-type.csv"
                 )
               }
-              className="text-white/50 hover:text-white hover:bg-white/5"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <Download className="w-4 h-4 mr-2" />
               Export
@@ -145,36 +145,36 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
               <BarChart data={typeData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="rgba(255,255,255,0.05)"
+                  stroke="hsl(var(--border))"
                 />
                 <XAxis
                   dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1f2126",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
-                    color: "#fff",
+                    color: "hsl(var(--card-foreground))",
                   }}
                 />
-                <Bar dataKey="value" fill="#5683da" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#18191b] border-white/10">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-medium">
+            <CardTitle className="text-foreground text-base font-medium">
               Sentiment Analysis
             </CardTitle>
           </CardHeader>
@@ -190,12 +190,12 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
                 return (
                   <div key={item.label}>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-white">{item.label}</span>
-                      <span className="text-sm text-white/60">
+                      <span className="text-sm text-foreground">{item.label}</span>
+                      <span className="text-sm text-muted-foreground">
                         {item.value} ({pct}%)
                       </span>
                     </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{ width: `${pct}%`, backgroundColor: item.color }}
@@ -209,9 +209,9 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
         </Card>
       </div>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-white text-base font-medium">
+          <CardTitle className="text-foreground text-base font-medium">
             Communication Log
           </CardTitle>
           <Button
@@ -230,7 +230,7 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
                 "communications-report.csv"
               )
             }
-            className="text-white/50 hover:text-white hover:bg-white/5"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent"
           >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
@@ -240,17 +240,17 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Subject
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Type
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Sentiment
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Date
                   </th>
                 </tr>
@@ -260,7 +260,7 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
                   <tr>
                     <td
                       colSpan={4}
-                      className="py-12 text-center text-sm text-white/40"
+                      className="py-12 text-center text-sm text-muted-foreground"
                     >
                       No communications in selected period
                     </td>
@@ -269,12 +269,12 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
                 {communications.map((comm: any) => (
                   <tr
                     key={comm.id}
-                    className="border-b border-white/5 hover:bg-white/[0.02]"
+                    className="border-b border-border/50 hover:bg-accent/50"
                   >
-                    <td className="py-3 px-4 text-sm text-white font-medium">
+                    <td className="py-3 px-4 text-sm text-foreground font-medium">
                       {comm.subject || "No subject"}
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/70 capitalize">
+                    <td className="py-3 px-4 text-sm text-muted-foreground capitalize">
                       {comm.type}
                     </td>
                     <td className="py-3 px-4">
@@ -282,16 +282,16 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
                         variant="secondary"
                         className={`text-xs ${
                           comm.sentiment === "positive"
-                            ? "bg-[#8dc572]/20 text-[#8dc572]"
+                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
                             : comm.sentiment === "negative"
-                              ? "bg-[#be6464]/20 text-[#be6464]"
-                              : "bg-[#5683da]/20 text-[#5683da]"
+                              ? "bg-red-500/15 text-red-600 dark:text-red-400"
+                              : "bg-blue-500/15 text-blue-600 dark:text-blue-400"
                         }`}
                       >
                         {comm.sentiment || "neutral"}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/50">
+                    <td className="py-3 px-4 text-sm text-muted-foreground">
                       {comm.occurred_at
                         ? new Date(comm.occurred_at).toLocaleDateString()
                         : "-"}

@@ -20,27 +20,27 @@ export function RecentSessions({ sessions }: RecentSessionsProps) {
   const recent = sessions.slice(0, 5);
 
   return (
-    <Card className="bg-[#18191b] border-white/10">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
-        <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-          <Clock className="w-4 h-4 text-[#6452db]" />
+        <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+          <Clock className="w-4 h-4 text-primary" />
           Recent Sessions
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
           {recent.length === 0 && (
-            <p className="text-sm text-white/40 text-center py-6">No sessions yet. Start the timer above!</p>
+            <p className="text-sm text-muted-foreground text-center py-6">No sessions yet. Start the timer above!</p>
           )}
           {recent.map((session) => (
-            <div key={session.id} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+            <div key={session.id} className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-[#6452db]/20 flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-4 h-4 text-[#6452db]" />
+                <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-4 h-4 text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm text-white truncate">{session.description || "Untitled session"}</p>
-                  <div className="flex items-center gap-2 text-xs text-white/40 mt-0.5">
+                  <p className="text-sm text-foreground truncate">{session.description || "Untitled session"}</p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
                     {session.projects && (
                       <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{session.projects.name}</span>
                     )}
@@ -51,11 +51,11 @@ export function RecentSessions({ sessions }: RecentSessionsProps) {
                 </div>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0 ml-3">
-                <Badge variant="secondary" className={`text-xs ${session.billable ? "bg-[#8dc572]/20 text-[#8dc572]" : "bg-white/10 text-white/50"}`}>
+                <Badge variant="secondary" className={`text-xs ${session.billable ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
                   {session.billable ? <DollarSign className="w-3 h-3 mr-1" /> : null}
                   {session.billable ? "Billable" : "Non-bill"}
                 </Badge>
-                <span className="text-sm font-mono font-medium text-white">{session.hours.toFixed(2)}h</span>
+                <span className="text-sm font-mono font-medium text-foreground">{session.hours.toFixed(2)}h</span>
               </div>
             </div>
           ))}

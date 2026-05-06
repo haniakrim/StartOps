@@ -85,7 +85,7 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-[#0066B1] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -95,34 +95,34 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <ReportStatCard
           icon={Activity}
-          iconColor="#0066B1"
+          iconColor="hsl(var(--primary))"
           value={stats.totalActivities.toString()}
           label="Total Activities"
         />
         <ReportStatCard
           icon={CheckCircle2}
-          iconColor="#00BFFF"
+          iconColor="#8dc572"
           value={stats.completed.toString()}
           label="Completed"
         />
         <ReportStatCard
           icon={Calendar}
-          iconColor="#00BFFF"
+          iconColor="#f0ad4e"
           value={stats.pending.toString()}
           label="Pending"
         />
         <ReportStatCard
           icon={TrendingUp}
-          iconColor="#0066B1"
+          iconColor="#ff8964"
           value={stats.completionRate}
           label="Completion Rate"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 bg-[#18191b] border-white/10">
+        <Card className="lg:col-span-2 bg-card border-border">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
-            <CardTitle className="text-white text-base font-medium">
+            <CardTitle className="text-foreground text-base font-medium">
               Activities by Type
             </CardTitle>
             <Button
@@ -134,7 +134,7 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
                   "activities-by-type.csv"
                 )
               }
-              className="text-white/50 hover:text-white hover:bg-white/5"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <Download className="w-4 h-4 mr-2" />
               Export
@@ -145,36 +145,36 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
               <BarChart data={typeData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="rgba(255,255,255,0.05)"
+                  stroke="hsl(var(--border))"
                 />
                 <XAxis
                   dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1f2126",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
-                    color: "#fff",
+                    color: "hsl(var(--card-foreground))",
                   }}
                 />
-                <Bar dataKey="value" fill="#E63946" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#18191b] border-white/10">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-medium">
+            <CardTitle className="text-foreground text-base font-medium">
               Type Breakdown
             </CardTitle>
           </CardHeader>
@@ -199,10 +199,10 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1f2126",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
-                    color: "#fff",
+                    color: "hsl(var(--card-foreground))",
                   }}
                 />
               </PieChart>
@@ -220,11 +220,11 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
                         backgroundColor: COLORS[index % COLORS.length],
                       }}
                     />
-                    <span className="text-white/60 capitalize">
+                    <span className="text-muted-foreground capitalize">
                       {entry.name}
                     </span>
                   </div>
-                  <span className="text-white">{entry.value}</span>
+                  <span className="text-foreground">{entry.value}</span>
                 </div>
               ))}
             </div>
@@ -232,9 +232,9 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
         </Card>
       </div>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-white text-base font-medium">
+          <CardTitle className="text-foreground text-base font-medium">
             Activity Log
           </CardTitle>
           <Button
@@ -254,7 +254,7 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
                 "activities-report.csv"
               )
             }
-            className="text-white/50 hover:text-white hover:bg-white/5"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent"
           >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
@@ -264,20 +264,20 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Subject
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Type
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Status
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Priority
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Due Date
                   </th>
                 </tr>
@@ -287,7 +287,7 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
                   <tr>
                     <td
                       colSpan={5}
-                      className="py-12 text-center text-sm text-white/40"
+                      className="py-12 text-center text-sm text-muted-foreground"
                     >
                       No activities in selected period
                     </td>
@@ -296,12 +296,12 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
                 {activities.map((act: any) => (
                   <tr
                     key={act.id}
-                    className="border-b border-white/5 hover:bg-white/[0.02]"
+                    className="border-b border-border/50 hover:bg-accent/50"
                   >
-                    <td className="py-3 px-4 text-sm text-white font-medium">
+                    <td className="py-3 px-4 text-sm text-foreground font-medium">
                       {act.subject}
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/70 capitalize">
+                    <td className="py-3 px-4 text-sm text-muted-foreground capitalize">
                       {act.type}
                     </td>
                     <td className="py-3 px-4">
@@ -314,10 +314,10 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
                         {act.status}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/70 capitalize">
+                    <td className="py-3 px-4 text-sm text-muted-foreground capitalize">
                       {act.priority}
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/50">
+                    <td className="py-3 px-4 text-sm text-muted-foreground">
                       {act.due_date
                         ? new Date(act.due_date).toLocaleDateString()
                         : "-"}
