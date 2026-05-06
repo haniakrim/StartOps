@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Search, Filter, Plus, MoreHorizontal, Mail, Phone, Building2, MapPin, ArrowUpDown, Download, Upload, Star, Loader2,
 } from "lucide-react";
+import { BulkActionBar } from "@/components/BulkActionBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -253,6 +254,69 @@ export default function Contacts() {
           </Dialog>
         </div>
       </div>
+
+      <BulkActionBar
+        selectedCount={selected.length}
+        onClear={() => setSelected([])}
+        onDelete={async () => {
+          try {
+            const { error } = await supabase.from("contacts").delete().in("id", selected);
+            if (error) throw error;
+            toast.success(`${selected.length} contacts deleted`);
+            setSelected([]);
+            fetchContacts();
+          } catch (error: any) {
+            toast.error("Failed to delete contacts: " + error.message);
+          }
+        }}
+        onStatusChange={async (status) => {
+          try {
+            const { error } = await supabase.from("contacts").update({ status }).in("id", selected);
+            if (error) throw error;
+            toast.success(`Status updated for ${selected.length} contacts`);
+            setSelected([]);
+            fetchContacts();
+          } catch (error: any) {
+            toast.error("Failed to update status: " + error.message);
+          }
+        }}
+        onExport={() => {
+          const selectedContacts = contacts.filter((c) => selected.includes(c.id));
+          const csv = [
+            ["First Name", "Last Name", "Email", "Phone", "Company", "Title", "Status"].join(","),
+            ...selectedContacts.map((c) =>
+              [c.first_name, c.last_name, c.email || "", c.phone || "", c.company || "", c.title || "", c.status || ""].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")
+            ),
+          ].join("\n");
+          const blob = new Blob([csv], { type: "text/csv" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `contacts-export-${new Date().toISOString().split("T")[0]}.csv`;
+          a.click();
+          URL.revokeObjectURL(url);
+          toast.success(`${selected.length} contacts exported`);
+          setSelected([]);
+        }}
+        onTagAdd={async (tag) => {
+          try {
+            const updates = contacts
+              .filter((c) => selected.includes(c.id))
+              .map((c) => ({
+                id: c.id,
+                tags: [...(c.tags || []), tag],
+              }));
+            for (const update of updates) {
+              await supabase.from("contacts").update({ tags: update.tags }).eq("id", update.id);
+            }
+            toast.success(`Tag added to ${selected.length} contacts`);
+            setSelected([]);
+            fetchContacts();
+          } catch (error: any) {
+            toast.error("Failed to add tags: " + error.message);
+          }
+        }}
+      />
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">

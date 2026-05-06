@@ -11,6 +11,7 @@ import { ExecutiveBriefing } from "@/components/dashboard/ExecutiveBriefing";
 import { DealHealth } from "@/components/dashboard/DealHealth";
 import { AIForecast } from "@/components/dashboard/AIForecast";
 import { AnomalyDetection } from "@/components/dashboard/AnomalyDetection";
+import { GettingStarted } from "@/components/dashboard/GettingStarted";
 import {
   DollarSign,
   Target,
@@ -95,6 +96,9 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
+
+      {/* Getting Started */}
+      <GettingStarted />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

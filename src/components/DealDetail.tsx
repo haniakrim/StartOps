@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { DollarSign, Calendar, User, Building2, TrendingUp, Loader2, Pencil, Trash2, GitBranch, MessageSquare, Clock, BrainCircuit, TrendingDown, Minus, History } from "lucide-react";
+import { CommentsSection } from "@/components/CommentsSection";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -154,6 +155,7 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
                   <TabsTrigger value="history" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">History</TabsTrigger>
                   <TabsTrigger value="communications" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Comms</TabsTrigger>
                   <TabsTrigger value="activities" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Tasks</TabsTrigger>
+                  <TabsTrigger value="comments" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Comments</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="mt-4 space-y-4">
@@ -245,6 +247,10 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
                     })}
                     {communications.length === 0 && <p className="text-sm text-white/40 text-center py-8">No communications logged</p>}
                   </div>
+                </TabsContent>
+
+                <TabsContent value="comments" className="mt-4">
+                  <CommentsSection entityType="deal" entityId={dealId} />
                 </TabsContent>
 
                 <TabsContent value="activities" className="mt-4">

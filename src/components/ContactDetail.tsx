@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Mail, Phone, Building2, Tag, Loader2, Pencil, Trash2, DollarSign, GitBranch, MessageSquare, Clock, Calendar, BrainCircuit, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Mail, Phone, Building2, Tag, Loader2, Pencil, Trash2, DollarSign, GitBranch, MessageSquare, Clock, BrainCircuit, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { CommentsSection } from "@/components/CommentsSection";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -140,6 +141,7 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                   <TabsTrigger value="timeline" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Timeline</TabsTrigger>
                   <TabsTrigger value="deals" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Deals ({deals.length})</TabsTrigger>
                   <TabsTrigger value="communications" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Comms ({communications.length})</TabsTrigger>
+                  <TabsTrigger value="comments" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Comments</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="mt-4 space-y-4">
@@ -200,7 +202,7 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                           <GitBranch className="w-4 h-4 text-white/30" />
                           <div>
                             <p className="text-sm text-white">{deal.name}</p>
-                            <p className="text-xs text-white/40\">{deal.stage} · {deal.probability || 0}% probability</p>
+                            <p className="text-xs text-white/40">{deal.stage} · {deal.probability || 0}% probability</p>
                           </div>
                         </div>
                         <span className="text-sm font-medium text-white flex items-center gap-1"><DollarSign className="w-3 h-3" />{(deal.value || 0).toLocaleString()}</span>
@@ -208,6 +210,10 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
                     ))}
                     {deals.length === 0 && <p className="text-sm text-white/40 text-center py-8">No deals associated</p>}
                   </div>
+                </TabsContent>
+
+                <TabsContent value="comments" className="mt-4">
+                  <CommentsSection entityType="contact" entityId={contactId} />
                 </TabsContent>
 
                 <TabsContent value="communications" className="mt-4">
