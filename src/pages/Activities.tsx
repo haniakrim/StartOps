@@ -427,7 +427,9 @@ export default function Activities() {
               ? filtered
               : tab === "pending"
                 ? pending
-                : completed;
+                : tab === "completed"
+                  ? completed
+                  : filtered;
           return (
             <TabsContent key={tab} value={tab} className="mt-6">
               {tab === "board" ? (
