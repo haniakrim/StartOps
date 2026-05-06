@@ -103,6 +103,7 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -292,5 +293,6 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
       dealId={dealId}
       contactId={deal?.contact_id}
     />
+    </>
   );
 }

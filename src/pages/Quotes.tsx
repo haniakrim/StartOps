@@ -15,8 +15,12 @@ interface Quote {
   title: string | null;
   status: string;
   subtotal: number;
+  tax_rate: number;
+  tax_amount: number;
   total: number;
   valid_until: string | null;
+  notes: string | null;
+  terms: string | null;
   created_at: string;
   contacts: { first_name: string; last_name: string; company: string | null } | null;
   deals: { name: string } | null;
