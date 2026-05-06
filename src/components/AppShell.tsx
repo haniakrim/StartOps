@@ -33,6 +33,7 @@ import {
   BrainCircuit,
   Clock,
   Target,
+  Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -43,6 +44,7 @@ import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 
 const navItems = [
   { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { path: "/today", icon: Sun, label: "Today" },
   { path: "/contacts", icon: Users, label: "Contacts" },
   { path: "/companies", icon: Building2, label: "Companies" },
   { path: "/deals", icon: GitBranch, label: "Deals" },

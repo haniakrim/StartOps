@@ -35,6 +35,7 @@ import Calendar from "./pages/Calendar";
 import Reports from "./pages/Reports";
 import Goals from "./pages/Goals";
 import Notifications from "./pages/Notifications";
+import Today from "./pages/Today";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +97,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/today"
+              element={
+                <ProtectedRoute>
+                  <Today />
                 </ProtectedRoute>
               }
             />
