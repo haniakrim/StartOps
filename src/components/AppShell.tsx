@@ -66,6 +66,7 @@ const navItems = [
   { path: "/audit", icon: FileText, label: "Audit Logs" },
   { path: "/support", icon: LifeBuoy, label: "Support" },
   { path: "/assistant", icon: Sparkles, label: "AI Assistant" },
+  { path: "/notifications", icon: Bell, label: "Notifications" },
   { path: "/settings", icon: Cog, label: "Settings" },
 ];
 
