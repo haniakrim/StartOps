@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Plus, MoreHorizontal, DollarSign, Calendar, User, Building2, Filter, Search, Loader2,
+  Plus, MoreHorizontal, DollarSign, Calendar, User, Building2, Filter, Search, Loader2, Download,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -162,6 +162,23 @@ export default function Deals() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
             <input type="text" placeholder="Search deals..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-64 bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
           </div>
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = deals.map(d => ({
+              "Deal Name": d.name,
+              "Value": d.value,
+              "Probability": d.probability,
+              "Stage": d.stage,
+              "Status": d.status,
+              "Expected Close": d.expected_close_date,
+              "Company": d.contacts?.company || "",
+              "Contact": d.contacts ? `${d.contacts.first_name} ${d.contacts.last_name}` : "",
+            }));
+            import("@/lib/export").then(({ exportToCSV }) => {
+              exportToCSV(exportData, "deals");
+            });
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
           <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Filter className="w-4 h-4 mr-2" />Filter</Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>

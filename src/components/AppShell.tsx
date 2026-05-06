@@ -11,6 +11,8 @@ import {
   Settings,
   LifeBuoy,
   FileText,
+  CreditCard,
+  Send,
   ChevronLeft,
   ChevronRight,
   Bell,
@@ -41,7 +43,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { CommandPalette } from "@/components/CommandPalette";
-import { NotificationsDropdown } from "@/components/NotificationsDropdown";
+import { RealtimeNotifications } from "@/components/RealtimeNotifications";
 
 const navItems = [
   { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -61,6 +63,7 @@ const navItems = [
   { path: "/forecasts", icon: BrainCircuit, label: "Forecasts" },
   { path: "/timesheets", icon: Clock, label: "Timesheets" },
   { path: "/quotes", icon: FileText, label: "Quotes" },
+  { path: "/documents", icon: FileText, label: "Documents" },
   { path: "/email-templates", icon: BookOpen, label: "Email Templates" },
   { path: "/goals", icon: Target, label: "Goals" },
   { path: "/organization", icon: Settings, label: "Organization" },
@@ -73,6 +76,8 @@ const navItems = [
   { path: "/assistant", icon: Sparkles, label: "AI Assistant" },
   { path: "/notifications", icon: Bell, label: "Notifications" },
   { path: "/settings", icon: Cog, label: "Settings" },
+  { path: "/subscriptions", icon: CreditCard, label: "Subscriptions" },
+  { path: "/campaigns", icon: Send, label: "Campaigns" },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -219,7 +224,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <NotificationsDropdown />
+            <RealtimeNotifications />
             <Button
               variant="ghost"
               size="icon"

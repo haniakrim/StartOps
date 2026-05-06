@@ -283,8 +283,14 @@ export default function Companies() {
           </Card>
         ))}
         {filtered.length === 0 && (
-          <div className="col-span-full text-center py-12 text-sm text-white/40">
-            {search ? "No companies match your search" : "No companies yet. Add your first one!"}
+          <div className="col-span-full">
+            <EmptyState
+              icon={Building2}
+              title={search ? "No companies match your search" : "No companies yet"}
+              description={search ? "Try adjusting your search terms" : "Add your first company to start tracking accounts"}
+              actionLabel={!search ? "Add Company" : undefined}
+              onAction={!search ? () => setDialogOpen(true) : undefined}
+            />
           </div>
         )}
       </div>

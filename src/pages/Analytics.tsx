@@ -399,13 +399,94 @@ export default function Analytics() {
         </TabsContent>
 
         <TabsContent value="sources" className="mt-6">
-          <Card className="bg-[#18191b] border-white/10">
-            <CardContent className="p-12 text-center">
-              <GitBranch className="w-12 h-12 text-white/20 mx-auto mb-4" />
-              <p className="text-sm text-white/40">Source tracking not yet configured</p>
-              <p className="text-xs text-white/30 mt-1">Add a source column to deals or use custom fields to track lead sources</p>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="bg-[#18191b] border-white/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-white text-base font-medium flex items-center gap-2">
+                  <GitBranch className="w-4 h-4 text-[#6452db]" />
+                  Lead Sources
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {sourceData.length > 0 ? (
+                  <>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <PieChart>
+                        <Pie
+                          data={sourceData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={90}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {sourceData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="space-y-2 mt-2">
+                      {sourceData.map((entry: any, index: number) => (
+                        <div key={entry.name} className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                            <span className="text-white/60">{entry.name}</span>
+                          </div>
+                          <span className="text-white">{entry.value} deals</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-12">
+                    <GitBranch className="w-12 h-12 text-white/20 mx-auto mb-4" />
+                    <p className="text-sm text-white/40">No source data yet</p>
+                    <p className="text-xs text-white/30 mt-1">Add a source when creating deals to track lead origins</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[#18191b] border-white/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-white text-base font-medium flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-[#ff8964]" />
+                  Source Performance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {sourceData.length > 0 ? (
+                  <div className="space-y-3">
+                    {sourceData.map((source: any) => {
+                      const totalValue = source.deals?.reduce((s: number, d: any) => s + (d.value || 0), 0) || 0;
+                      const wonCount = source.deals?.filter((d: any) => d.stage === "closed-won").length || 0;
+                      const conversionRate = source.deals?.length > 0 ? Math.round((wonCount / source.deals.length) * 100) : 0;
+                      return (
+                        <div key={source.name} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                          <div>
+                            <p className="text-sm font-medium text-white">{source.name}</p>
+                            <p className="text-xs text-white/40">{source.value} deals · ${totalValue.toLocaleString()} total</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-white">{conversionRate}%</p>
+                            <p className="text-xs text-white/40">conversion</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <BarChart3 className="w-12 h-12 text-white/20 mx-auto mb-4" />
+                    <p className="text-sm text-white/40">No source performance data</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

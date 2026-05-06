@@ -200,7 +200,26 @@ export default function Contacts() {
           <p className="text-sm text-white/50 mt-1">Manage your contacts and relationships</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Download className="w-4 h-4 mr-2" />Export</Button>
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const selectedContacts = contacts.filter((c) => selected.includes(c.id));
+            const data = selectedContacts.length > 0 ? selectedContacts : contacts;
+            const exportData = data.map(c => ({
+              "First Name": c.first_name,
+              "Last Name": c.last_name,
+              "Email": c.email,
+              "Phone": c.phone,
+              "Company": c.company,
+              "Title": c.title,
+              "Status": c.status,
+              "Tags": (c.tags || []).join(", "),
+              "Created": c.created_at,
+            }));
+            import("@/lib/export").then(({ exportToCSV }) => {
+              exportToCSV(exportData, "contacts");
+            });
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)} className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Upload className="w-4 h-4 mr-2" />Import</Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
