@@ -230,13 +230,13 @@ export default function Contacts() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Contacts</h1>
-          <p className="text-sm text-white/50 mt-1">Manage your leads and customers</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Contacts</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage your leads and customers</p>
         </div>
         <div className="flex items-center gap-2">
           <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="border-white/10 text-white hover:bg-white/5">
+              <Button variant="outline" size="sm">
                 <Upload className="w-4 h-4 mr-2" />Import
               </Button>
             </DialogTrigger>
@@ -246,16 +246,16 @@ export default function Contacts() {
                 <Input type="file" accept=".csv" onChange={handleFileChange} />
                 {importPreview.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm text-white/70">Preview (first 5 rows):</p>
+                    <p className="text-sm text-muted-foreground">Preview (first 5 rows):</p>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
-                        <thead><tr className="border-b border-white/10">{importPreview[0].map((h, i) => <th key={i} className="text-left py-2 px-2 text-white/50">{h}</th>)}</tr></thead>
-                        <tbody>{importPreview.slice(1).map((row, i) => <tr key={i} className="border-b border-white/5">{row.map((cell, j) => <td key={j} className="py-2 px-2 text-white/70">{cell}</td>)}</tr>)}</tbody>
+                        <thead><tr className="border-b border-border">{importPreview[0].map((h, i) => <th key={i} className="text-left py-2 px-2 text-muted-foreground">{h}</th>)}</tr></thead>
+                        <tbody>{importPreview.slice(1).map((row, i) => <tr key={i} className="border-b border-border/50">{row.map((cell, j) => <td key={j} className="py-2 px-2 text-foreground/70">{cell}</td>)}</tr>)}</tbody>
                       </table>
                     </div>
                   </div>
                 )}
-                <Button onClick={importContacts} disabled={!importFile} className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                <Button onClick={importContacts} disabled={!importFile} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                   Import Contacts
                 </Button>
               </div>
@@ -263,7 +263,7 @@ export default function Contacts() {
           </Dialog>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                 <Plus className="w-4 h-4 mr-2" />Add Contact
               </Button>
             </DialogTrigger>
@@ -272,31 +272,31 @@ export default function Contacts() {
               <form onSubmit={createContact} className="space-y-4 pt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">First Name</Label>
-                    <Input required value={newContact.first_name} onChange={(e) => setNewContact(p => ({ ...p, first_name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Label>First Name</Label>
+                    <Input required value={newContact.first_name} onChange={(e) => setNewContact(p => ({ ...p, first_name: e.target.value }))} />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Last Name</Label>
-                    <Input required value={newContact.last_name} onChange={(e) => setNewContact(p => ({ ...p, last_name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Label>Last Name</Label>
+                    <Input required value={newContact.last_name} onChange={(e) => setNewContact(p => ({ ...p, last_name: e.target.value }))} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Email</Label>
-                  <Input type="email" value={newContact.email} onChange={(e) => setNewContact(p => ({ ...p, email: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Email</Label>
+                  <Input type="email" value={newContact.email} onChange={(e) => setNewContact(p => ({ ...p, email: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Phone</Label>
-                  <Input value={newContact.phone} onChange={(e) => setNewContact(p => ({ ...p, phone: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Phone</Label>
+                  <Input value={newContact.phone} onChange={(e) => setNewContact(p => ({ ...p, phone: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Company</Label>
-                  <Input value={newContact.company} onChange={(e) => setNewContact(p => ({ ...p, company: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Company</Label>
+                  <Input value={newContact.company} onChange={(e) => setNewContact(p => ({ ...p, company: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Title</Label>
-                  <Input value={newContact.title} onChange={(e) => setNewContact(p => ({ ...p, title: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Title</Label>
+                  <Input value={newContact.title} onChange={(e) => setNewContact(p => ({ ...p, title: e.target.value }))} />
                 </div>
-                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Contact</Button>
+                <Button type="submit" className="w-full">Create Contact</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -305,8 +305,8 @@ export default function Contacts() {
 
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-          <Input placeholder="Search contacts..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 bg-[#18191b] border-white/10 text-white placeholder:text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input placeholder="Search contacts..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
       </div>
 
@@ -321,35 +321,35 @@ export default function Contacts() {
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(contact => (
-            <Card key={contact.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors cursor-pointer" onClick={() => { setDetailContactId(contact.id); setDetailOpen(true); }}>
+            <Card key={contact.id} className="cursor-pointer" onClick={() => { setDetailContactId(contact.id); setDetailOpen(true); }}>
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10 bg-[#6452db]/20">
-                      <AvatarFallback className="text-[#6452db] text-sm font-medium">{contact.first_name[0]}{contact.last_name[0]}</AvatarFallback>
+                    <Avatar className="w-10 h-10">
+                      <AvatarFallback className="text-primary text-sm font-medium">{contact.first_name[0]}{contact.last_name[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="text-sm font-medium text-white">{contact.first_name} {contact.last_name}</h3>
-                      {contact.title && <p className="text-xs text-white/50">{contact.title}</p>}
+                      <h3 className="text-sm font-medium text-foreground">{contact.first_name} {contact.last_name}</h3>
+                      {contact.title && <p className="text-xs text-muted-foreground">{contact.title}</p>}
                     </div>
                   </div>
                   <Badge variant="secondary" className={`text-xs ${statusColors[contact.status || ''] || statusColors.Lead}`}>{contact.status || 'Lead'}</Badge>
                 </div>
                 <div className="mt-4 space-y-2">
                   {contact.email && (
-                    <div className="flex items-center gap-2 text-sm text-white/60">
-                      <Mail className="w-3.5 h-3.5 text-white/30" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Mail className="w-3.5 h-3.5 text-muted-foreground/50" />
                       {contact.email}
                     </div>
                   )}
                   {contact.phone && (
-                    <div className="flex items-center gap-2 text-sm text-white/60">
-                      <Phone className="w-3.5 h-3.5 text-white/30" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Phone className="w-3.5 h-3.5 text-muted-foreground/50" />
                       {contact.phone}
                     </div>
                   )}
@@ -362,7 +362,7 @@ export default function Contacts() {
                 </div>
                 <div className="mt-4 flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 text-[#f0ad4e]" />
+                    <Star className="w-3.5 h-3.5 text-amber-500" />
                     <span className="text-xs text-white/50">{contact.lead_score || 0}/100</span>
                   </div>
                   <span className="text-xs text-white/30">{new Date(contact.created_at).toLocaleDateString()}</span>
@@ -377,7 +377,7 @@ export default function Contacts() {
       )}
 
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-2xl bg-[#18191b] border-white/10 text-white">
+        <DialogContent className="max-w-2xl">
           {detailContactId && <ContactDetail contactId={detailContactId} open={true} onClose={() => setDetailOpen(false)} />}
         </DialogContent>
       </Dialog>
