@@ -38,6 +38,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
 
   async function fetchComments() {
     if (!entityId) return;
+    if (!organizationId) return;
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -45,6 +46,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
         .select("*")
         .eq("entity_type", entityType)
         .eq("entity_id", entityId)
+        .eq("organization_id", organizationId)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
@@ -82,8 +84,13 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
   }
 
   async function deleteComment(id: string) {
+    if (!organizationId) return;
     try {
-      const { error } = await supabase.from("comments").delete().eq("id", id);
+      const { error } = await supabase
+        .from("comments")
+        .delete()
+        .eq("id", id)
+        .eq("organization_id", organizationId);
       if (error) throw error;
       toast.success("Comment deleted");
       fetchComments();
