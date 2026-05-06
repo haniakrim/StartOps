@@ -44,8 +44,30 @@ export function exportToJSON(data: any[], filename: string) {
   document.body.removeChild(link);
 }
 
+function escapeHtml(str: unknown): string {
+  if (str === null || str === undefined) return "";
+  const text = String(str);
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 export function exportToPDF(data: any[], filename: string) {
   // Simple HTML-based PDF generation
+  const headers = Object.keys(data[0] || {});
+  const headerRow = headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("");
+  const bodyRows = data
+    .map(
+      (row) =>
+        `<tr>${headers
+          .map((h) => `<td>${escapeHtml(row[h])}</td>`)
+          .join("")}</tr>`
+    )
+    .join("");
+
   const html = `
     <html>
       <head>
@@ -57,14 +79,14 @@ export function exportToPDF(data: any[], filename: string) {
         </style>
       </head>
       <body>
-        <h1>${filename}</h1>
-        <p>Generated on ${new Date().toLocaleString()}</p>
+        <h1>${escapeHtml(filename)}</h1>
+        <p>Generated on ${escapeHtml(new Date().toLocaleString())}</p>
         <table>
           <thead>
-            <tr>${Object.keys(data[0] || {}).map(h => `<th>${h}</th>`).join("")}</tr>
+            <tr>${headerRow}</tr>
           </thead>
           <tbody>
-            ${data.map(row => `<tr>${Object.values(row).map(v => `<td>${v ?? ""}</td>`).join("")}</tr>`).join("")}
+            ${bodyRows}
           </tbody>
         </table>
       </body>

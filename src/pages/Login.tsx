@@ -152,6 +152,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [rateLimitTimer, setRateLimitTimer] = useState(0);
 
   useEffect(() => {
     if (user) {
@@ -161,26 +164,47 @@ export default function Login() {
     return () => clearTimeout(timer);
   }, [user, navigate]);
 
-  async function handleDemoLogin() {
-    setLoading(true);
-    toast.info("Entering demo mode...");
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: "demo@example.com",
-        password: "demodemo123",
-      });
-      if (error) throw error;
-      toast.success("Welcome to the demo!");
-      navigate("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Demo login failed");
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (rateLimitTimer > 0) {
+      const timer = setTimeout(() => {
+        setRateLimitTimer((prev) => {
+          const next = prev - 1;
+          if (next <= 0) {
+            setIsRateLimited(false);
+            return 0;
+          }
+          return next;
+        });
+      }, 1000);
+      return () => clearTimeout(timer);
     }
+  }, [rateLimitTimer]);
+
+  function validatePassword(pw: string): string | null {
+    if (pw.length < 8) return "Password must be at least 8 characters";
+    if (!/[A-Z]/.test(pw)) return "Password must contain at least one uppercase letter";
+    if (!/[a-z]/.test(pw)) return "Password must contain at least one lowercase letter";
+    if (!/[0-9]/.test(pw)) return "Password must contain at least one number";
+    if (!/[^A-Za-z0-9]/.test(pw)) return "Password must contain at least one special character";
+    return null;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (isRateLimited) {
+      toast.error(`Please wait ${rateLimitTimer} seconds before trying again.`);
+      return;
+    }
+
+    if (isSignUp) {
+      const pwError = validatePassword(password);
+      if (pwError) {
+        toast.error(pwError);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -230,7 +254,24 @@ export default function Login() {
           email,
           password,
         });
-        if (error) throw error;
+        if (error) {
+          const newAttempts = failedAttempts + 1;
+          setFailedAttempts(newAttempts);
+          if (newAttempts >= 5) {
+            setIsRateLimited(true);
+            setRateLimitTimer(60);
+            toast.error("Too many failed attempts. Please wait 60 seconds.");
+          } else if (newAttempts >= 3) {
+            setIsRateLimited(true);
+            setRateLimitTimer(30);
+            toast.error("Too many failed attempts. Please wait 30 seconds.");
+          } else {
+            throw error;
+          }
+          setLoading(false);
+          return;
+        }
+        setFailedAttempts(0);
         toast.success("Signed in successfully");
         navigate("/dashboard");
       }
@@ -409,7 +450,7 @@ export default function Login() {
                       className="pl-10 pr-10"
                       placeholder="••••••••"
                       required
-                      minLength={6}
+                      minLength={8}
                     />
                     <button
                       type="button"
@@ -441,25 +482,6 @@ export default function Login() {
                   )}
                 </Button>
               </form>
-
-              {!isSignUp && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={loading}
-                  onClick={handleDemoLogin}
-                  className="w-full h-11 text-sm font-medium transition-all mt-3 border-dashed"
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Try Demo
-                    </>
-                  )}
-                </Button>
-              )}
 
               <div className="mt-6 text-center">
                 <button

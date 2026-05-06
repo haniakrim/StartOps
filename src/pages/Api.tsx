@@ -101,9 +101,10 @@ export default function Api() {
     }
   }
 
-  const apiKey = apiKeys[0]?.key_prefix ? `${apiKeys[0].key_prefix}...` : "sk_live_51Hx9m2K3LpQr8TnW4vYz";
+  const apiKey = apiKeys[0]?.key_prefix ? `${apiKeys[0].key_prefix}...` : null;
 
   const copyKey = () => {
+    if (!apiKey) return;
     navigator.clipboard.writeText(apiKey);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -134,12 +135,13 @@ export default function Api() {
         <CardContent className="p-6 pt-0 space-y-4">
           <div className="flex items-center gap-3">
             <code className="flex-1 bg-muted border border-border rounded-md px-4 py-3 text-sm text-foreground font-mono">
-              {apiKey}
+              {apiKey ?? "No API key configured"}
             </code>
             <Button
               variant="ghost"
               size="icon"
               onClick={copyKey}
+              disabled={!apiKey}
               className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}

@@ -14,11 +14,48 @@ serve(async (req) => {
   try {
     console.log("[seed-demo] Starting demo seed process")
 
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      console.error("[seed-demo] Missing Authorization header")
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401
+      })
+    }
+
+    const token = authHeader.replace('Bearer ', '')
+
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       { auth: { autoRefreshToken: false, persistSession: false } }
     )
+
+    // Verify the JWT token and get user info
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+    if (authError || !user) {
+      console.error("[seed-demo] Invalid token:", authError?.message)
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401
+      })
+    }
+
+    // Check admin role
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile || profile.role !== 'admin') {
+      console.error("[seed-demo] User is not admin:", profileError?.message || profile?.role)
+      return new Response(JSON.stringify({ error: 'Forbidden: admin access required' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 403
+      })
+    }
 
     const demoEmail = 'demo@example.com'
     const demoPassword = 'demodemo123'

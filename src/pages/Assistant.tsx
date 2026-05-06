@@ -239,10 +239,18 @@ export default function Assistant() {
                     className={`text-sm whitespace-pre-wrap ${
                       msg.role === "user" ? "text-white" : "text-foreground"
                     }`}
-                    dangerouslySetInnerHTML={{
-                      __html: msg.content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>'),
-                    }}
-                  />
+                  >
+                    {msg.content.split(/(\*\*.*?\*\*)/).map((part, i) => {
+                      if (part.startsWith("**") && part.endsWith("**")) {
+                        return (
+                          <strong key={i} className="text-foreground">
+                            {part.slice(2, -2)}
+                          </strong>
+                        );
+                      }
+                      return part;
+                    })}
+                  </div>
                 </CardContent>
               </Card>
             </div>

@@ -85,10 +85,24 @@ export default function Security() {
     }
   }
 
+  function validatePassword(pw: string): string | null {
+    if (pw.length < 8) return "Password must be at least 8 characters";
+    if (!/[A-Z]/.test(pw)) return "Password must contain at least one uppercase letter";
+    if (!/[a-z]/.test(pw)) return "Password must contain at least one lowercase letter";
+    if (!/[0-9]/.test(pw)) return "Password must contain at least one number";
+    if (!/[^A-Za-z0-9]/.test(pw)) return "Password must contain at least one special character";
+    return null;
+  }
+
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
       toast.error("Passwords do not match");
+      return;
+    }
+    const pwError = validatePassword(newPassword);
+    if (pwError) {
+      toast.error(pwError);
       return;
     }
     try {
@@ -171,11 +185,12 @@ export default function Security() {
                     <div className="space-y-2">
                       <Label className="text-white/70 text-sm">New Password</Label>
                       <div className="relative">
-                        <Input type={showPassword ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="bg-[#0b0d10] border-white/10 text-white pr-10" required minLength={6} />
+                        <Input type={showPassword ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="bg-[#0b0d10] border-white/10 text-white pr-10" required minLength={8} />
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white">
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
+                      <p className="text-xs text-white/40">Min 8 chars, uppercase, lowercase, number, special char</p>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-white/70 text-sm">Confirm Password</Label>
