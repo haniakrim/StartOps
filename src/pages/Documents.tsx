@@ -176,12 +176,13 @@ export default function Documents() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
+          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
-              <Plus className="w-4 h-4 mr-2" />Add Document
-            </Button>
-          </DialogTrigger>
+            <DialogTrigger asChild>
+              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                <Plus className="w-4 h-4 mr-2" />Add Document
+              </Button>
+            </DialogTrigger>
           <DialogContent className="bg-[#18191b] border-white/10 text-white">
             <DialogHeader><DialogTitle>Add Document</DialogTitle></DialogHeader>
             <form onSubmit={uploadDocument} className="space-y-4 pt-4">

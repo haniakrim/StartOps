@@ -148,12 +148,13 @@ export default function Employees() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
+          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
-              <Plus className="w-4 h-4 mr-2" />Add Employee
-            </Button>
-          </DialogTrigger>
+            <DialogTrigger asChild>
+              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                <Plus className="w-4 h-4 mr-2" />Add Employee
+              </Button>
+            </DialogTrigger>
           <DialogContent className="bg-[#18191b] border-white/10 text-white">
             <DialogHeader><DialogTitle>Add Employee</DialogTitle></DialogHeader>
             <form onSubmit={createEmployee} className="space-y-4 pt-4">

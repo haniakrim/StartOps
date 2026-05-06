@@ -176,6 +176,7 @@ export default function Timesheets() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
+          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FileText, Plus, Search, Loader2, Filter, Send, CheckCircle2, XCircle, Eye, Trash2, DollarSign, TrendingUp, Clock, Download } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -163,9 +164,10 @@ export default function Quotes() {
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
           <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90" onClick={() => setBuilderOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          New Quote
-        </Button>
+            <Plus className="w-4 h-4 mr-2" />
+            New Quote
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
