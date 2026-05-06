@@ -33,7 +33,7 @@ export default function Analytics() {
     try {
       setLoading(true);
 
-      const { data: dealsData, error: dealsError } = await supabase.from("deals").select("value, stage, status, created_at, expected_close_date, source");
+      const { data: dealsData, error: dealsError } = await supabase.from("deals").select("value, stage, status, created_at, expected_close_date");
       if (dealsError) throw dealsError;
 
       const totalRevenue = dealsData?.reduce((sum, d) => sum + (d.value || 0), 0) || 0;
@@ -82,13 +82,8 @@ export default function Analytics() {
       ];
       setFunnelData(funnel);
 
-      // Source breakdown
-      const sources: Record<string, number> = {};
-      dealsData?.forEach((d) => {
-        const source = d.source || "Unknown";
-        sources[source] = (sources[source] || 0) + (d.value || 0);
-      });
-      setSourceData(Object.entries(sources).map(([name, value]) => ({ name, value })).slice(0, 6));
+      // Source breakdown - deals table doesn't have source column yet
+      setSourceData([]);
 
       // Cohort analysis (simplified - deals by creation month and close outcome)
       const cohorts: Record<string, { created: number; won: number; lost: number }> = {};
@@ -404,68 +399,13 @@ export default function Analytics() {
         </TabsContent>
 
         <TabsContent value="sources" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="bg-[#18191b] border-white/10">
-              <CardHeader className="pb-2"><CardTitle className="text-white text-base font-medium">Revenue by Source</CardTitle></CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={sourceData.length ? sourceData : [{ name: "No data", value: 1 }]}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {(sourceData.length ? sourceData : [{ name: "No data", value: 1 }]).map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} formatter={(value: number) => [`$${value.toLocaleString()}`]} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="space-y-1 mt-2">
-                  {sourceData.map((entry, index) => (
-                    <div key={entry.name} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                        <span className="text-white/60 capitalize">{entry.name}</span>
-                      </div>
-                      <span className="text-white">${(entry.value as number).toLocaleString()}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-[#18191b] border-white/10">
-              <CardHeader className="pb-2"><CardTitle className="text-white text-base font-medium">Source Performance</CardTitle></CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {sourceData.map((source, i) => {
-                    const total = sourceData.reduce((s, d) => s + (d.value as number), 0);
-                    const pct = total > 0 ? ((source.value as number) / total) * 100 : 0;
-                    return (
-                      <div key={source.name}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-white capitalize">{source.name}</span>
-                          <span className="text-sm text-white/60">{pct.toFixed(1)}%</span>
-                        </div>
-                        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: COLORS[i % COLORS.length] }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {sourceData.length === 0 && (
-                    <p className="text-sm text-white/40 text-center py-8">No source data available</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card className="bg-[#18191b] border-white/10">
+            <CardContent className="p-12 text-center">
+              <GitBranch className="w-12 h-12 text-white/20 mx-auto mb-4" />
+              <p className="text-sm text-white/40">Source tracking not yet configured</p>
+              <p className="text-xs text-white/30 mt-1">Add a source column to deals or use custom fields to track lead sources</p>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
