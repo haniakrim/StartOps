@@ -38,7 +38,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { GlobalSearch } from "@/components/GlobalSearch";
+import { CommandPalette } from "@/components/CommandPalette";
 import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 
 const navItems = [
@@ -90,7 +90,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#0b0d10] text-white flex">
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/60 z-40 lg:hidden"
@@ -98,13 +97,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed lg:static inset-y-0 left-0 z-50 bg-[#0b0d10] border-r border-white/10 transition-all duration-300 flex flex-col ${
           collapsed ? "w-16" : "w-64"
         } ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
-        {/* Logo */}
         <div className="h-16 flex items-center px-4 border-b border-white/10">
           <div className="w-8 h-8 rounded-lg bg-[#6452db] flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">S</span>
@@ -122,7 +119,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const active = isActive(item.path);
@@ -147,7 +143,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        {/* Bottom */}
         <div className="p-3 border-t border-white/10">
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -191,11 +186,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <GlobalSearch />
+        <CommandPalette />
 
-        {/* Top bar */}
         <header className="h-16 flex items-center gap-4 px-6 border-b border-white/10 bg-[#0b0d10]/80 backdrop-blur-sm sticky top-0 z-30">
           <button
             onClick={() => setMobileOpen(true)}
@@ -213,7 +206,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <input
                 type="text"
                 readOnly
-                placeholder="Search contacts, deals, companies... (⌘K)"
+                placeholder="Search commands, pages, actions... (⌘K)"
                 className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50 cursor-pointer"
               />
             </div>
@@ -233,7 +226,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page content */}
         <main className="flex-1 overflow-auto p-6">{children}</main>
       </div>
     </div>
