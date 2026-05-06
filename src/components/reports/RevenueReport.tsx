@@ -110,7 +110,7 @@ export function RevenueReport({ range }: { range: DateRange }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-[#6452db] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -144,9 +144,9 @@ export function RevenueReport({ range }: { range: DateRange }) {
         />
       </div>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-white text-base font-medium">
+          <CardTitle className="text-foreground text-base font-medium">
             Revenue by Month
           </CardTitle>
           <Button
@@ -161,7 +161,7 @@ export function RevenueReport({ range }: { range: DateRange }) {
                 "revenue-monthly-report.csv"
               )
             }
-            className="text-white/50 hover:text-white hover:bg-white/5"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent"
           >
             <Download className="w-4 h-4 mr-2" />
             Export
@@ -172,26 +172,26 @@ export function RevenueReport({ range }: { range: DateRange }) {
             <BarChart data={monthlyData}>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="rgba(255,255,255,0.05)"
+                stroke="hsl(var(--border))"
               />
               <XAxis
                 dataKey="name"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 tickFormatter={(v) => `$${v / 1000}k`}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#1f2126",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  backgroundColor: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
-                  color: "#fff",
+                  color: "hsl(var(--card-foreground))",
                 }}
                 formatter={(value: number) => [
                   `$${value.toLocaleString()}`,
@@ -204,9 +204,9 @@ export function RevenueReport({ range }: { range: DateRange }) {
         </CardContent>
       </Card>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-white text-base font-medium">
+          <CardTitle className="text-foreground text-base font-medium">
             Invoice Details
           </CardTitle>
           <Button
@@ -228,7 +228,7 @@ export function RevenueReport({ range }: { range: DateRange }) {
                 "invoices-report.csv"
               )
             }
-            className="text-white/50 hover:text-white hover:bg-white/5"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent"
           >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
@@ -238,20 +238,20 @@ export function RevenueReport({ range }: { range: DateRange }) {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Invoice
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Client
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Amount
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Status
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Due Date
                   </th>
                 </tr>
@@ -261,7 +261,7 @@ export function RevenueReport({ range }: { range: DateRange }) {
                   <tr>
                     <td
                       colSpan={5}
-                      className="py-12 text-center text-sm text-white/40"
+                      className="py-12 text-center text-sm text-muted-foreground"
                     >
                       No invoices in selected period
                     </td>
@@ -270,17 +270,17 @@ export function RevenueReport({ range }: { range: DateRange }) {
                 {invoices.map((inv: any) => (
                   <tr
                     key={inv.id}
-                    className="border-b border-white/5 hover:bg-white/[0.02]"
+                    className="border-b border-border/50 hover:bg-accent/50"
                   >
-                    <td className="py-3 px-4 text-sm text-white font-medium">
+                    <td className="py-3 px-4 text-sm text-foreground font-medium">
                       {inv.invoice_number}
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/70">
+                    <td className="py-3 px-4 text-sm text-muted-foreground">
                       {inv.contacts
                         ? `${inv.contacts.first_name} ${inv.contacts.last_name}`
                         : "-"}
                     </td>
-                    <td className="py-3 px-4 text-sm text-white">
+                    <td className="py-3 px-4 text-sm text-foreground">
                       ${(inv.amount || 0).toLocaleString()}
                     </td>
                     <td className="py-3 px-4">
@@ -293,7 +293,7 @@ export function RevenueReport({ range }: { range: DateRange }) {
                         {inv.status}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/50">
+                    <td className="py-3 px-4 text-sm text-muted-foreground">
                       {inv.due_date
                         ? new Date(inv.due_date).toLocaleDateString()
                         : "-"}

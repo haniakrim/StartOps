@@ -94,7 +94,7 @@ export function PipelineReport({ range }: { range: DateRange }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-[#6452db] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -129,9 +129,9 @@ export function PipelineReport({ range }: { range: DateRange }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 bg-[#18191b] border-white/10">
+        <Card className="lg:col-span-2 bg-card border-border">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
-            <CardTitle className="text-white text-base font-medium">
+            <CardTitle className="text-foreground text-base font-medium">
               Deals by Stage
             </CardTitle>
             <Button
@@ -146,7 +146,7 @@ export function PipelineReport({ range }: { range: DateRange }) {
                   "pipeline-stage-report.csv"
                 )
               }
-              className="text-white/50 hover:text-white hover:bg-white/5"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <Download className="w-4 h-4 mr-2" />
               Export
@@ -157,30 +157,30 @@ export function PipelineReport({ range }: { range: DateRange }) {
               <BarChart data={stageData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="rgba(255,255,255,0.05)"
+                  stroke="hsl(var(--border))"
                 />
                 <XAxis
                   dataKey="name"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1f2126",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
-                    color: "#fff",
+                    color: "hsl(var(--card-foreground))",
                   }}
                 />
                 <Bar
                   dataKey="value"
-                  fill="#6452db"
+                  fill="hsl(var(--primary))"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -188,9 +188,9 @@ export function PipelineReport({ range }: { range: DateRange }) {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#18191b] border-white/10">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base font-medium">
+            <CardTitle className="text-foreground text-base font-medium">
               Stage Distribution
             </CardTitle>
           </CardHeader>
@@ -215,10 +215,10 @@ export function PipelineReport({ range }: { range: DateRange }) {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1f2126",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
-                    color: "#fff",
+                    color: "hsl(var(--card-foreground))",
                   }}
                 />
               </PieChart>
@@ -236,9 +236,9 @@ export function PipelineReport({ range }: { range: DateRange }) {
                         backgroundColor: COLORS[index % COLORS.length],
                       }}
                     />
-                    <span className="text-white/60">{entry.name}</span>
+                    <span className="text-muted-foreground">{entry.name}</span>
                   </div>
-                  <span className="text-white">{entry.value}</span>
+                  <span className="text-foreground">{entry.value}</span>
                 </div>
               ))}
             </div>
@@ -246,9 +246,9 @@ export function PipelineReport({ range }: { range: DateRange }) {
         </Card>
       </div>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-white text-base font-medium">
+          <CardTitle className="text-foreground text-base font-medium">
             Deal Details
           </CardTitle>
           <Button
@@ -267,7 +267,7 @@ export function PipelineReport({ range }: { range: DateRange }) {
                 "deals-report.csv"
               )
             }
-            className="text-white/50 hover:text-white hover:bg-white/5"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent"
           >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
@@ -277,20 +277,20 @@ export function PipelineReport({ range }: { range: DateRange }) {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Deal
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Company
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Stage
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Value
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
                     Probability
                   </th>
                 </tr>
@@ -300,7 +300,7 @@ export function PipelineReport({ range }: { range: DateRange }) {
                   <tr>
                     <td
                       colSpan={5}
-                      className="py-12 text-center text-sm text-white/40"
+                      className="py-12 text-center text-sm text-muted-foreground"
                     >
                       No deals in selected period
                     </td>
@@ -309,12 +309,12 @@ export function PipelineReport({ range }: { range: DateRange }) {
                 {deals.map((deal: any) => (
                   <tr
                     key={deal.id}
-                    className="border-b border-white/5 hover:bg-white/[0.02]"
+                    className="border-b border-border/50 hover:bg-accent/50"
                   >
-                    <td className="py-3 px-4 text-sm text-white font-medium">
+                    <td className="py-3 px-4 text-sm text-foreground font-medium">
                       {deal.name}
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/70">
+                    <td className="py-3 px-4 text-sm text-muted-foreground">
                       {deal.contacts?.company || "-"}
                     </td>
                     <td className="py-3 px-4">
@@ -327,10 +327,10 @@ export function PipelineReport({ range }: { range: DateRange }) {
                         {deal.stage}
                       </Badge>
                     </td>
-                    <td className="py-3 px-4 text-sm text-white">
+                    <td className="py-3 px-4 text-sm text-foreground">
                       ${(deal.value || 0).toLocaleString()}
                     </td>
-                    <td className="py-3 px-4 text-sm text-white/70">
+                    <td className="py-3 px-4 text-sm text-muted-foreground">
                       {deal.probability || 0}%
                     </td>
                   </tr>
