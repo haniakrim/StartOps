@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { ContactDetail } from "@/components/ContactDetail";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Contact {
   id: string;
@@ -73,6 +74,7 @@ export default function Contacts() {
   const [importing, setImporting] = useState(false);
 
   useEffect(() => { fetchContacts(); }, []);
+  useRealtimeTable("contacts", fetchContacts);
 
   async function fetchContacts() {
     try {

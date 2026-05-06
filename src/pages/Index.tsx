@@ -14,13 +14,13 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { HeroDashboardPreview } from "@/components/landing/HeroDashboardPreview";
-import { ModuleGrid } from "@/components/landing/ModuleGrid";
-import { StatsSection } from "@/components/landing/StatsSection";
-import { FeatureSection } from "@/components/landing/FeatureSection";
-import { CTASection } from "@/components/landing/CTASection";
-import { LandingFooter } from "@/components/landing/LandingFooter";
-import { FadeIn } from "@/components/landing/FadeIn";
+import HeroDashboardPreview from "@/components/landing/HeroDashboardPreview";
+import ModuleGrid from "@/components/landing/ModuleGrid";
+import StatsSection from "@/components/landing/StatsSection";
+import FeatureSection from "@/components/landing/FeatureSection";
+import CTASection from "@/components/landing/CTASection";
+import LandingFooter from "@/components/landing/LandingFooter";
+import FadeIn from "@/components/landing/FadeIn";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -400,7 +400,7 @@ export default function Index() {
       {/* CTA Section */}
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
-          <CTASection onGetStarted={() => navigate("/login")} />
+          <CTASection />
         </div>
       </section>
 
