@@ -23,9 +23,9 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 const severityColors: Record<string, string> = {
-  info: "bg-[#337ab7]/20 text-[#337ab7]",
-  warning: "bg-[#f0ad4e]/20 text-[#f0ad4e]",
-  error: "bg-[#eb5757]/20 text-[#eb5757]",
+  info: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  warning: "bg-orange-500/15 text-orange-600 dark:text-orange-400",
+  error: "bg-red-500/15 text-red-600 dark:text-red-400",
 };
 
 export default function Audit() {
@@ -66,7 +66,7 @@ export default function Audit() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -74,44 +74,44 @@ export default function Audit() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white tracking-tight">Audit Logs</h1>
-        <p className="text-white/50 mt-1">Track all activity across your organization</p>
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">Audit Logs</h1>
+        <p className="text-muted-foreground mt-1">Track all activity across your organization</p>
       </div>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-white text-base flex items-center gap-2">
-            <FileText className="w-4 h-4 text-[#6452db]" />
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <FileText className="w-4 h-4 text-expo-blue" />
             Recent Activity
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 pt-0">
           <div className="space-y-2">
             {logs.length === 0 && (
-              <p className="text-sm text-white/40 text-center py-8">No audit logs yet. Activity will appear here as users interact with the system.</p>
+              <p className="text-sm text-muted-foreground text-center py-8">No audit logs yet. Activity will appear here as users interact with the system.</p>
             )}
             {logs.map((log) => {
               const Icon = typeIcons[log.type] || FileText;
               return (
                 <div
                   key={log.id}
-                  className="flex items-center gap-4 p-3 rounded-md hover:bg-white/5 transition-colors"
+                  className="flex items-center gap-4 p-3 rounded-md hover:bg-accent transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-md bg-[#0b0d10] flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-white/40" />
+                  <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-4 h-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-white font-medium">{log.action}</span>
+                      <span className="text-sm text-foreground font-medium">{log.action}</span>
                       <Badge className={`text-xs border-0 ${severityColors[log.severity]}`}>
                         {log.severity}
                       </Badge>
                     </div>
-                    <p className="text-xs text-white/40 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {log.actor} on {log.target}
                     </p>
                   </div>
-                  <span className="text-xs text-white/30 flex-shrink-0">{log.time}</span>
+                  <span className="text-xs text-muted-foreground flex-shrink-0">{log.time}</span>
                 </div>
               );
             })}

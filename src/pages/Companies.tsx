@@ -30,10 +30,10 @@ interface Company {
 }
 
 const statusColors: Record<string, string> = {
-  Customer: "bg-[#8dc572]/20 text-[#8dc572]",
-  Prospect: "bg-[#5683da]/20 text-[#5683da]",
-  "At Risk": "bg-[#be6464]/20 text-[#be6464]",
-  Lead: "bg-[#6452db]/20 text-[#6452db]",
+  Customer: "bg-expo-green/15 text-expo-green",
+  Prospect: "bg-expo-blue/15 text-expo-blue",
+  "At Risk": "bg-expo-pink/15 text-expo-pink",
+  Lead: "bg-expo-indigo/15 text-expo-indigo",
 };
 
 export default function Companies() {
@@ -184,7 +184,7 @@ export default function Companies() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -205,7 +205,7 @@ export default function Companies() {
             if (!open) { setEditingCompany(null); resetForm(); }
           }}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />Add Company
               </Button>
             </DialogTrigger>
@@ -275,7 +275,7 @@ export default function Companies() {
 
       {/* Bulk Actions */}
       {selected.length > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#6452db]/10 border border-[#6452db]/20">
+        <div className="flex items-center gap-3 p-3 rounded-expo-lg bg-expo-blue/10 border border-expo-blue/20">
           <span className="text-sm text-white">{selected.length} selected</span>
           <div className="flex-1" />
           <Select onValueChange={bulkUpdateStatus}>
@@ -301,7 +301,7 @@ export default function Companies() {
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-          <input type="text" placeholder="Search companies..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+          <input type="text" placeholder="Search companies..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-card border border-border rounded-expo-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50" />
         </div>
         <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Filter className="w-4 h-4 mr-2" />Filters</Button>
         <Button variant="ghost" size="sm" className="text-white/50 hover:text-white"><ArrowUpDown className="w-4 h-4 mr-2" />Sort</Button>
@@ -319,7 +319,7 @@ export default function Companies() {
                     checked={selected.includes(company.id)}
                     onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, company.id] : prev.filter((id) => id !== company.id))}
                   />
-                  <div className="w-10 h-10 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-expo-lg bg-expo-blue/15 flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-[#6452db]" />
                   </div>
                 </div>

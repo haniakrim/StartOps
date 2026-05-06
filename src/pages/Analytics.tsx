@@ -134,7 +134,7 @@ export default function Analytics() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -183,10 +183,10 @@ export default function Analytics() {
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="bg-card border border-border">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><BarChart3 className="w-4 h-4 mr-2" />Overview</TabsTrigger>
-          <TabsTrigger value="funnel" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Filter className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
-          <TabsTrigger value="cohorts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Users className="w-4 h-4 mr-2" />Cohorts</TabsTrigger>
-          <TabsTrigger value="sources" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><GitBranch className="w-4 h-4 mr-2" />Sources</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><BarChart3 className="w-4 h-4 mr-2" />Overview</TabsTrigger>
+          <TabsTrigger value="funnel" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><Filter className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
+          <TabsTrigger value="cohorts" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><Users className="w-4 h-4 mr-2" />Cohorts</TabsTrigger>
+          <TabsTrigger value="sources" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><GitBranch className="w-4 h-4 mr-2" />Sources</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 space-y-4">
@@ -264,7 +264,7 @@ export default function Analytics() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center"><GitBranch className="w-4 h-4 text-primary" /></div>
+                      <div className="w-8 h-8 rounded-expo-lg bg-expo-blue/15 flex items-center justify-center"><GitBranch className="w-4 h-4 text-expo-blue" /></div>
                       <div><p className="text-sm text-foreground">Pipeline Coverage</p><p className="text-xs text-muted-foreground">Active deals vs target</p></div>
                     </div>
                     <span className="text-sm font-medium text-foreground">{stats.activeDeals} deals</span>
@@ -294,7 +294,7 @@ export default function Analytics() {
             <Card className="bg-card border-border">
               <CardHeader className="pb-2">
                 <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-primary" />
+                  <Filter className="w-4 h-4 text-expo-blue" />
                   Deal Conversion Funnel
                 </CardTitle>
               </CardHeader>
@@ -313,9 +313,9 @@ export default function Analytics() {
                             {i > 0 && <span className="text-xs text-muted-foreground">{conversion}% conv.</span>}
                           </div>
                         </div>
-                        <div className="h-8 bg-muted rounded-md overflow-hidden">
+                        <div className="h-8 bg-muted rounded-expo-md overflow-hidden">
                           <div
-                            className="h-full rounded-md transition-all duration-500 flex items-center justify-end pr-2"
+                            className="h-full rounded-expo-md transition-all duration-500 flex items-center justify-end pr-2"
                             style={{ width: `${Math.max(width, 5)}%`, backgroundColor: stage.color }}
                           >
                             <span className="text-xs text-white font-medium">{width.toFixed(0)}%</span>
@@ -387,7 +387,7 @@ export default function Analytics() {
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-primary rounded-full" style={{ width: `${cohort.rate}%` }} />
+                              <div className="h-full bg-expo-blue rounded-full" style={{ width: `${cohort.rate}%` }} />
                             </div>
                             <span className="text-sm text-foreground">{cohort.rate}%</span>
                           </div>
@@ -418,7 +418,7 @@ export default function Analytics() {
             <Card className="bg-card border-border">
               <CardHeader className="pb-2">
                 <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
-                  <GitBranch className="w-4 h-4 text-primary" />
+                  <GitBranch className="w-4 h-4 text-expo-blue" />
                   Lead Sources
                 </CardTitle>
               </CardHeader>

@@ -144,16 +144,16 @@ function SidebarNavItem({
     <NavLink
       to={item.path}
       className={cn(
-        "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative",
+        "group flex items-center gap-3 px-3 py-2 rounded-expo-lg text-sm font-medium transition-all duration-200 relative",
         isActive
-          ? "bg-primary/10 text-primary"
+          ? "bg-expo-blue/10 text-expo-blue"
           : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
       )}
     >
       <item.icon
         className={cn(
           "w-[18px] h-[18px] flex-shrink-0 transition-colors",
-          isActive ? "text-primary" : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/70"
+          isActive ? "text-expo-blue" : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/70"
         )}
       />
       {!collapsed && (
@@ -162,13 +162,13 @@ function SidebarNavItem({
           {item.badge && (
             <Badge
               variant="secondary"
-              className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-primary/15 text-primary border-0"
+              className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-expo-blue/15 text-expo-blue border-0"
             >
               {item.badge}
             </Badge>
           )}
           {isActive && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-expo-blue" />
           )}
         </>
       )}
@@ -212,7 +212,7 @@ function NavGroupSection({
       <button
         onClick={() => toggleGroup(group.label)}
         className={cn(
-          "flex items-center gap-2 w-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
+          "flex items-center gap-2 w-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors rounded-expo-md",
           hasActiveItem ? "text-primary/80" : "text-sidebar-foreground/30 hover:text-sidebar-foreground/50"
         )}
       >
@@ -226,7 +226,7 @@ function NavGroupSection({
       </button>
       <div
         className={cn(
-          "space-y-0.5 overflow-hidden transition-all duration-200",
+          "space-y-0.5 overflow-hidden transition-all duration-200 ease-expo-out",
           isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
         )}
       >
@@ -252,7 +252,7 @@ function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="relative w-9 h-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-300"
+      className="relative w-9 h-9 rounded-expo-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-300"
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
       <Sun
@@ -317,22 +317,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-50 bg-sidebar border-r border-border transition-all duration-300 ease-out flex flex-col",
+          "fixed lg:static inset-y-0 left-0 z-50 bg-sidebar border-r border-border transition-all duration-300 ease-expo-out flex flex-col",
           collapsed ? "w-[72px]" : "w-[260px]",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Logo */}
         <div className="h-16 flex items-center px-4 border-b border-border flex-shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
-            <span className="text-primary-foreground font-bold text-sm">S</span>
+          <div className="w-8 h-8 rounded-expo-lg bg-expo-blue flex items-center justify-center flex-shrink-0 shadow-expo-sm">
+            <span className="text-white font-bold text-sm">S</span>
           </div>
           {!collapsed && (
             <div className="ml-3 flex items-center gap-2">
               <span className="font-semibold text-sidebar-foreground tracking-tight text-[15px]">
                 StartOps
               </span>
-              <Badge className="bg-primary/15 text-primary border-primary/20 text-[10px] px-1.5 py-0 h-4 hover:bg-primary/15">
+              <Badge className="bg-expo-blue/15 text-expo-blue border-expo-blue/20 text-[10px] px-1.5 py-0 h-4 hover:bg-expo-blue/15">
                 Pro
               </Badge>
             </div>
@@ -364,7 +364,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {/* Collapse toggle */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex w-full items-center justify-center p-2 rounded-lg text-muted-foreground/40 hover:text-muted-foreground hover:bg-accent transition-all mb-2"
+            className="hidden lg:flex w-full items-center justify-center p-2 rounded-expo-lg text-muted-foreground/40 hover:text-muted-foreground hover:bg-accent transition-all mb-2"
           >
             {collapsed ? (
               <ChevronRight className="w-4 h-4" />
@@ -377,8 +377,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </button>
 
           {/* User profile */}
-          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-sidebar-accent transition-colors group">
-            <Avatar className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 ring-2 ring-border">
+          <div className="flex items-center gap-3 px-2 py-2 rounded-expo-lg hover:bg-sidebar-accent transition-colors group">
+            <Avatar className="w-8 h-8 bg-expo-blue ring-2 ring-border">
               <AvatarFallback className="bg-transparent text-primary-foreground text-xs font-medium">
                 {userInitials}
               </AvatarFallback>
@@ -439,7 +439,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 type="text"
                 readOnly
                 placeholder="Search commands, pages, actions..."
-                className="w-full bg-muted border border-border rounded-xl pl-9 pr-16 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/30 focus:ring-1 focus:ring-primary/20 cursor-pointer transition-all"
+                className="w-full bg-muted border border-border rounded-expo-lg pl-9 pr-16 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-expo-blue/30 focus:ring-1 focus:ring-expo-blue/20 cursor-pointer transition-all"
               />
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground/40 bg-muted px-1.5 py-0.5 rounded border border-border">
                 ⌘K
@@ -455,7 +455,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               variant="ghost"
               size="icon"
               onClick={signOut}
-              className="text-muted-foreground hover:text-destructive hover:bg-accent rounded-xl"
+              className="text-muted-foreground hover:text-destructive hover:bg-accent rounded-expo-lg"
               title="Sign out"
             >
               <LogOut className="w-5 h-5" />

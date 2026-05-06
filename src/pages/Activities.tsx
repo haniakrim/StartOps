@@ -217,7 +217,7 @@ export default function Activities() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -255,7 +255,7 @@ export default function Activities() {
           <DialogTrigger asChild>
             <Button
               size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="bg-expo-blue text-white hover:bg-expo-blue/90"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Activity
@@ -387,7 +387,7 @@ export default function Activities() {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full bg-expo-blue text-white hover:bg-expo-blue/90"
               >
                 Create Activity
               </Button>
@@ -398,10 +398,10 @@ export default function Activities() {
       </div>
 
       {selected.length > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
+        <div className="flex items-center gap-3 p-3 rounded-expo-lg bg-expo-blue/10 border border-expo-blue/20">
           <span className="text-sm text-foreground">{selected.length} selected</span>
           <div className="flex-1" />
-          <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10 h-8" onClick={async () => {
+          <Button variant="ghost" size="sm" className="text-expo-blue hover:text-expo-blue hover:bg-expo-blue/10 h-8" onClick={async () => {
             try {
               const { error } = await supabase.from("activities").update({ status: "completed", completed_at: new Date().toISOString() }).in("id", selected);
               if (error) throw error;
@@ -439,7 +439,7 @@ export default function Activities() {
             placeholder="Search activities..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-card border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50"
+            className="w-full bg-card border border-border rounded-expo-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -472,28 +472,28 @@ export default function Activities() {
         <TabsList className="bg-card border border-border">
           <TabsTrigger
             value="pending"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
+            className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"
           >
             <Clock className="w-4 h-4 mr-2" />
             Pending ({pending.length})
           </TabsTrigger>
           <TabsTrigger
             value="completed"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
+            className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"
           >
             <Check className="w-4 h-4 mr-2" />
             Completed ({completed.length})
           </TabsTrigger>
           <TabsTrigger
             value="all"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
+            className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"
           >
             <Activity className="w-4 h-4 mr-2" />
             All ({filtered.length})
           </TabsTrigger>
           <TabsTrigger
             value="board"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
+            className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"
           >
             <LayoutGrid className="w-4 h-4 mr-2" />
             Board
@@ -521,7 +521,7 @@ export default function Activities() {
                   return (
                     <Card
                       key={activity.id}
-                      className="bg-card border-border hover:border-primary/20 transition-colors"
+                      className="bg-card border-border hover:border-expo-blue/20 transition-colors"
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">

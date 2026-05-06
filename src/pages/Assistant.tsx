@@ -189,8 +189,8 @@ export default function Assistant() {
   return (
     <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
       <div>
-        <h1 className="text-2xl font-semibold text-white tracking-tight">AI Assistant</h1>
-        <p className="text-sm text-white/50 mt-1">Ask questions about your business in natural language</p>
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">AI Assistant</h1>
+        <p className="text-sm text-muted-foreground mt-1">Ask questions about your business in natural language</p>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-4 pb-4">
@@ -200,7 +200,7 @@ export default function Assistant() {
             className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             {msg.role === "assistant" && (
-              <div className="w-8 h-8 rounded-lg bg-[#6452db] flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-expo-lg bg-expo-blue flex items-center justify-center flex-shrink-0">
                 <Bot className="w-4 h-4 text-white" />
               </div>
             )}
@@ -208,28 +208,28 @@ export default function Assistant() {
               <Card
                 className={`${
                   msg.role === "user"
-                    ? "bg-[#6452db] border-[#6452db]"
+                    ? "bg-expo-blue border-expo-blue"
                     : msg.type === "warning"
-                      ? "bg-[#be6464]/10 border-[#be6464]/20"
+                      ? "bg-red-500/10 border-red-500/20"
                       : msg.type === "insight"
-                        ? "bg-[#8dc572]/10 border-[#8dc572]/20"
-                        : "bg-[#18191b] border-white/10"
+                        ? "bg-emerald-500/10 border-emerald-500/20"
+                        : "bg-card border-border"
                 }`}
               >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    {msg.type === "warning" && <AlertCircle className="w-4 h-4 text-[#be6464]" />}
-                    {msg.type === "insight" && <Lightbulb className="w-4 h-4 text-[#8dc572]" />}
-                    {msg.type === "chart" && <BarChart3 className="w-4 h-4 text-[#6452db]" />}
+                    {msg.type === "warning" && <AlertCircle className="w-4 h-4 text-red-500" />}
+                    {msg.type === "insight" && <Lightbulb className="w-4 h-4 text-emerald-500" />}
+                    {msg.type === "chart" && <BarChart3 className="w-4 h-4 text-expo-blue" />}
                     <span
                       className={`text-xs font-medium ${
                         msg.role === "user"
                           ? "text-white/70"
                           : msg.type === "warning"
-                            ? "text-[#be6464]"
+                            ? "text-expo-pink"
                             : msg.type === "insight"
-                              ? "text-[#8dc572]"
-                              : "text-white/50"
+                              ? "text-expo-green"
+                              : "text-muted-foreground"
                       }`}
                     >
                       {msg.role === "user" ? "You" : "StartOps AI"}
@@ -237,30 +237,30 @@ export default function Assistant() {
                   </div>
                   <div
                     className={`text-sm whitespace-pre-wrap ${
-                      msg.role === "user" ? "text-white" : "text-white/80"
+                      msg.role === "user" ? "text-white" : "text-foreground"
                     }`}
                     dangerouslySetInnerHTML={{
-                      __html: msg.content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>'),
+                      __html: msg.content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>'),
                     }}
                   />
                 </CardContent>
               </Card>
             </div>
             {msg.role === "user" && (
-              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4 text-foreground" />
               </div>
             )}
           </div>
         ))}
         {loading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#6452db] flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-expo-lg bg-expo-blue flex items-center justify-center flex-shrink-0">
               <Bot className="w-4 h-4 text-white" />
             </div>
-            <Card className="bg-[#18191b] border-white/10">
+            <Card className="bg-card border-border">
               <CardContent className="p-4">
-                <Loader2 className="w-4 h-4 text-[#6452db] animate-spin" />
+                <Loader2 className="w-4 h-4 text-expo-blue animate-spin" />
               </CardContent>
             </Card>
           </div>
@@ -276,7 +276,7 @@ export default function Assistant() {
               onClick={() => {
                 setInput(s);
               }}
-              className="px-3 py-1.5 rounded-full bg-[#18191b] border border-white/10 text-xs text-white/60 hover:text-white hover:border-white/20 transition-colors"
+              className="px-3 py-1.5 rounded-full bg-card border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
             >
               {s}
             </button>
@@ -291,13 +291,13 @@ export default function Assistant() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your pipeline, deals, revenue..."
-            className="w-full bg-[#18191b] border border-white/10 rounded-lg pl-4 pr-12 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50"
+            className="w-full bg-card border border-border rounded-expo-lg pl-4 pr-12 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50"
           />
           <Button
             type="submit"
             size="sm"
             disabled={loading || !input.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#6452db] text-white hover:bg-[#6452db]/90 h-8 w-8 p-0"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-expo-blue text-white hover:bg-expo-blue/90 h-8 w-8 p-0"
           >
             <Send className="w-4 h-4" />
           </Button>

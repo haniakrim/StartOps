@@ -30,7 +30,7 @@ export default function Dashboard() {
       change: "+12.5%",
       trend: "up" as const,
       icon: DollarSign,
-      color: "hsl(var(--chart-1))",
+      color: "#007AFF",
     },
     {
       title: "Active Deals",
@@ -38,7 +38,7 @@ export default function Dashboard() {
       change: "+8.2%",
       trend: "up" as const,
       icon: Target,
-      color: "hsl(var(--chart-2))",
+      color: "#5856D6",
     },
     {
       title: "Contacts",
@@ -46,7 +46,7 @@ export default function Dashboard() {
       change: "+24.1%",
       trend: "up" as const,
       icon: Users,
-      color: "hsl(var(--chart-3))",
+      color: "#AF52DE",
     },
     {
       title: "Companies",
@@ -54,14 +54,14 @@ export default function Dashboard() {
       change: "-2.4%",
       trend: "down" as const,
       icon: Building2,
-      color: "hsl(var(--chart-4))",
+      color: "#34C759",
     },
   ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -71,14 +71,14 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground tracking-tight">
+          <h1 className="text-h2 text-foreground tracking-tight">
             Dashboard
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-body-sm text-muted-foreground mt-1">
             Welcome back. Here's what's happening today.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-muted rounded-expo-lg p-1">
           {(["week", "month", "quarter", "year"] as const).map((range) => (
             <Button
               key={range}
@@ -87,8 +87,8 @@ export default function Dashboard() {
               onClick={() => setTimeRange(range)}
               className={
                 timeRange === range
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  ? "bg-expo-blue text-white hover:bg-expo-blue/90 rounded-expo-md"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent rounded-expo-md"
               }
             >
               {range.charAt(0).toUpperCase() + range.slice(1)}

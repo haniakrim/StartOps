@@ -1,6 +1,5 @@
 import { Trash2, Tag, Download, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -33,9 +32,9 @@ export function BulkActionBar({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20 animate-in fade-in slide-in-from-bottom-2">
+    <div className="flex items-center gap-3 p-3 rounded-expo-lg bg-expo-blue/10 border border-expo-blue/20 animate-in fade-in slide-in-from-bottom-2">
       <div className="flex items-center gap-2">
-        <CheckCircle2 className="w-4 h-4 text-primary" />
+        <CheckCircle2 className="w-4 h-4 text-expo-blue" />
         <span className="text-sm font-medium text-foreground">
           {selectedCount} selected
         </span>
@@ -45,11 +44,11 @@ export function BulkActionBar({
 
       {showStatus && onStatusChange && (
         <Select onValueChange={onStatusChange}>
-          <SelectTrigger className="h-8 w-36 bg-muted border-border text-foreground text-xs">
+          <SelectTrigger className="h-8 w-36 bg-muted border-border text-foreground text-xs rounded-expo-md">
             <Tag className="w-3 h-3 mr-2" />
             <SelectValue placeholder="Change status" />
           </SelectTrigger>
-          <SelectContent className="bg-card border-border text-foreground">
+          <SelectContent className="bg-card border-border text-foreground rounded-expo-lg">
             <SelectItem value="Lead">Lead</SelectItem>
             <SelectItem value="Prospect">Prospect</SelectItem>
             <SelectItem value="Customer">Customer</SelectItem>
@@ -61,11 +60,11 @@ export function BulkActionBar({
 
       {showTags && onTagAdd && (
         <Select onValueChange={onTagAdd}>
-          <SelectTrigger className="h-8 w-32 bg-muted border-border text-foreground text-xs">
+          <SelectTrigger className="h-8 w-32 bg-muted border-border text-foreground text-xs rounded-expo-md">
             <Tag className="w-3 h-3 mr-2" />
             <SelectValue placeholder="Add tag" />
           </SelectTrigger>
-          <SelectContent className="bg-card border-border text-foreground">
+          <SelectContent className="bg-card border-border text-foreground rounded-expo-lg">
             <SelectItem value="VIP">VIP</SelectItem>
             <SelectItem value="Hot Lead">Hot Lead</SelectItem>
             <SelectItem value="Follow Up">Follow Up</SelectItem>
@@ -80,7 +79,7 @@ export function BulkActionBar({
           variant="ghost"
           size="sm"
           onClick={onExport}
-          className="h-8 text-muted-foreground hover:text-foreground hover:bg-accent text-xs"
+          className="h-8 text-muted-foreground hover:text-foreground hover:bg-accent text-xs rounded-expo-md"
         >
           <Download className="w-3.5 h-3.5 mr-1.5" />
           Export
@@ -91,7 +90,7 @@ export function BulkActionBar({
         variant="ghost"
         size="sm"
         onClick={onDelete}
-        className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10 text-xs"
+        className="h-8 text-expo-pink hover:text-expo-pink hover:bg-expo-pink/10 text-xs rounded-expo-md"
       >
         <Trash2 className="w-3.5 h-3.5 mr-1.5" />
         Delete
@@ -101,7 +100,7 @@ export function BulkActionBar({
         variant="ghost"
         size="sm"
         onClick={onClear}
-        className="h-8 text-muted-foreground hover:text-foreground hover:bg-accent text-xs ml-auto"
+        className="h-8 text-muted-foreground hover:text-foreground hover:bg-accent text-xs ml-auto rounded-expo-md"
       >
         <X className="w-3.5 h-3.5 mr-1.5" />
         Clear

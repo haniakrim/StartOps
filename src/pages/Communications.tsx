@@ -204,7 +204,7 @@ export default function Communications() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -213,11 +213,11 @@ export default function Communications() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Communications</h1>
-          <p className="text-sm text-white/50 mt-1">AI-powered conversation tracking and sentiment analysis</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Communications</h1>
+          <p className="text-sm text-muted-foreground mt-1">AI-powered conversation tracking and sentiment analysis</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => {
             const exportData = communications.map(c => ({
               "Type": c.type,
               "Direction": c.direction,
@@ -235,155 +235,155 @@ export default function Communications() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
-          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />Log Communication
               </Button>
             </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-lg">
-            <DialogHeader><DialogTitle>Log Communication</DialogTitle></DialogHeader>
-            <form onSubmit={createCommunication} className="space-y-4 pt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-white/70">Type</Label>
-                  <Select value={newComm.type} onValueChange={(v) => setNewComm(p => ({ ...p, type: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                      <SelectItem value="email">Email</SelectItem>
-                      <SelectItem value="call">Call</SelectItem>
-                      <SelectItem value="meeting">Meeting</SelectItem>
-                      <SelectItem value="note">Note</SelectItem>
-                    </SelectContent>
-                  </Select>
+            <DialogContent className="bg-card border-border text-card-foreground max-w-lg">
+              <DialogHeader><DialogTitle>Log Communication</DialogTitle></DialogHeader>
+              <form onSubmit={createCommunication} className="space-y-4 pt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Type</Label>
+                    <Select value={newComm.type} onValueChange={(v) => setNewComm(p => ({ ...p, type: v }))}>
+                      <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        <SelectItem value="email">Email</SelectItem>
+                        <SelectItem value="call">Call</SelectItem>
+                        <SelectItem value="meeting">Meeting</SelectItem>
+                        <SelectItem value="note">Note</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Direction</Label>
+                    <Select value={newComm.direction} onValueChange={(v) => setNewComm(p => ({ ...p, direction: v }))}>
+                      <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        <SelectItem value="inbound">Inbound</SelectItem>
+                        <SelectItem value="outbound">Outbound</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-white/70">Direction</Label>
-                  <Select value={newComm.direction} onValueChange={(v) => setNewComm(p => ({ ...p, direction: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                      <SelectItem value="inbound">Inbound</SelectItem>
-                      <SelectItem value="outbound">Outbound</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              {newComm.type === "email" && emailTemplates.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-white/70">Template</Label>
-                  <Select
-                    value=""
-                    onValueChange={async (v) => {
-                      const template = emailTemplates.find((t) => t.id === v);
-                      if (template) {
-                        // Update usage count in DB
-                        await supabase
-                          .from("email_templates")
-                          .update({ usage_count: (template.usage_count || 0) + 1 })
-                          .eq("id", template.id);
-                        setNewComm((p) => ({
-                          ...p,
-                          subject: template.subject,
-                          content: template.body,
-                        }));
-                        toast.success(`Applied template: ${template.name}`);
-                        fetchEmailTemplates();
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
-                      <SelectValue placeholder="Select a template" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                      {emailTemplates.map((t) => (
-                        <SelectItem key={t.id} value={t.id}>
-                          {t.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+                {newComm.type === "email" && emailTemplates.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Template</Label>
+                    <Select
+                      value=""
+                      onValueChange={async (v) => {
+                        const template = emailTemplates.find((t) => t.id === v);
+                        if (template) {
+                          // Update usage count in DB
+                          await supabase
+                            .from("email_templates")
+                            .update({ usage_count: (template.usage_count || 0) + 1 })
+                            .eq("id", template.id);
+                          setNewComm((p) => ({
+                            ...p,
+                            subject: template.subject,
+                            content: template.body,
+                          }));
+                          toast.success(`Applied template: ${template.name}`);
+                          fetchEmailTemplates();
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="bg-muted border-border">
+                        <SelectValue placeholder="Select a template" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        {emailTemplates.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            {t.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
-              <div className="space-y-2">
-                <Label className="text-white/70">Subject</Label>
-                <Input value={newComm.subject} onChange={(e) => setNewComm(p => ({ ...p, subject: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Re: Proposal follow-up" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white/70">Content</Label>
-                <textarea
-                  value={newComm.content}
-                  onChange={(e) => setNewComm(p => ({ ...p, content: e.target.value }))}
-                  className="w-full bg-[#0b0d10] border border-white/10 rounded-md p-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50 min-h-[100px] resize-y"
-                  placeholder="Conversation content... AI will analyze sentiment and generate summary."
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Contact</Label>
-                  <Select value={newComm.contact_id} onValueChange={(v) => setNewComm(p => ({ ...p, contact_id: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select contact" /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                      {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <Label>Subject</Label>
+                  <Input value={newComm.subject} onChange={(e) => setNewComm(p => ({ ...p, subject: e.target.value }))} className="bg-muted border-border" placeholder="Re: Proposal follow-up" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Deal (optional)</Label>
-                  <Select value={newComm.deal_id} onValueChange={(v) => setNewComm(p => ({ ...p, deal_id: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select deal" /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                      {deals.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <Label>Content</Label>
+                  <textarea
+                    value={newComm.content}
+                    onChange={(e) => setNewComm(p => ({ ...p, content: e.target.value }))}
+                    className="w-full bg-muted border border-border rounded-expo-lg p-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50 min-h-[100px] resize-y"
+                    placeholder="Conversation content... AI will analyze sentiment and generate summary."
+                  />
                 </div>
-              </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">
-                <BrainCircuit className="w-4 h-4 mr-2" />Log & Analyze
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Contact</Label>
+                    <Select value={newComm.contact_id} onValueChange={(v) => setNewComm(p => ({ ...p, contact_id: v }))}>
+                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select contact" /></SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Deal (optional)</Label>
+                    <Select value={newComm.deal_id} onValueChange={(v) => setNewComm(p => ({ ...p, deal_id: v }))}>
+                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select deal" /></SelectTrigger>
+                      <SelectContent className="bg-card border-border">
+                        {deals.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button type="submit" className="w-full">
+                  <BrainCircuit className="w-4 h-4 mr-2" />Log & Analyze
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Sentiment Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Card className="bg-[#18191b] border-white/10">
+        <Card className="bg-card border-border">
           <CardContent className="p-5">
-            <Mail className="w-5 h-5 text-[#6452db] mb-3" />
-            <p className="text-2xl font-semibold text-white">{stats.total}</p>
-            <p className="text-sm text-white/50">Total Communications</p>
+            <Mail className="w-5 h-5 text-expo-blue mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{stats.total}</p>
+            <p className="text-sm text-muted-foreground">Total Communications</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card className="bg-card border-border">
           <CardContent className="p-5">
-            <TrendingUp className="w-5 h-5 text-[#8dc572] mb-3" />
-            <p className="text-2xl font-semibold text-white">{stats.positive}</p>
-            <p className="text-sm text-white/50">Positive Sentiment</p>
+            <TrendingUp className="w-5 h-5 text-emerald-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{stats.positive}</p>
+            <p className="text-sm text-muted-foreground">Positive Sentiment</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card className="bg-card border-border">
           <CardContent className="p-5">
-            <Minus className="w-5 h-5 text-[#5683da] mb-3" />
-            <p className="text-2xl font-semibold text-white">{stats.neutral}</p>
-            <p className="text-sm text-white/50">Neutral</p>
+            <Minus className="w-5 h-5 text-blue-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{stats.neutral}</p>
+            <p className="text-sm text-muted-foreground">Neutral</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card className="bg-card border-border">
           <CardContent className="p-5">
-            <TrendingDown className="w-5 h-5 text-[#be6464] mb-3" />
-            <p className="text-2xl font-semibold text-white">{stats.negative}</p>
-            <p className="text-sm text-white/50">Negative Sentiment</p>
+            <TrendingDown className="w-5 h-5 text-red-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{stats.negative}</p>
+            <p className="text-sm text-muted-foreground">Negative Sentiment</p>
           </CardContent>
         </Card>
       </div>
 
       {selected.length > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#6452db]/10 border border-[#6452db]/20">
-          <span className="text-sm text-white">{selected.length} selected</span>
+        <div className="flex items-center gap-3 p-3 rounded-expo-lg bg-expo-blue/10 border border-expo-blue/20">
+          <span className="text-sm text-foreground">{selected.length} selected</span>
           <div className="flex-1" />
-          <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={async () => {
+          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8" onClick={async () => {
             try {
               const { error } = await supabase.from("communications").delete().in("id", selected);
               if (error) throw error;
@@ -396,21 +396,21 @@ export default function Communications() {
           }}>
             <Trash2 className="w-4 h-4 mr-1" />Delete
           </Button>
-          <Button variant="ghost" size="sm" className="text-white/50 hover:text-white h-8" onClick={() => setSelected([])}>Clear</Button>
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground h-8" onClick={() => setSelected([])}>Clear</Button>
         </div>
       )}
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-          <input type="text" placeholder="Search communications..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input type="text" placeholder="Search communications..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-card border border-border rounded-expo-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50" />
         </div>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+          <SelectTrigger className="bg-card border-border text-foreground w-36 h-9 text-xs">
             <Filter className="w-3 h-3 mr-2" />
             <SelectValue placeholder="Type" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+          <SelectContent className="bg-card border-border">
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="email">Email</SelectItem>
             <SelectItem value="call">Call</SelectItem>
@@ -419,10 +419,10 @@ export default function Communications() {
           </SelectContent>
         </Select>
         <Select value={sentimentFilter} onValueChange={setSentimentFilter}>
-          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+          <SelectTrigger className="bg-card border-border text-foreground w-36 h-9 text-xs">
             <SelectValue placeholder="Sentiment" />
           </SelectTrigger>
-          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+          <SelectContent className="bg-card border-border">
             <SelectItem value="all">All Sentiments</SelectItem>
             <SelectItem value="positive">Positive</SelectItem>
             <SelectItem value="neutral">Neutral</SelectItem>
@@ -432,11 +432,11 @@ export default function Communications() {
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="bg-[#18191b] border border-white/10">
-          <TabsTrigger value="all" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">All ({filtered.length})</TabsTrigger>
-          <TabsTrigger value="emails" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Mail className="w-4 h-4 mr-2" />Emails ({emails.length})</TabsTrigger>
-          <TabsTrigger value="calls" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Phone className="w-4 h-4 mr-2" />Calls ({calls.length})</TabsTrigger>
-          <TabsTrigger value="meetings" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><MessageSquare className="w-4 h-4 mr-2" />Meetings ({meetings.length})</TabsTrigger>
+        <TabsList className="bg-card border border-border">
+          <TabsTrigger value="all" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground">All ({filtered.length})</TabsTrigger>
+          <TabsTrigger value="emails" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><Mail className="w-4 h-4 mr-2" />Emails ({emails.length})</TabsTrigger>
+          <TabsTrigger value="calls" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><Phone className="w-4 h-4 mr-2" />Calls ({calls.length})</TabsTrigger>
+          <TabsTrigger value="meetings" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><MessageSquare className="w-4 h-4 mr-2" />Meetings ({meetings.length})</TabsTrigger>
         </TabsList>
 
         {(["all", "emails", "calls", "meetings"] as const).map(tab => {
@@ -449,22 +449,22 @@ export default function Communications() {
                   const sentiment = sentimentConfig[comm.sentiment || "neutral"];
                   const SentimentIcon = sentiment.icon;
                   return (
-                    <Card key={comm.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
+                    <Card key={comm.id} className="bg-card border-border hover:border-expo-blue/20 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
                           <input
                             type="checkbox"
-                            className="mt-2 rounded border-white/20 bg-transparent"
+                            className="mt-2 rounded border-border bg-transparent"
                             checked={selected.includes(comm.id)}
                             onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, comm.id] : prev.filter((id) => id !== comm.id))}
                           />
-                          <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                            <Icon className="w-5 h-5 text-white/40" />
+                          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                            <Icon className="w-5 h-5 text-muted-foreground" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <p className="text-sm font-medium text-white">{comm.subject || "No subject"}</p>
-                              <Badge variant="secondary" className={`text-xs ${comm.direction === "inbound" ? "bg-[#5683da]/20 text-[#5683da]" : "bg-white/10 text-white/50"}`}>
+                              <p className="text-sm font-medium text-foreground">{comm.subject || "No subject"}</p>
+                              <Badge variant="secondary" className={`text-xs ${comm.direction === "inbound" ? "bg-blue-500/15 text-blue-600 dark:text-blue-400" : "bg-muted text-muted-foreground"}`}>
                                 {comm.direction}
                               </Badge>
                               <div className="flex items-center gap-1" style={{ color: sentiment.color }}>
@@ -473,9 +473,9 @@ export default function Communications() {
                               </div>
                             </div>
                             {comm.summary && (
-                              <p className="text-xs text-white/50 mb-2">{comm.summary}</p>
+                              <p className="text-xs text-muted-foreground mb-2">{comm.summary}</p>
                             )}
-                            <div className="flex items-center gap-3 text-xs text-white/30">
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
                               {comm.contacts && (
                                 <span className="flex items-center gap-1"><User className="w-3 h-3" />{comm.contacts.first_name} {comm.contacts.last_name}</span>
                               )}
@@ -491,7 +491,7 @@ export default function Communications() {
                   );
                 })}
                 {items.length === 0 && (
-                  <p className="text-sm text-white/40 text-center py-12">No {tab} communications</p>
+                  <p className="text-sm text-muted-foreground text-center py-12">No {tab} communications</p>
                 )}
               </div>
             </TabsContent>

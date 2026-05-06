@@ -112,7 +112,7 @@ export default function Api() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -120,73 +120,73 @@ export default function Api() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white tracking-tight">API & Webhooks</h1>
-        <p className="text-white/50 mt-1">Manage API keys and webhook integrations</p>
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">API & Webhooks</h1>
+        <p className="text-muted-foreground mt-1">Manage API keys and webhook integrations</p>
       </div>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-white text-base flex items-center gap-2">
-            <Key className="w-4 h-4 text-[#6452db]" />
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <Key className="w-4 h-4 text-expo-blue" />
             API Key
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 pt-0 space-y-4">
           <div className="flex items-center gap-3">
-            <code className="flex-1 bg-[#0b0d10] border border-white/10 rounded-md px-4 py-3 text-sm text-white/80 font-mono">
+            <code className="flex-1 bg-muted border border-border rounded-md px-4 py-3 text-sm text-foreground font-mono">
               {apiKey}
             </code>
             <Button
               variant="ghost"
               size="icon"
               onClick={copyKey}
-              className="text-white/60 hover:text-white hover:bg-white/5"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
-              {copied ? <Check className="w-4 h-4 text-[#8dc572]" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="text-white/60 hover:text-white hover:bg-white/5"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               <RefreshCw className="w-4 h-4" />
             </Button>
           </div>
-          <div className="flex items-center gap-2 text-sm text-white/40">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Shield className="w-4 h-4" />
             Never share your API key in client-side code or public repositories.
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-white text-base flex items-center gap-2">
-            <Webhook className="w-4 h-4 text-[#6452db]" />
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
+            <Webhook className="w-4 h-4 text-expo-blue" />
             Webhooks
           </CardTitle>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />Add Webhook
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#18191b] border-white/10 text-white">
+            <DialogContent className="bg-card border-border text-card-foreground">
               <DialogHeader><DialogTitle>Add Webhook</DialogTitle></DialogHeader>
               <form onSubmit={createWebhook} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Name</Label>
-                  <Input required value={newWebhook.name} onChange={(e) => setNewWebhook((p) => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Production Webhook" />
+                  <Label>Name</Label>
+                  <Input required value={newWebhook.name} onChange={(e) => setNewWebhook((p) => ({ ...p, name: e.target.value }))} className="bg-muted border-border" placeholder="Production Webhook" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">URL</Label>
-                  <Input required type="url" value={newWebhook.url} onChange={(e) => setNewWebhook((p) => ({ ...p, url: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="https://api.yourservice.com/webhook" />
+                  <Label>URL</Label>
+                  <Input required type="url" value={newWebhook.url} onChange={(e) => setNewWebhook((p) => ({ ...p, url: e.target.value }))} className="bg-muted border-border" placeholder="https://api.yourservice.com/webhook" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Event</Label>
-                  <Input value={newWebhook.events} onChange={(e) => setNewWebhook((p) => ({ ...p, events: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Event</Label>
+                  <Input value={newWebhook.events} onChange={(e) => setNewWebhook((p) => ({ ...p, events: e.target.value }))} className="bg-muted border-border" />
                 </div>
-                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Webhook</Button>
+                <Button type="submit" className="w-full">Create Webhook</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -194,32 +194,32 @@ export default function Api() {
         <CardContent className="p-6 pt-0">
           <div className="space-y-3">
             {webhooks.length === 0 && (
-              <p className="text-sm text-white/40 text-center py-8">No webhooks configured yet.</p>
+              <p className="text-sm text-muted-foreground text-center py-8">No webhooks configured yet.</p>
             )}
             {webhooks.map((wh) => (
               <div
                 key={wh.id}
-                className="flex items-center justify-between p-4 bg-[#0b0d10] rounded-lg border border-white/10"
+                className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border"
               >
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <code className="text-sm text-white/80 font-mono">{wh.events?.[0] || "all"}</code>
+                    <code className="text-sm text-foreground font-mono">{wh.events?.[0] || "all"}</code>
                     <Badge
                       className={`text-xs ${
                         wh.is_active
-                          ? "bg-[#8dc572]/20 text-[#8dc572] border-0"
-                          : "bg-white/10 text-white/60 border-0"
+                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-0"
+                          : "bg-muted text-muted-foreground border-0"
                       }`}
                     >
                       {wh.is_active ? "active" : "paused"}
                     </Badge>
                   </div>
-                  <p className="text-xs text-white/40 truncate">{wh.url}</p>
-                  <p className="text-xs text-white/30">Created {new Date(wh.created_at).toLocaleDateString()}</p>
+                  <p className="text-xs text-muted-foreground truncate">{wh.url}</p>
+                  <p className="text-xs text-muted-foreground/70">Created {new Date(wh.created_at).toLocaleDateString()}</p>
                 </div>
                 <div className="flex items-center gap-4">
                   <Switch checked={wh.is_active} onCheckedChange={() => toggleWebhook(wh.id, wh.is_active)} />
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-white/30 hover:text-[#be6464]" onClick={() => deleteWebhook(wh.id)}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => deleteWebhook(wh.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>

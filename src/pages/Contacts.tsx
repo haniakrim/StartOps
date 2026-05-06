@@ -33,11 +33,11 @@ interface Contact {
 }
 
 const statusColors: Record<string, string> = {
-  Active: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
-  Prospect: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  Active: "bg-expo-green/15 text-expo-green",
+  Prospect: "bg-expo-blue/15 text-expo-blue",
   Inactive: "bg-muted text-muted-foreground",
-  Lead: "bg-primary/15 text-primary",
-  Customer: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  Lead: "bg-expo-blue/15 text-expo-blue",
+  Customer: "bg-expo-green/15 text-expo-green",
 };
 
 function calculateLeadScore(contact: Contact): number {
@@ -213,7 +213,7 @@ export default function Contacts() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -250,7 +250,7 @@ export default function Contacts() {
           <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)} className="border-border text-muted-foreground hover:text-foreground hover:bg-accent"><Upload className="w-4 h-4 mr-2" />Import</Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" />Add Contact</Button>
+              <Button size="sm"><Plus className="w-4 h-4 mr-2" />Add Contact</Button>
             </DialogTrigger>
             <DialogContent className="bg-card border-border text-card-foreground">
               <DialogHeader><DialogTitle>Add New Contact</DialogTitle></DialogHeader>
@@ -263,7 +263,7 @@ export default function Contacts() {
                 <div className="space-y-2"><Label>Phone</Label><Input value={newContact.phone} onChange={(e) => setNewContact((prev) => ({ ...prev, phone: e.target.value }))} className="bg-muted border-border" /></div>
                 <div className="space-y-2"><Label>Company</Label><Input value={newContact.company} onChange={(e) => setNewContact((prev) => ({ ...prev, company: e.target.value }))} className="bg-muted border-border" /></div>
                 <div className="space-y-2"><Label>Title</Label><Input value={newContact.title} onChange={(e) => setNewContact((prev) => ({ ...prev, title: e.target.value }))} className="bg-muted border-border" /></div>
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Contact</Button>
+                <Button type="submit" className="w-full">Create Contact</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -301,7 +301,7 @@ export default function Contacts() {
                     </div>
                   </div>
                 )}
-                <Button onClick={importContacts} disabled={importing || importPreview.length === 0} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button onClick={importContacts} disabled={importing || importPreview.length === 0} className="w-full">
                   {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
                   Import {importPreview.length > 0 ? `${importPreview.length}+ Contacts` : 'Contacts'}
                 </Button>
@@ -377,7 +377,7 @@ export default function Contacts() {
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input type="text" placeholder="Search contacts..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-card border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50" />
+          <input type="text" placeholder="Search contacts..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-card border border-border rounded-expo-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50" />
         </div>
         <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent"><Filter className="w-4 h-4 mr-2" />Filters</Button>
         <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground"><ArrowUpDown className="w-4 h-4 mr-2" />Sort</Button>
@@ -415,7 +415,7 @@ export default function Contacts() {
                           <button onClick={(e) => { e.stopPropagation(); toggleStar(contact.id); }} className="text-muted-foreground/30 hover:text-orange-500 transition-colors">
                             <Star className={`w-4 h-4 ${starredContacts.includes(contact.id) ? "fill-orange-500 text-orange-500" : ""}`} />
                           </button>
-                          <Avatar className="w-8 h-8 bg-primary"><AvatarFallback className="bg-primary text-primary-foreground text-xs">{contact.first_name[0]}{contact.last_name[0]}</AvatarFallback></Avatar>
+                          <Avatar className="w-8 h-8 bg-expo-blue"><AvatarFallback className="bg-expo-blue text-white text-xs">{contact.first_name[0]}{contact.last_name[0]}</AvatarFallback></Avatar>
                           <div>
                             <p className="text-sm font-medium text-foreground">{contact.first_name} {contact.last_name}</p>
                             <p className="text-xs text-muted-foreground">{contact.title || "No title"}</p>

@@ -329,19 +329,19 @@ export default function Login() {
           >
             {/* Mobile logo */}
             <div className="md:hidden text-center mb-8">
-              <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
-                <Building2 className="w-6 h-6 text-primary-foreground" />
-              </div>
+              <div className="w-12 h-12 rounded-expo-xl bg-expo-blue flex items-center justify-center mx-auto mb-4">
+               <Building2 className="w-6 h-6 text-white" />
+             </div>
               <h1 className="text-2xl font-semibold text-foreground tracking-tight">
                 StartOps
               </h1>
             </div>
 
             <div className={cn(
-              "border rounded-xl p-6 sm:p-8 shadow-xl",
+              "border rounded-expo-xl p-6 sm:p-8 shadow-expo-lg dark:shadow-expo-dark-lg",
               isDark
-                ? "bg-[#18191b] border-white/10 shadow-black/20"
-                : "bg-card border-border shadow-black/5"
+                ? "bg-expo-dark-surface border-expo-dark-border"
+                : "bg-card border-border"
             )}>
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-foreground">
@@ -465,7 +465,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setIsSignUp(!isSignUp)}
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  className="text-sm text-expo-blue hover:text-expo-blue/80 transition-colors"
                 >
                   {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up as admin"}
                 </button>

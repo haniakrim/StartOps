@@ -139,7 +139,7 @@ export default function Calendar() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -148,16 +148,16 @@ export default function Calendar() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Calendar</h1>
-          <p className="text-sm text-white/50 mt-1">Unified view of deadlines, activities, and milestones</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Calendar</h1>
+          <p className="text-sm text-muted-foreground mt-1">Unified view of deadlines, activities, and milestones</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={filter} onValueChange={setFilter}>
-            <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36">
+            <SelectTrigger className="bg-card border-border text-foreground w-36">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectContent className="bg-card border-border">
               <SelectItem value="all">All Events</SelectItem>
               <SelectItem value="activity">Activities</SelectItem>
               <SelectItem value="deal">Deals</SelectItem>
@@ -168,23 +168,23 @@ export default function Calendar() {
           </Select>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />Add Event
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#18191b] border-white/10 text-white">
+            <DialogContent className="bg-card border-border text-card-foreground">
               <DialogHeader><DialogTitle>Add Event</DialogTitle></DialogHeader>
               <form onSubmit={createEvent} className="space-y-4 pt-4">
-                <div className="space-y-2"><Label className="text-white/70">Title</Label><Input required value={newEvent.title} onChange={(e) => setNewEvent(p => ({ ...p, title: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+                <div className="space-y-2"><Label>Title</Label><Input required value={newEvent.title} onChange={(e) => setNewEvent(p => ({ ...p, title: e.target.value }))} className="bg-muted border-border" /></div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label className="text-white/70">Date</Label><Input type="date" required value={newEvent.date} onChange={(e) => setNewEvent(p => ({ ...p, date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
-                  <div className="space-y-2"><Label className="text-white/70">Time</Label><Input type="time" value={newEvent.time} onChange={(e) => setNewEvent(p => ({ ...p, time: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
+                  <div className="space-y-2"><Label>Date</Label><Input type="date" required value={newEvent.date} onChange={(e) => setNewEvent(p => ({ ...p, date: e.target.value }))} className="bg-muted border-border" /></div>
+                  <div className="space-y-2"><Label>Time</Label><Input type="time" value={newEvent.time} onChange={(e) => setNewEvent(p => ({ ...p, time: e.target.value }))} className="bg-muted border-border" /></div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Type</Label>
+                  <Label>Type</Label>
                   <Select value={newEvent.type} onValueChange={(v) => setNewEvent(p => ({ ...p, type: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-card border-border">
                       <SelectItem value="activity">Activity</SelectItem>
                       <SelectItem value="meeting">Meeting</SelectItem>
                       <SelectItem value="call">Call</SelectItem>
@@ -192,8 +192,8 @@ export default function Calendar() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2"><Label className="text-white/70">Description</Label><Input value={newEvent.description} onChange={(e) => setNewEvent(p => ({ ...p, description: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" /></div>
-                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Event</Button>
+                <div className="space-y-2"><Label>Description</Label><Input value={newEvent.description} onChange={(e) => setNewEvent(p => ({ ...p, description: e.target.value }))} className="bg-muted border-border" /></div>
+                <Button type="submit" className="w-full">Create Event</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -201,32 +201,32 @@ export default function Calendar() {
       </div>
 
       {/* Calendar Header */}
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardContent className="p-0">
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
+          <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/5" onClick={() => setCurrentDate(new Date(year, month - 1, 1))}>
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => setCurrentDate(new Date(year, month - 1, 1))}>
                 <ChevronLeft className="w-5 h-5" />
               </Button>
-              <h2 className="text-lg font-semibold text-white">{monthNames[month]} {year}</h2>
-              <Button variant="ghost" size="icon" className="text-white/60 hover:text-white hover:bg-white/5" onClick={() => setCurrentDate(new Date(year, month + 1, 1))}>
+              <h2 className="text-lg font-semibold text-foreground">{monthNames[month]} {year}</h2>
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => setCurrentDate(new Date(year, month + 1, 1))}>
                 <ChevronRight className="w-5 h-5" />
               </Button>
             </div>
-            <Button variant="ghost" size="sm" className="text-white/60 hover:text-white" onClick={() => setCurrentDate(new Date())}>Today</Button>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" onClick={() => setCurrentDate(new Date())}>Today</Button>
           </div>
 
           {/* Day headers */}
-          <div className="grid grid-cols-7 border-b border-white/10">
+          <div className="grid grid-cols-7 border-b border-border">
             {dayNames.map(d => (
-              <div key={d} className="py-2 text-center text-xs font-medium text-white/40 uppercase">{d}</div>
+              <div key={d} className="py-2 text-center text-xs font-medium text-muted-foreground uppercase">{d}</div>
             ))}
           </div>
 
           {/* Calendar grid */}
           <div className="grid grid-cols-7">
             {Array.from({ length: firstDay }).map((_, i) => (
-              <div key={`empty-${i}`} className="min-h-[100px] border-b border-r border-white/5" />
+              <div key={`empty-${i}`} className="min-h-[100px] border-b border-r border-border/50" />
             ))}
             {Array.from({ length: daysInMonth }).map((_, day) => {
               const dayNum = day + 1;
@@ -238,9 +238,9 @@ export default function Calendar() {
                 <div
                   key={dayNum}
                   onClick={() => setSelectedDate(new Date(year, month, dayNum))}
-                  className={`min-h-[100px] border-b border-r border-white/5 p-1.5 cursor-pointer transition-colors ${isSelected ? "bg-[#6452db]/10" : "hover:bg-white/[0.02]"}`}
+                  className={`min-h-[100px] border-b border-r border-border/50 p-1.5 cursor-pointer transition-colors ${isSelected ? "bg-expo-blue/10" : "hover:bg-accent/50"}`}
                 >
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm mb-1 ${isToday ? "bg-[#6452db] text-white font-medium" : "text-white/60"}`}>
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm mb-1 ${isToday ? "bg-expo-blue text-white font-medium" : "text-muted-foreground"}`}>
                     {dayNum}
                   </div>
                   <div className="space-y-1">
@@ -254,7 +254,7 @@ export default function Calendar() {
                       );
                     })}
                     {dayEvents.length > 3 && (
-                      <div className="text-[10px] text-white/30 px-1.5">+{dayEvents.length - 3} more</div>
+                      <div className="text-[10px] text-muted-foreground px-1.5">+{dayEvents.length - 3} more</div>
                     )}
                   </div>
                 </div>
@@ -266,9 +266,9 @@ export default function Calendar() {
 
       {/* Selected date events */}
       {selectedDate && (
-        <Card className="bg-[#18191b] border-white/10">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base">
+            <CardTitle className="text-foreground text-base">
               Events for {selectedDate.toLocaleDateString("default", { weekday: "long", month: "long", day: "numeric" })}
             </CardTitle>
           </CardHeader>
@@ -277,21 +277,21 @@ export default function Calendar() {
               {getEventsForDate(selectedDate.getDate()).map((event) => {
                 const Icon = typeIcons[event.type] || CheckCircle2;
                 return (
-                  <div key={event.id} className="flex items-center gap-3 p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                  <div key={event.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted border border-border">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${event.color}20` }}>
                       <Icon className="w-4 h-4" style={{ color: event.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white">{event.title}</p>
-                      <p className="text-xs text-white/40">{event.description}</p>
+                      <p className="text-sm font-medium text-foreground">{event.title}</p>
+                      <p className="text-xs text-muted-foreground">{event.description}</p>
                     </div>
-                    <Badge variant="secondary" className="text-xs bg-white/10 text-white/50 capitalize">{event.type}</Badge>
-                    {event.status === "overdue" && <AlertCircle className="w-4 h-4 text-[#be6464]" />}
+                    <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground capitalize">{event.type}</Badge>
+                    {event.status === "overdue" && <AlertCircle className="w-4 h-4 text-red-500" />}
                   </div>
                 );
               })}
               {getEventsForDate(selectedDate.getDate()).length === 0 && (
-                <p className="text-sm text-white/40 text-center py-8">No events for this date</p>
+                <p className="text-sm text-muted-foreground text-center py-8">No events for this date</p>
               )}
             </div>
           </CardContent>

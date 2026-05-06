@@ -155,7 +155,7 @@ export default function Deals() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
       </div>
     );
   }
@@ -170,7 +170,7 @@ export default function Deals() {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input type="text" placeholder="Search deals..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-64 bg-card border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50" />
+            <input type="text" placeholder="Search deals..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-64 bg-card border border-border rounded-expo-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50" />
           </div>
           <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => {
             const exportData = deals.map(d => ({
@@ -193,7 +193,7 @@ export default function Deals() {
           <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent"><Filter className="w-4 h-4 mr-2" />Filter</Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" />New Deal</Button>
+              <Button size="sm"><Plus className="w-4 h-4 mr-2" />New Deal</Button>
             </DialogTrigger>
             <DialogContent className="bg-card border-border text-card-foreground max-w-lg">
               <DialogHeader><DialogTitle>Create New Deal</DialogTitle></DialogHeader>
@@ -235,7 +235,7 @@ export default function Deals() {
                     </Select>
                   </div>
                 </div>
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Deal</Button>
+                <Button type="submit" className="w-full">Create Deal</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -259,7 +259,7 @@ export default function Deals() {
               <div className="space-y-3 min-h-[100px]">
                 {stageDeals.length === 0 && <div className="text-center py-8 text-xs text-muted-foreground border border-dashed border-border rounded-md">Drop deals here</div>}
                 {stageDeals.map((deal) => (
-                  <Card key={deal.id} draggable onDragStart={() => handleDragStart(deal)} onClick={() => openDetail(deal.id)} className="bg-card border-border cursor-grab active:cursor-grabbing hover:border-primary/20 transition-colors">
+                  <Card key={deal.id} draggable onDragStart={() => handleDragStart(deal)} onClick={() => openDetail(deal.id)} className="bg-card border-border cursor-grab active:cursor-grabbing hover:border-expo-blue/20 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="text-sm font-medium text-foreground">{deal.name}</h4>
