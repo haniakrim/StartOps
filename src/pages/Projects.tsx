@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   FolderKanban, Clock, Users, AlertTriangle, CheckCircle2, Plus,
-  Search, Loader2, TrendingUp, BarChart3, Calendar
+  Search, Loader2, TrendingUp, BarChart3, Calendar, LayoutGrid
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { ProjectBoard } from "@/components/projects/ProjectBoard";
 
 interface Project {
   id: string;
@@ -33,12 +34,14 @@ interface ProjectTask {
   id: string;
   project_id: string;
   name: string;
+  description: string;
   status: string;
   priority: string;
   assignee_id: string | null;
-  estimated_hours: number;
+  estimated_hours: number | null;
   actual_hours: number;
   due_date: string;
+  completed_at: string | null;
 }
 
 const statusColors: Record<string, string> = {
@@ -61,6 +64,7 @@ export default function Projects() {
   const [tasks, setTasks] = useState<ProjectTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [newProject, setNewProject] = useState({ name: "", description: "", budget: "", priority: "medium", start_date: "", end_date: "" });
 
   useEffect(() => { fetchProjects(); }, []);
@@ -77,6 +81,10 @@ export default function Projects() {
 
       const { data: taskData } = await supabase.from("project_tasks").select("*").order("created_at", { ascending: false });
       setTasks(taskData || []);
+
+      if (data && data.length > 0 && !selectedProjectId) {
+        setSelectedProjectId(data[0].id);
+      }
     } catch (error: any) {
       toast.error("Failed to load projects: " + error.message);
     } finally {
@@ -111,6 +119,8 @@ export default function Projects() {
     const daysLeft = p.end_date ? Math.ceil((new Date(p.end_date).getTime() - Date.now()) / 86400000) : 999;
     return (progress < 50 && daysLeft < 14) || (p.actual_cost || 0) > (p.budget || 0) * 0.9;
   });
+
+  const selectedProject = projects.find(p => p.id === selectedProjectId);
 
   if (loading) {
     return (
@@ -198,6 +208,7 @@ export default function Projects() {
           <TabsTrigger value="active" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><FolderKanban className="w-4 h-4 mr-2" />Active</TabsTrigger>
           <TabsTrigger value="planning" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Calendar className="w-4 h-4 mr-2" />Planning</TabsTrigger>
           <TabsTrigger value="completed" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><CheckCircle2 className="w-4 h-4 mr-2" />Completed</TabsTrigger>
+          <TabsTrigger value="board" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><LayoutGrid className="w-4 h-4 mr-2" />Task Board</TabsTrigger>
         </TabsList>
 
         {["active", "planning", "completed"].map(tab => {
@@ -213,7 +224,7 @@ export default function Projects() {
                   const budgetUsed = project.budget > 0 ? ((project.actual_cost || 0) / project.budget) * 100 : 0;
                   const isAtRisk = atRiskProjects.some(p => p.id === project.id);
                   return (
-                    <Card key={project.id} className={`bg-[#18191b] border-white/10 hover:border-white/20 transition-colors ${isAtRisk ? "border-[#f0ad4e]/30" : ""}`}>
+                    <Card key={project.id} className={`bg-[#18191b] border-white/10 hover:border-white/20 transition-colors cursor-pointer ${isAtRisk ? "border-[#f0ad4e]/30" : ""}`} onClick={() => setSelectedProjectId(project.id)}>
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between mb-3">
                           <Badge variant="secondary" className={`text-xs ${statusColors[project.status] || statusColors.planning}`}>{project.status}</Badge>
@@ -252,6 +263,36 @@ export default function Projects() {
             </TabsContent>
           );
         })}
+
+        <TabsContent value="board" className="mt-6">
+          {selectedProject ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-white">{selectedProject.name}</h2>
+                  <p className="text-sm text-white/50">Task board</p>
+                </div>
+                <Select value={selectedProjectId || ""} onValueChange={setSelectedProjectId}>
+                  <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-64">
+                    <SelectValue placeholder="Select project" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    {projects.map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <ProjectBoard
+                projectId={selectedProject.id}
+                tasks={tasks}
+                onUpdate={fetchProjects}
+              />
+            </div>
+          ) : (
+            <div className="text-center py-12 text-sm text-white/40">No project selected. Create a project first!</div>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
   );
