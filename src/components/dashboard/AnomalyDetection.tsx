@@ -130,23 +130,23 @@ export function AnomalyDetection() {
 
   if (loading) {
     return (
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardContent className="p-6 flex items-center justify-center">
-          <Loader2 className="w-5 h-5 text-[#6452db] animate-spin" />
+          <Loader2 className="w-5 h-5 text-primary animate-spin" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-[#18191b] border-white/10">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-            <BrainCircuit className="w-4 h-4 text-[#ff8964]" />
+          <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+            <BrainCircuit className="w-4 h-4 text-orange-500" />
             AI Anomaly Detection
           </CardTitle>
-          <Badge variant="outline" className="border-white/10 text-white/50 text-xs">
+          <Badge variant="outline" className="border-border text-muted-foreground text-xs">
             Cross-System
           </Badge>
         </div>
@@ -155,35 +155,35 @@ export function AnomalyDetection() {
         <div className="space-y-3">
           {anomalies.length === 0 && (
             <div className="text-center py-6">
-              <Zap className="w-8 h-8 text-[#8dc572]/30 mx-auto mb-2" />
-              <p className="text-sm text-white/40">All systems operating normally</p>
-              <p className="text-xs text-white/30 mt-1">No anomalies detected across Revenue, Finance, or Projects</p>
+              <Zap className="w-8 h-8 text-emerald-500/30 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">All systems operating normally</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">No anomalies detected across Revenue, Finance, or Projects</p>
             </div>
           )}
           {anomalies.map((anomaly) => {
             const Icon = anomaly.severity === "high" ? AlertTriangle : anomaly.severity === "medium" ? TrendingDown : TrendingUp;
             const color = anomaly.severity === "high" ? "#be6464" : anomaly.severity === "medium" ? "#f0ad4e" : "#5683da";
             return (
-              <div key={anomaly.id} className="flex items-start gap-3 p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+              <div key={anomaly.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${color}15` }}>
                   <Icon className="w-4 h-4" style={{ color }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium text-white">{anomaly.title}</p>
-                    <Badge className={`text-xs border-0 ${anomaly.severity === "high" ? "bg-[#be6464]/20 text-[#be6464]" : anomaly.severity === "medium" ? "bg-[#f0ad4e]/20 text-[#f0ad4e]" : "bg-[#5683da]/20 text-[#5683da]"}`}>
+                    <p className="text-sm font-medium text-foreground">{anomaly.title}</p>
+                    <Badge className={`text-xs border-0 ${anomaly.severity === "high" ? "bg-red-500/15 text-red-600 dark:text-red-400" : anomaly.severity === "medium" ? "bg-orange-500/15 text-orange-600 dark:text-orange-400" : "bg-blue-500/15 text-blue-600 dark:text-blue-400"}`}>
                       {anomaly.severity}
                     </Badge>
-                    <Badge variant="outline" className="text-xs border-white/10 text-white/40">{anomaly.module}</Badge>
+                    <Badge variant="outline" className="text-xs border-border text-muted-foreground">{anomaly.module}</Badge>
                   </div>
-                  <p className="text-xs text-white/50">{anomaly.description}</p>
+                  <p className="text-xs text-muted-foreground">{anomaly.description}</p>
                 </div>
               </div>
             );
           })}
         </div>
         {anomalies.length > 0 && (
-          <Button variant="ghost" size="sm" className="w-full mt-3 text-white/40 hover:text-white hover:bg-white/5" onClick={detectAnomalies}>
+          <Button variant="ghost" size="sm" className="w-full mt-3 text-muted-foreground hover:text-foreground hover:bg-accent" onClick={detectAnomalies}>
             <Zap className="w-3.5 h-3.5 mr-2" />Refresh Detection
           </Button>
         )}

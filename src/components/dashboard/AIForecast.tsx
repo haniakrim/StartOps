@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, Loader2, BrainCircuit, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { TrendingUp, Loader2, BrainCircuit } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface ForecastData {
   month: string;
@@ -66,61 +66,68 @@ export function AIForecast() {
 
   if (loading) {
     return (
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardContent className="p-6 flex items-center justify-center">
-          <Loader2 className="w-5 h-5 text-[#6452db] animate-spin" />
+          <Loader2 className="w-5 h-5 text-primary animate-spin" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-[#18191b] border-white/10">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-            <BrainCircuit className="w-4 h-4 text-[#6452db]" />
+          <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+            <BrainCircuit className="w-4 h-4 text-primary" />
             AI Revenue Forecast
           </CardTitle>
-          <Badge variant="outline" className="border-white/10 text-white/50 text-xs">
+          <Badge variant="outline" className="border-border text-muted-foreground text-xs">
             Probabilistic Model
           </Badge>
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-            <p className="text-xs text-white/40 mb-1">Projected</p>
-            <p className="text-lg font-semibold text-white">${stats.projected.toLocaleString()}</p>
+          <div className="p-3 rounded-lg bg-muted/50 border border-border">
+            <p className="text-xs text-muted-foreground mb-1">Projected</p>
+            <p className="text-lg font-semibold text-foreground">${stats.projected.toLocaleString()}</p>
           </div>
-          <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-            <p className="text-xs text-white/40 mb-1">Weighted</p>
-            <p className="text-lg font-semibold text-[#6452db]">${Math.round(stats.weighted).toLocaleString()}</p>
+          <div className="p-3 rounded-lg bg-muted/50 border border-border">
+            <p className="text-xs text-muted-foreground mb-1">Weighted</p>
+            <p className="text-lg font-semibold text-primary">${Math.round(stats.weighted).toLocaleString()}</p>
           </div>
-          <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-            <p className="text-xs text-white/40 mb-1">Confidence</p>
-            <p className="text-lg font-semibold text-[#8dc572]">{stats.confidence.toFixed(1)}%</p>
+          <div className="p-3 rounded-lg bg-muted/50 border border-border">
+            <p className="text-xs text-muted-foreground mb-1">Confidence</p>
+            <p className="text-lg font-semibold text-emerald-500">{stats.confidence.toFixed(1)}%</p>
           </div>
         </div>
         <ResponsiveContainer width="100%" height={220}>
           <AreaChart data={data}>
             <defs>
               <linearGradient id="colorProjected" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6452db" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#6452db" stopOpacity={0} />
+                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorWeighted" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#8dc572" stopOpacity={0.3} />
                 <stop offset="95%" stopColor="#8dc572" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
-            <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} formatter={(value: number) => [`$${value.toLocaleString()}`]} />
-            <Area type="monotone" dataKey="projected" stroke="#6452db" strokeWidth={2} fillOpacity={1} fill="url(#colorProjected)" name="Projected" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "8px",
+                color: "hsl(var(--card-foreground))",
+              }}
+              formatter={(value: number) => [`$${value.toLocaleString()}`]}
+            />
+            <Area type="monotone" dataKey="projected" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorProjected)" name="Projected" />
             <Area type="monotone" dataKey="weighted" stroke="#8dc572" strokeWidth={2} fillOpacity={1} fill="url(#colorWeighted)" name="Weighted" />
-            <Area type="monotone" dataKey="confidence_high" stroke="transparent" fill="rgba(255,255,255,0.03)" name="Upper Bound" />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>

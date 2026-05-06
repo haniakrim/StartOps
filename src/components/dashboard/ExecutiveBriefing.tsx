@@ -90,23 +90,23 @@ export function ExecutiveBriefing() {
 
   if (loading) {
     return (
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardContent className="p-6 flex items-center justify-center">
-          <Loader2 className="w-5 h-5 text-[#6452db] animate-spin" />
+          <Loader2 className="w-5 h-5 text-primary animate-spin" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-[#18191b] border-white/10">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#ff8964]" />
+          <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-orange-500" />
             Executive Briefing
           </CardTitle>
-          <Badge variant="outline" className="border-white/10 text-white/50 text-xs">
+          <Badge variant="outline" className="border-border text-muted-foreground text-xs">
             AI-Generated
           </Badge>
         </div>
@@ -117,19 +117,19 @@ export function ExecutiveBriefing() {
             const Icon = item.type === "warning" ? AlertTriangle : item.type === "action" ? Lightbulb : TrendingUp;
             const color = item.type === "warning" ? "#f0ad4e" : item.type === "action" ? "#6452db" : "#8dc572";
             return (
-              <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+              <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${color}15` }}>
                   <Icon className="w-4 h-4" style={{ color }} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">{item.title}</p>
-                  <p className="text-xs text-white/50 mt-0.5">{item.description}</p>
+                  <p className="text-sm font-medium text-foreground">{item.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
                 </div>
               </div>
             );
           })}
           {briefing.length === 0 && (
-            <p className="text-sm text-white/40 text-center py-4">No briefing available yet. Add more data to generate insights.</p>
+            <p className="text-sm text-muted-foreground text-center py-4">No briefing available yet. Add more data to generate insights.</p>
           )}
         </div>
       </CardContent>
