@@ -1,0 +1,1 @@
+SELECT table_name, column_name FROM information_schema.columns WHERE column_name = 'organization_id' AND table_name IN ('invoices', 'expenses', 'forecasts', 'support_tickets', 'subscriptions', 'campaigns', 'webhooks', 'audit_logs', 'custom_fields', 'time_entries', 'vendors', 'sla_policies', 'api_keys', 'documents') ORDER BY table_name;

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Building2, Eye, EyeOff, Loader2, Shield, UserPlus, LogIn, Lock, Mail, Sun, Moon } from "lucide-react";
+import { Building2, Eye, EyeOff, Loader2, Shield, UserPlus, LogIn, Lock, Mail, Sun, Moon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -151,6 +151,7 @@ export default function Login() {
   const [lastName, setLastName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
@@ -220,6 +221,27 @@ export default function Login() {
       toast.error(error.message || "Authentication failed");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDemoSignIn() {
+    setDemoLoading(true);
+    try {
+      // Ensure demo data is seeded (creates user + data if needed)
+      toast.info("Setting up demo environment...");
+      await supabase.functions.invoke("seed-demo");
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: "demo@example.com",
+        password: "demodemo123",
+      });
+      if (error) throw error;
+      toast.success("Welcome to the demo!");
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error("Demo login failed: " + error.message);
+    } finally {
+      setDemoLoading(false);
     }
   }
 
@@ -433,6 +455,33 @@ export default function Login() {
                   {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up as admin"}
                 </button>
               </div>
+
+              {!isSignUp && (
+                <div className="mt-4">
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-card px-2 text-muted-foreground">or</span>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-4 h-11 text-sm font-medium border-dashed border-primary/40 text-primary hover:bg-primary/5 hover:border-primary/60 transition-all"
+                    onClick={handleDemoSignIn}
+                    disabled={demoLoading || loading}
+                  >
+                    {demoLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : (
+                      <Sparkles className="w-4 h-4 mr-2" />
+                    )}
+                    Try Demo — Explore with sample data
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Security badges */}

@@ -48,6 +48,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { CommandPalette } from "@/components/CommandPalette";
 import { RealtimeNotifications } from "@/components/RealtimeNotifications";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface NavItem {
   path: string;
@@ -280,6 +281,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   );
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+  const isDemoUser = user?.email === "demo@example.com";
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => {
@@ -412,6 +414,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         <CommandPalette />
+
+        {/* Demo Mode Banner */}
+        {isDemoUser && (
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-2 flex items-center justify-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+              Demo Mode — You're exploring with sample data
+            </span>
+            <button
+              onClick={async () => {
+                await supabase.functions.invoke("seed-demo");
+                window.location.reload();
+              }}
+              className="text-xs font-medium text-amber-600 dark:text-amber-400 underline underline-offset-2 hover:text-amber-700 dark:hover:text-amber-300 ml-2"
+            >
+              Reset data
+            </button>
+          </div>
+        )}
 
         {/* Header */}
         <header className="h-16 flex items-center gap-4 px-6 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-30">

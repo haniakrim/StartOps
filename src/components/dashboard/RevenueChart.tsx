@@ -14,12 +14,12 @@ const revenueData = [
 
 export function RevenueChart() {
   return (
-    <Card className="lg:col-span-2 bg-[#18191b] border-white/10">
+    <Card className="lg:col-span-2 bg-card border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-white text-base font-medium">Revenue Overview</CardTitle>
-          <Badge variant="outline" className="border-white/10 text-white/50 text-xs">
-            <TrendingUp className="w-3 h-3 mr-1 text-[#8dc572]" />+23.4% YoY
+          <CardTitle className="text-foreground text-base font-medium">Revenue Overview</CardTitle>
+          <Badge variant="outline" className="border-border text-muted-foreground text-xs">
+            <TrendingUp className="w-3 h-3 mr-1 text-emerald-500" />+23.4% YoY
           </Badge>
         </div>
       </CardHeader>
@@ -28,15 +28,23 @@ export function RevenueChart() {
           <AreaChart data={revenueData}>
             <defs>
               <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6452db" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#6452db" stopOpacity={0} />
+                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
-            <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]} />
-            <Area type="monotone" dataKey="value" stroke="#6452db" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "8px",
+                color: "hsl(var(--card-foreground))",
+              }}
+              formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]}
+            />
+            <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>

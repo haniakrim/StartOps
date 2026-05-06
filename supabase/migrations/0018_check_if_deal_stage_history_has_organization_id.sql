@@ -1,0 +1,1 @@
+SELECT column_name FROM information_schema.columns WHERE table_name = 'deal_stage_history' AND column_name = 'organization_id';
