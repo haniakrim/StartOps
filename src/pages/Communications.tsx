@@ -58,6 +58,16 @@ export default function Communications() {
     contact_id: "",
     deal_id: "",
   });
+  const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("startops_email_templates");
+      if (raw) setEmailTemplates(JSON.parse(raw));
+    } catch {
+      setEmailTemplates([]);
+    }
+  }, []);
 
   useEffect(() => {
     fetchCommunications();
@@ -221,6 +231,42 @@ export default function Communications() {
                   </Select>
                 </div>
               </div>
+              {newComm.type === "email" && emailTemplates.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-white/70">Template</Label>
+                  <Select
+                    value=""
+                    onValueChange={(v) => {
+                      const template = emailTemplates.find((t) => t.id === v);
+                      if (template) {
+                        const updated = emailTemplates.map((t) =>
+                          t.id === v ? { ...t, usageCount: (t.usageCount || 0) + 1 } : t
+                        );
+                        setEmailTemplates(updated);
+                        localStorage.setItem("startops_email_templates", JSON.stringify(updated));
+                        setNewComm((p) => ({
+                          ...p,
+                          subject: template.subject,
+                          content: template.body,
+                        }));
+                        toast.success(`Applied template: ${template.name}`);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                      <SelectValue placeholder="Select a template" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                      {emailTemplates.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          {t.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label className="text-white/70">Subject</Label>
                 <Input value={newComm.subject} onChange={(e) => setNewComm(p => ({ ...p, subject: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Re: Proposal follow-up" />

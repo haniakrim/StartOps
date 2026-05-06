@@ -34,6 +34,7 @@ import {
   Clock,
   Target,
   Sun,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -60,6 +61,7 @@ const navItems = [
   { path: "/forecasts", icon: BrainCircuit, label: "Forecasts" },
   { path: "/timesheets", icon: Clock, label: "Timesheets" },
   { path: "/quotes", icon: FileText, label: "Quotes" },
+  { path: "/email-templates", icon: BookOpen, label: "Email Templates" },
   { path: "/goals", icon: Target, label: "Goals" },
   { path: "/organization", icon: Settings, label: "Organization" },
   { path: "/security", icon: Shield, label: "Security" },

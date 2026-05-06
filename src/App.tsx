@@ -37,6 +37,7 @@ import Goals from "./pages/Goals";
 import Notifications from "./pages/Notifications";
 import Today from "./pages/Today";
 import Quotes from "./pages/Quotes";
+import EmailTemplates from "./pages/EmailTemplates";
 
 const queryClient = new QueryClient();
 
@@ -322,6 +323,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Quotes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/email-templates"
+              element={
+                <ProtectedRoute>
+                  <EmailTemplates />
                 </ProtectedRoute>
               }
             />
