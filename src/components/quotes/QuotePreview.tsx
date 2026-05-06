@@ -41,10 +41,10 @@ interface QuotePreviewProps {
 }
 
 const statusColors: Record<string, string> = {
-  draft: "bg-white/10 text-white/50",
-  sent: "bg-[#00BFFF]/20 text-[#00BFFF]",
-  accepted: "bg-[#0066B1]/20 text-[#0066B1]",
-  rejected: "bg-[#E63946]/20 text-[#E63946]",
+  draft: "bg-muted text-muted-foreground",
+  sent: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  accepted: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  rejected: "bg-red-500/15 text-red-600 dark:text-red-400",
 };
 
 export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePreviewProps) {
@@ -67,15 +67,15 @@ export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePre
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border text-card-foreground max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-white flex items-center gap-2">
-              <FileText className="w-5 h-5 text-[#6452db]" />
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
               Quote Preview
             </DialogTitle>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={printQuote} className="text-white/60 hover:text-white hover:bg-white/5">
+              <Button variant="ghost" size="sm" onClick={printQuote} className="text-muted-foreground hover:text-foreground hover:bg-accent">
                 <Printer className="w-4 h-4 mr-2" />
                 Print
               </Button>
@@ -86,8 +86,8 @@ export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePre
         <div className="space-y-6 pt-4 print:p-8">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-white">QUOTE</h2>
-              <p className="text-sm text-white/50 mt-1">{quote.quote_number}</p>
+              <h2 className="text-2xl font-bold text-foreground">QUOTE</h2>
+              <p className="text-sm text-muted-foreground mt-1">{quote.quote_number}</p>
             </div>
             <Badge variant="secondary" className={`text-sm ${statusColors[quote.status]}`}>
               {quote.status}
@@ -96,67 +96,67 @@ export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePre
 
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-2">From</p>
-              <p className="text-sm font-medium text-white">StartOps</p>
-              <p className="text-sm text-white/50">Your Company Address</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">From</p>
+              <p className="text-sm font-medium text-foreground">StartOps</p>
+              <p className="text-sm text-muted-foreground">Your Company Address</p>
             </div>
             <div>
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-2">To</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">To</p>
               {quote.contacts ? (
                 <>
-                  <p className="text-sm font-medium text-white">{quote.contacts.first_name} {quote.contacts.last_name}</p>
-                  <p className="text-sm text-white/50">{quote.contacts.company || "No company"}</p>
-                  <p className="text-sm text-white/50">{quote.contacts.email || ""}</p>
+                  <p className="text-sm font-medium text-foreground">{quote.contacts.first_name} {quote.contacts.last_name}</p>
+                  <p className="text-sm text-muted-foreground">{quote.contacts.company || "No company"}</p>
+                  <p className="text-sm text-muted-foreground">{quote.contacts.email || ""}</p>
                 </>
               ) : (
-                <p className="text-sm text-white/50">No contact selected</p>
+                <p className="text-sm text-muted-foreground">No contact selected</p>
               )}
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-              <p className="text-xs text-white/40 mb-1">Date</p>
-              <p className="text-sm text-white">{new Date(quote.created_at).toLocaleDateString()}</p>
+            <div className="p-3 rounded-lg bg-muted border border-border">
+              <p className="text-xs text-muted-foreground mb-1">Date</p>
+              <p className="text-sm text-foreground">{new Date(quote.created_at).toLocaleDateString()}</p>
             </div>
-            <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-              <p className="text-xs text-white/40 mb-1">Valid Until</p>
-              <p className="text-sm text-white">{quote.valid_until ? new Date(quote.valid_until).toLocaleDateString() : "Not set"}</p>
+            <div className="p-3 rounded-lg bg-muted border border-border">
+              <p className="text-xs text-muted-foreground mb-1">Valid Until</p>
+              <p className="text-sm text-foreground">{quote.valid_until ? new Date(quote.valid_until).toLocaleDateString() : "Not set"}</p>
             </div>
-            <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-              <p className="text-xs text-white/40 mb-1">Deal</p>
-              <p className="text-sm text-white truncate">{quote.deals?.name || "Not linked"}</p>
+            <div className="p-3 rounded-lg bg-muted border border-border">
+              <p className="text-xs text-muted-foreground mb-1">Deal</p>
+              <p className="text-sm text-foreground truncate">{quote.deals?.name || "Not linked"}</p>
             </div>
           </div>
 
           {quote.title && (
             <div>
-              <p className="text-lg font-medium text-white">{quote.title}</p>
+              <p className="text-lg font-medium text-foreground">{quote.title}</p>
             </div>
           )}
 
-          <div className="border border-white/10 rounded-lg overflow-hidden">
+          <div className="border border-border rounded-lg overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10 bg-[#0b0d10]">
-                  <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Item</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-white/50 uppercase">Qty</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-white/50 uppercase">Price</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-white/50 uppercase">Discount</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-white/50 uppercase">Total</th>
+                <tr className="border-b border-border bg-muted">
+                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Item</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Qty</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Price</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Discount</th>
+                  <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item) => (
-                  <tr key={item.id} className="border-b border-white/5">
+                  <tr key={item.id} className="border-b border-border/50">
                     <td className="py-3 px-4">
-                      <p className="text-sm text-white">{item.products?.name || "Custom item"}</p>
-                      <p className="text-xs text-white/40">{item.description}</p>
+                      <p className="text-sm text-foreground">{item.products?.name || "Custom item"}</p>
+                      <p className="text-xs text-muted-foreground">{item.description}</p>
                     </td>
-                    <td className="py-3 px-4 text-sm text-white text-right">{item.quantity}</td>
-                    <td className="py-3 px-4 text-sm text-white text-right">${(item.unit_price || 0).toLocaleString()}</td>
-                    <td className="py-3 px-4 text-sm text-white text-right">{item.discount_percent > 0 ? `${item.discount_percent}%` : "-"}</td>
-                    <td className="py-3 px-4 text-sm text-white font-medium text-right">${(item.total || 0).toLocaleString()}</td>
+                    <td className="py-3 px-4 text-sm text-foreground text-right">{item.quantity}</td>
+                    <td className="py-3 px-4 text-sm text-foreground text-right">${(item.unit_price || 0).toLocaleString()}</td>
+                    <td className="py-3 px-4 text-sm text-foreground text-right">{item.discount_percent > 0 ? `${item.discount_percent}%` : "-"}</td>
+                    <td className="py-3 px-4 text-sm text-foreground font-medium text-right">${(item.total || 0).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -166,38 +166,38 @@ export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePre
           <div className="flex justify-end">
             <div className="w-64 space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-white/50">Subtotal</span>
-                <span className="text-white">${(quote.subtotal || 0).toLocaleString()}</span>
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-foreground">${(quote.subtotal || 0).toLocaleString()}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-white/50">Tax ({quote.tax_rate}%)</span>
-                <span className="text-white">${(quote.tax_amount || 0).toLocaleString()}</span>
+                <span className="text-muted-foreground">Tax ({quote.tax_rate}%)</span>
+                <span className="text-foreground">${(quote.tax_amount || 0).toLocaleString()}</span>
               </div>
-              <div className="h-px bg-white/10" />
+              <div className="h-px bg-border" />
               <div className="flex items-center justify-between">
-                <span className="text-base font-medium text-white">Total</span>
-                <span className="text-lg font-semibold text-[#ff8964]">${(quote.total || 0).toLocaleString()}</span>
+                <span className="text-base font-medium text-foreground">Total</span>
+                <span className="text-lg font-semibold text-primary">${(quote.total || 0).toLocaleString()}</span>
               </div>
             </div>
           </div>
 
           {quote.notes && (
-            <div className="p-4 rounded-lg bg-[#0b0d10] border border-white/5">
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Notes</p>
-              <p className="text-sm text-white/70 whitespace-pre-wrap">{quote.notes}</p>
+            <div className="p-4 rounded-lg bg-muted border border-border">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Notes</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{quote.notes}</p>
             </div>
           )}
 
           {quote.terms && (
-            <div className="p-4 rounded-lg bg-[#0b0d10] border border-white/5">
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Terms & Conditions</p>
-              <p className="text-sm text-white/70 whitespace-pre-wrap">{quote.terms}</p>
+            <div className="p-4 rounded-lg bg-muted border border-border">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Terms & Conditions</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{quote.terms}</p>
             </div>
           )}
 
           {quote.status === "draft" && (
             <div className="flex gap-2">
-              <Button onClick={() => updateStatus("sent")} className="flex-1 bg-[#00BFFF] text-white hover:bg-[#00BFFF]/90">
+              <Button onClick={() => updateStatus("sent")} className="flex-1 bg-blue-500 text-white hover:bg-blue-500/90">
                 <Send className="w-4 h-4 mr-2" />
                 Mark as Sent
               </Button>
@@ -206,11 +206,11 @@ export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePre
 
           {quote.status === "sent" && (
             <div className="flex gap-2">
-              <Button onClick={() => updateStatus("accepted")} className="flex-1 bg-[#0066B1] text-white hover:bg-[#0066B1]/90">
+              <Button onClick={() => updateStatus("accepted")} className="flex-1 bg-emerald-500 text-white hover:bg-emerald-500/90">
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Mark Accepted
               </Button>
-              <Button onClick={() => updateStatus("rejected")} variant="outline" className="flex-1 border-[#E63946]/30 text-[#E63946] hover:bg-[#E63946]/10">
+              <Button onClick={() => updateStatus("rejected")} variant="outline" className="flex-1 border-red-500/30 text-red-500 hover:bg-red-500/10">
                 <XCircle className="w-4 h-4 mr-2" />
                 Mark Rejected
               </Button>
