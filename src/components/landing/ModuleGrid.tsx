@@ -42,51 +42,51 @@ interface Module {
 
 const modules: Module[] = [
   // CRM
-  { name: "Contacts", description: "Manage leads and customer relationships", icon: Users, color: "#6452db", category: "CRM" },
-  { name: "Companies", description: "Track organizations and accounts", icon: Building2, color: "#6452db", category: "CRM" },
-  { name: "Deals", description: "Visual pipeline from lead to close", icon: TrendingUp, color: "#ff8964", category: "CRM" },
-  { name: "Activities", description: "Calls, meetings, tasks, and emails", icon: Calendar, color: "#5683da", category: "CRM" },
+  { name: "Contacts", description: "Manage leads and customer relationships", icon: Users, color: "#0066B1", category: "CRM" },
+  { name: "Companies", description: "Track organizations and accounts", icon: Building2, color: "#0066B1", category: "CRM" },
+  { name: "Deals", description: "Visual pipeline from lead to close", icon: TrendingUp, color: "#E63946", category: "CRM" },
+  { name: "Activities", description: "Calls, meetings, tasks, and emails", icon: Calendar, color: "#00BFFF", category: "CRM" },
   // Finance
-  { name: "Invoices", description: "Create and track billing", icon: FileText, color: "#8dc572", category: "Finance" },
-  { name: "Expenses", description: "Monitor spending and budgets", icon: Receipt, color: "#8dc572", category: "Finance" },
-  { name: "Vendors", description: "Supplier and vendor management", icon: Truck, color: "#8dc572", category: "Finance" },
-  { name: "Cash Flow", description: "Real-time financial visibility", icon: Wallet, color: "#8dc572", category: "Finance" },
+  { name: "Invoices", description: "Create and track billing", icon: FileText, color: "#0066B1", category: "Finance" },
+  { name: "Expenses", description: "Monitor spending and budgets", icon: Receipt, color: "#0066B1", category: "Finance" },
+  { name: "Vendors", description: "Supplier and vendor management", icon: Truck, color: "#0066B1", category: "Finance" },
+  { name: "Cash Flow", description: "Real-time financial visibility", icon: Wallet, color: "#0066B1", category: "Finance" },
   // Operations
-  { name: "Projects", description: "Kanban boards and task tracking", icon: FolderKanban, color: "#f0ad4e", category: "Operations" },
-  { name: "Inventory", description: "Stock levels and product tracking", icon: Package, color: "#f0ad4e", category: "Operations" },
-  { name: "Employees", description: "Team directory and HR records", icon: UserCircle, color: "#f0ad4e", category: "Operations" },
-  { name: "Timesheets", description: "Time tracking and reporting", icon: Clock, color: "#f0ad4e", category: "Operations" },
+  { name: "Projects", description: "Kanban boards and task tracking", icon: FolderKanban, color: "#00BFFF", category: "Operations" },
+  { name: "Inventory", description: "Stock levels and product tracking", icon: Package, color: "#00BFFF", category: "Operations" },
+  { name: "Employees", description: "Team directory and HR records", icon: UserCircle, color: "#00BFFF", category: "Operations" },
+  { name: "Timesheets", description: "Time tracking and reporting", icon: Clock, color: "#00BFFF", category: "Operations" },
   // Growth
-  { name: "Campaigns", description: "Marketing campaign management", icon: Megaphone, color: "#be6464", category: "Growth" },
-  { name: "Quotes", description: "Professional quote builder", icon: FileSpreadsheet, color: "#be6464", category: "Growth" },
-  { name: "Email Templates", description: "Reusable email designs", icon: Mail, color: "#be6464", category: "Growth" },
-  { name: "Subscriptions", description: "Recurring revenue tracking", icon: Repeat, color: "#be6464", category: "Growth" },
+  { name: "Campaigns", description: "Marketing campaign management", icon: Megaphone, color: "#E63946", category: "Growth" },
+  { name: "Quotes", description: "Professional quote builder", icon: FileSpreadsheet, color: "#E63946", category: "Growth" },
+  { name: "Email Templates", description: "Reusable email designs", icon: Mail, color: "#E63946", category: "Growth" },
+  { name: "Subscriptions", description: "Recurring revenue tracking", icon: Repeat, color: "#E63946", category: "Growth" },
   // Intelligence
-  { name: "Analytics", description: "Real-time dashboards and KPIs", icon: BarChart3, color: "#5683da", category: "Intelligence" },
-  { name: "Reports", description: "Custom reports and exports", icon: FileBarChart, color: "#5683da", category: "Intelligence" },
-  { name: "Forecasts", description: "AI-powered revenue predictions", icon: LineChart, color: "#5683da", category: "Intelligence" },
-  { name: "AI Assistant", description: "Smart insights and automation", icon: Sparkles, color: "#6452db", category: "Intelligence" },
-  { name: "Goals", description: "OKRs and target tracking", icon: Target, color: "#5683da", category: "Intelligence" },
+  { name: "Analytics", description: "Real-time dashboards and KPIs", icon: BarChart3, color: "#00BFFF", category: "Intelligence" },
+  { name: "Reports", description: "Custom reports and exports", icon: FileBarChart, color: "#00BFFF", category: "Intelligence" },
+  { name: "Forecasts", description: "AI-powered revenue predictions", icon: LineChart, color: "#00BFFF", category: "Intelligence" },
+  { name: "AI Assistant", description: "Smart insights and automation", icon: Sparkles, color: "#0066B1", category: "Intelligence" },
+  { name: "Goals", description: "OKRs and target tracking", icon: Target, color: "#00BFFF", category: "Intelligence" },
   // Platform
-  { name: "Workflows", description: "Automate repetitive tasks", icon: GitBranch, color: "#ff8964", category: "Platform" },
-  { name: "Custom Fields", description: "Tailor data to your needs", icon: Settings, color: "#ff8964", category: "Platform" },
-  { name: "Calendar", description: "Shared team scheduling", icon: CalendarDays, color: "#ff8964", category: "Platform" },
-  { name: "Documents", description: "File storage and sharing", icon: FileStack, color: "#ff8964", category: "Platform" },
-  { name: "Security", description: "SSO, 2FA, and audit logs", icon: Shield, color: "#ff8964", category: "Platform" },
-  { name: "API", description: "REST API and webhooks", icon: Code, color: "#ff8964", category: "Platform" },
-  { name: "Audit", description: "Complete activity history", icon: ClipboardList, color: "#ff8964", category: "Platform" },
-  { name: "Notes", description: "Shared notes and wikis", icon: StickyNote, color: "#ff8964", category: "Platform" },
+  { name: "Workflows", description: "Automate repetitive tasks", icon: GitBranch, color: "#E63946", category: "Platform" },
+  { name: "Custom Fields", description: "Tailor data to your needs", icon: Settings, color: "#E63946", category: "Platform" },
+  { name: "Calendar", description: "Shared team scheduling", icon: CalendarDays, color: "#E63946", category: "Platform" },
+  { name: "Documents", description: "File storage and sharing", icon: FileStack, color: "#E63946", category: "Platform" },
+  { name: "Security", description: "SSO, 2FA, and audit logs", icon: Shield, color: "#E63946", category: "Platform" },
+  { name: "API", description: "REST API and webhooks", icon: Code, color: "#E63946", category: "Platform" },
+  { name: "Audit", description: "Complete activity history", icon: ClipboardList, color: "#E63946", category: "Platform" },
+  { name: "Notes", description: "Shared notes and wikis", icon: StickyNote, color: "#E63946", category: "Platform" },
 ];
 
 const categories = ["CRM", "Finance", "Operations", "Growth", "Intelligence", "Platform"];
 
 const categoryColors: Record<string, string> = {
-  CRM: "#6452db",
-  Finance: "#8dc572",
-  Operations: "#f0ad4e",
-  Growth: "#be6464",
-  Intelligence: "#5683da",
-  Platform: "#ff8964",
+  CRM: "#0066B1",
+  Finance: "#0066B1",
+  Operations: "#00BFFF",
+  Growth: "#E63946",
+  Intelligence: "#00BFFF",
+  Platform: "#E63946",
 };
 
 export default function ModuleGrid() {

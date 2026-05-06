@@ -60,17 +60,17 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 const typeColors: Record<string, string> = {
-  email: "#6452db",
-  call: "#8dc572",
-  meeting: "#f0ad4e",
-  task: "#5683da",
-  note: "#ff8964",
+  email: "#0066B1",
+  call: "#0066B1",
+  meeting: "#00BFFF",
+  task: "#00BFFF",
+  note: "#E63946",
 };
 
 const priorityColors: Record<string, string> = {
-  high: "bg-[#be6464]/20 text-[#be6464]",
-  medium: "bg-[#f0ad4e]/20 text-[#f0ad4e]",
-  low: "bg-[#8dc572]/20 text-[#8dc572]",
+  high: "bg-[#E63946]/20 text-[#E63946]",
+  medium: "bg-[#00BFFF]/20 text-[#00BFFF]",
+  low: "bg-[#0066B1]/20 text-[#0066B1]",
 };
 
 export default function Activities() {
@@ -217,7 +217,7 @@ export default function Activities() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#0066B1] animate-spin" />
       </div>
     );
   }
@@ -255,13 +255,13 @@ export default function Activities() {
           <DialogTrigger asChild>
             <Button
               size="sm"
-              className="bg-[#6452db] text-white hover:bg-[#6452db]/90"
+              className="bg-[#0066B1] text-white hover:bg-[#0066B1]/90"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Activity
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-lg">
+          <DialogContent className="bg-[#0A1628] border-white/10 text-white max-w-lg">
             <DialogHeader>
               <DialogTitle>Create New Activity</DialogTitle>
             </DialogHeader>
@@ -398,10 +398,10 @@ export default function Activities() {
       </div>
 
       {selected.length > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#6452db]/10 border border-[#6452db]/20">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#0066B1]/10 border border-[#0066B1]/20">
           <span className="text-sm text-white">{selected.length} selected</span>
           <div className="flex-1" />
-          <Button variant="ghost" size="sm" className="text-[#8dc572] hover:text-[#8dc572] hover:bg-[#8dc572]/10 h-8" onClick={async () => {
+          <Button variant="ghost" size="sm" className="text-[#0066B1] hover:text-[#0066B1] hover:bg-[#0066B1]/10 h-8" onClick={async () => {
             try {
               const { error } = await supabase.from("activities").update({ status: "completed", completed_at: new Date().toISOString() }).in("id", selected);
               if (error) throw error;
@@ -414,7 +414,7 @@ export default function Activities() {
           }}>
             <Check className="w-4 h-4 mr-1" />Complete
           </Button>
-          <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={async () => {
+          <Button variant="ghost" size="sm" className="text-[#E63946] hover:text-[#E63946] hover:bg-[#E63946]/10 h-8" onClick={async () => {
             try {
               const { error } = await supabase.from("activities").delete().in("id", selected);
               if (error) throw error;

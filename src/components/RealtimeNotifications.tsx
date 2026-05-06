@@ -116,10 +116,10 @@ export function RealtimeNotifications() {
   };
 
   const typeColors = {
-    info: "text-[#5683da]",
-    success: "text-[#8dc572]",
-    warning: "text-[#f0ad4e]",
-    error: "text-[#be6464]",
+    info: "text-[#00BFFF]",
+    success: "text-[#0066B1]",
+    warning: "text-[#00BFFF]",
+    error: "text-[#E63946]",
   };
 
   return (
@@ -132,7 +132,7 @@ export function RealtimeNotifications() {
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-[#be6464] text-white text-[10px] border-0">
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-[#E63946] text-white text-[10px] border-0">
             {unreadCount}
           </Badge>
         )}

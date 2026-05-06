@@ -31,16 +31,16 @@ interface ProjectBoardProps {
 }
 
 const columnConfig = [
-  { id: "todo", label: "To Do", color: "#5683da" },
-  { id: "in_progress", label: "In Progress", color: "#f0ad4e" },
-  { id: "done", label: "Done", color: "#8dc572" },
+  { id: "todo", label: "To Do", color: "#0066B1" },
+  { id: "in_progress", label: "In Progress", color: "#00BFFF" },
+  { id: "done", label: "Done", color: "#0066B1" },
 ];
 
 const priorityColors: Record<string, string> = {
-  low: "bg-[#8dc572]/20 text-[#8dc572]",
-  medium: "bg-[#f0ad4e]/20 text-[#f0ad4e]",
-  high: "bg-[#ff8964]/20 text-[#ff8964]",
-  urgent: "bg-[#be6464]/20 text-[#be6464]",
+  low: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  medium: "bg-orange-500/15 text-orange-600 dark:text-orange-400",
+  high: "bg-red-500/15 text-red-600 dark:text-red-400",
+  urgent: "bg-red-600/15 text-red-700 dark:text-red-300",
 };
 
 export function ProjectBoard({ projectId, tasks, onUpdate }: ProjectBoardProps) {
@@ -152,33 +152,33 @@ export function ProjectBoard({ projectId, tasks, onUpdate }: ProjectBoardProps) 
             return (
               <div key={col.id} className="flex items-center gap-1.5 text-sm">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: col.color }} />
-                <span className="text-white/60">{col.label}</span>
-                <Badge variant="secondary" className="bg-white/10 text-white/50 text-xs">{count}</Badge>
+                <span className="text-muted-foreground">{col.label}</span>
+                <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">{count}</Badge>
               </div>
             );
           })}
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90" onClick={() => setDialogOpen(true)}>
+          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />Add Task
           </Button>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white">
+          <DialogContent className="bg-card border-border text-card-foreground">
             <DialogHeader><DialogTitle>New Task</DialogTitle></DialogHeader>
             <form onSubmit={createTask} className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label className="text-white/70">Task Name</Label>
-                <Input required value={newTask.name} onChange={(e) => setNewTask((p) => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Design homepage mockups" />
+                <Label>Task Name</Label>
+                <Input required value={newTask.name} onChange={(e) => setNewTask((p) => ({ ...p, name: e.target.value }))} className="bg-muted border-border" placeholder="Design homepage mockups" />
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Description</Label>
-                <Input value={newTask.description} onChange={(e) => setNewTask((p) => ({ ...p, description: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label>Description</Label>
+                <Input value={newTask.description} onChange={(e) => setNewTask((p) => ({ ...p, description: e.target.value }))} className="bg-muted border-border" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Priority</Label>
+                  <Label>Priority</Label>
                   <Select value={newTask.priority} onValueChange={(v) => setNewTask((p) => ({ ...p, priority: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-card border-border">
                       <SelectItem value="low">Low</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="high">High</SelectItem>
@@ -187,15 +187,15 @@ export function ProjectBoard({ projectId, tasks, onUpdate }: ProjectBoardProps) 
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Due Date</Label>
-                  <Input type="date" value={newTask.due_date} onChange={(e) => setNewTask((p) => ({ ...p, due_date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Due Date</Label>
+                  <Input type="date" value={newTask.due_date} onChange={(e) => setNewTask((p) => ({ ...p, due_date: e.target.value }))} className="bg-muted border-border" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Estimated Hours</Label>
-                <Input type="number" value={newTask.estimated_hours} onChange={(e) => setNewTask((p) => ({ ...p, estimated_hours: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label>Estimated Hours</Label>
+                <Input type="number" value={newTask.estimated_hours} onChange={(e) => setNewTask((p) => ({ ...p, estimated_hours: e.target.value }))} className="bg-muted border-border" />
               </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Task</Button>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Task</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -205,32 +205,32 @@ export function ProjectBoard({ projectId, tasks, onUpdate }: ProjectBoardProps) 
         {columnConfig.map((col) => {
           const colTasks = projectTasks.filter((t) => t.status === col.id);
           return (
-            <div key={col.id} className="bg-[#0b0d10] rounded-lg border border-white/5 p-3 min-h-[300px]" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, col.id)}>
+            <div key={col.id} className="bg-muted rounded-lg border border-border p-3 min-h-[300px]" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, col.id)}>
               <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: col.color }} />
-                  <span className="text-sm font-medium text-white">{col.label}</span>
+                  <span className="text-sm font-medium text-foreground">{col.label}</span>
                 </div>
-                <Badge variant="secondary" className="bg-white/10 text-white/50 text-xs">{colTasks.length}</Badge>
+                <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">{colTasks.length}</Badge>
               </div>
               <div className="space-y-2">
-                {colTasks.length === 0 && <div className="text-center py-8 text-xs text-white/20 border border-dashed border-white/10 rounded-md">Drop tasks here</div>}
+                {colTasks.length === 0 && <div className="text-center py-8 text-xs text-muted-foreground border border-dashed border-border rounded-md">Drop tasks here</div>}
                 {colTasks.map((task) => (
-                  <Card key={task.id} draggable onDragStart={() => handleDragStart(task)} className="bg-[#18191b] border-white/10 cursor-grab active:cursor-grabbing hover:border-white/20 transition-colors">
+                  <Card key={task.id} draggable onDragStart={() => handleDragStart(task)} className="bg-card border-border cursor-grab active:cursor-grabbing hover:border-primary/20 transition-colors">
                     <CardContent className="p-3">
                       <div className="flex items-start justify-between mb-2">
-                        <p className="text-sm font-medium text-white flex-1 min-w-0">{task.name}</p>
+                        <p className="text-sm font-medium text-foreground flex-1 min-w-0">{task.name}</p>
                         <div className="flex items-center gap-1 ml-2">
-                          <button onClick={() => setEditingTask(task)} className="text-white/30 hover:text-white p-1"><Pencil className="w-3 h-3" /></button>
-                          <button onClick={() => deleteTask(task.id)} className="text-white/30 hover:text-[#be6464] p-1"><Trash2 className="w-3 h-3" /></button>
+                          <button onClick={() => setEditingTask(task)} className="text-muted-foreground hover:text-foreground p-1"><Pencil className="w-3 h-3" /></button>
+                          <button onClick={() => deleteTask(task.id)} className="text-muted-foreground hover:text-destructive p-1"><Trash2 className="w-3 h-3" /></button>
                         </div>
                       </div>
-                      {task.description && <p className="text-xs text-white/40 mb-2 line-clamp-2">{task.description}</p>}
+                      {task.description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{task.description}</p>}
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant="secondary" className={`text-xs ${priorityColors[task.priority] || priorityColors.medium}`}>{task.priority}</Badge>
-                        {task.estimated_hours && <span className="text-xs text-white/30 flex items-center gap-1"><Clock className="w-3 h-3" />{task.estimated_hours}h</span>}
+                        {task.estimated_hours && <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{task.estimated_hours}h</span>}
                       </div>
-                      <div className="flex items-center justify-between text-xs text-white/30">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
                         {task.due_date && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(task.due_date).toLocaleDateString()}</span>}
                         <span className="flex items-center gap-1"><User className="w-3 h-3" />{task.assignee_id ? "Assigned" : "Unassigned"}</span>
                       </div>
@@ -244,24 +244,24 @@ export function ProjectBoard({ projectId, tasks, onUpdate }: ProjectBoardProps) 
       </div>
 
       <Dialog open={!!editingTask} onOpenChange={() => setEditingTask(null)}>
-        <DialogContent className="bg-[#18191b] border-white/10 text-white">
+        <DialogContent className="bg-card border-border text-card-foreground">
           <DialogHeader><DialogTitle>Edit Task</DialogTitle></DialogHeader>
           {editingTask && (
             <form onSubmit={updateTask} className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label className="text-white/70">Task Name</Label>
-                <Input required value={editingTask.name} onChange={(e) => setEditingTask((p) => (p ? { ...p, name: e.target.value } : null))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label>Task Name</Label>
+                <Input required value={editingTask.name} onChange={(e) => setEditingTask((p) => (p ? { ...p, name: e.target.value } : null))} className="bg-muted border-border" />
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Description</Label>
-                <Input value={editingTask.description || ""} onChange={(e) => setEditingTask((p) => (p ? { ...p, description: e.target.value } : null))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label>Description</Label>
+                <Input value={editingTask.description || ""} onChange={(e) => setEditingTask((p) => (p ? { ...p, description: e.target.value } : null))} className="bg-muted border-border" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Priority</Label>
+                  <Label>Priority</Label>
                   <Select value={editingTask.priority} onValueChange={(v) => setEditingTask((p) => (p ? { ...p, priority: v } : null))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-card border-border">
                       <SelectItem value="low">Low</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="high">High</SelectItem>
@@ -270,15 +270,15 @@ export function ProjectBoard({ projectId, tasks, onUpdate }: ProjectBoardProps) 
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Due Date</Label>
-                  <Input type="date" value={editingTask.due_date || ""} onChange={(e) => setEditingTask((p) => (p ? { ...p, due_date: e.target.value } : null))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Due Date</Label>
+                  <Input type="date" value={editingTask.due_date || ""} onChange={(e) => setEditingTask((p) => (p ? { ...p, due_date: e.target.value } : null))} className="bg-muted border-border" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Estimated Hours</Label>
-                <Input type="number" value={editingTask.estimated_hours || ""} onChange={(e) => setEditingTask((p) => (p ? { ...p, estimated_hours: parseInt(e.target.value) || null } : null))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label>Estimated Hours</Label>
+                <Input type="number" value={editingTask.estimated_hours || ""} onChange={(e) => setEditingTask((p) => (p ? { ...p, estimated_hours: parseInt(e.target.value) || null } : null))} className="bg-muted border-border" />
               </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Save Changes</Button>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Save Changes</Button>
             </form>
           )}
         </DialogContent>

@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
-const COLORS = ["#6452db", "#ff8964", "#5683da", "#8dc572", "#f0ad4e", "#be6464"];
+const COLORS = ["#0066B1", "#E63946", "#00BFFF", "#0066B1", "#00BFFF", "#E63946"];
 
 export default function Analytics() {
   const [loading, setLoading] = useState(true);
@@ -74,11 +74,11 @@ export default function Analytics() {
 
       // Conversion funnel
       const funnel = [
-        { name: "Leads", value: dealsData?.filter(d => d.stage === "lead").length || 0, color: "#6452db" },
-        { name: "Qualified", value: dealsData?.filter(d => d.stage === "qualified").length || 0, color: "#5683da" },
-        { name: "Proposal", value: dealsData?.filter(d => d.stage === "proposal").length || 0, color: "#ff8964" },
-        { name: "Negotiation", value: dealsData?.filter(d => d.stage === "negotiation").length || 0, color: "#f0ad4e" },
-        { name: "Closed Won", value: wonDeals, color: "#8dc572" },
+        { name: "Leads", value: dealsData?.filter(d => d.stage === "lead").length || 0, color: "#0066B1" },
+        { name: "Qualified", value: dealsData?.filter(d => d.stage === "qualified").length || 0, color: "#00BFFF" },
+        { name: "Proposal", value: dealsData?.filter(d => d.stage === "proposal").length || 0, color: "#E63946" },
+        { name: "Negotiation", value: dealsData?.filter(d => d.stage === "negotiation").length || 0, color: "#00BFFF" },
+        { name: "Closed Won", value: wonDeals, color: "#0066B1" },
       ];
       setFunnelData(funnel);
 

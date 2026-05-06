@@ -20,7 +20,7 @@ const statCards = [
     change: "+12.5%",
     up: true,
     icon: DollarSign,
-    color: "#6452db",
+    color: "#0066B1",
   },
   {
     title: "Active Deals",
@@ -28,7 +28,7 @@ const statCards = [
     change: "+8.2%",
     up: true,
     icon: TrendingUp,
-    color: "#ff8964",
+    color: "#E63946",
   },
   {
     title: "Contacts",
@@ -36,7 +36,7 @@ const statCards = [
     change: "+24%",
     up: true,
     icon: Users,
-    color: "#8dc572",
+    color: "#0066B1",
   },
   {
     title: "Companies",
@@ -44,16 +44,16 @@ const statCards = [
     change: "-2.1%",
     up: false,
     icon: Building2,
-    color: "#5683da",
+    color: "#00BFFF",
   },
 ];
 
 const pipelineStages = [
-  { name: "Lead", count: 24, color: "#5683da" },
-  { name: "Qualified", count: 18, color: "#6452db" },
-  { name: "Proposal", count: 12, color: "#ff8964" },
-  { name: "Negotiation", count: 8, color: "#f0ad4e" },
-  { name: "Closed Won", count: 6, color: "#8dc572" },
+  { name: "Lead", count: 24, color: "#00BFFF" },
+  { name: "Qualified", count: 18, color: "#0066B1" },
+  { name: "Proposal", count: 12, color: "#E63946" },
+  { name: "Negotiation", count: 8, color: "#00BFFF" },
+  { name: "Closed Won", count: 6, color: "#0066B1" },
 ];
 
 const contacts = [
@@ -81,10 +81,10 @@ export default function HeroDashboardPreview() {
   return (
     <div className="relative w-full max-w-lg mx-auto lg:mx-0">
       {/* Glow effect behind */}
-      <div className="absolute -inset-4 bg-gradient-to-r from-[#6452db]/20 via-[#ff8964]/10 to-[#5683da]/20 rounded-3xl blur-2xl animate-pulse-glow" />
+      <div className="absolute -inset-4 bg-gradient-to-r from-[#0066B1]/20 via-[#E63946]/10 to-[#00BFFF]/20 rounded-3xl blur-2xl animate-pulse-glow" />
 
       {/* Dashboard card */}
-      <div className="relative bg-[#18191b] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="relative bg-[#0A1628] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
           <div className="flex gap-1.5">
@@ -162,7 +162,7 @@ export default function HeroDashboardPreview() {
                       initial={{ height: 0 }}
                       animate={{ height: `${height}%` }}
                       transition={{ duration: 0.5, delay: i * 0.05 }}
-                      className="flex-1 rounded-t-sm bg-gradient-to-t from-[#6452db] to-[#ff8964]/60"
+                      className="flex-1 rounded-t-sm bg-gradient-to-t from-[#0066B1] to-[#E63946]/60"
                     />
                   ))}
                 </div>
@@ -240,7 +240,7 @@ export default function HeroDashboardPreview() {
                     transition={{ delay: i * 0.1 }}
                     className="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6452db] to-[#ff8964] flex items-center justify-center text-xs font-bold text-white">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0066B1] to-[#E63946] flex items-center justify-center text-xs font-bold text-white">
                       {contact.name.split(" ").map((n) => n[0]).join("")}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -256,7 +256,7 @@ export default function HeroDashboardPreview() {
                         contact.status === "Active"
                           ? "bg-emerald-500/10 text-emerald-400"
                           : contact.status === "Customer"
-                          ? "bg-[#6452db]/10 text-[#6452db]"
+                          ? "bg-[#0066B1]/10 text-[#0066B1]"
                           : "bg-white/5 text-white/40"
                       }`}
                     >
@@ -276,7 +276,7 @@ export default function HeroDashboardPreview() {
               key={v}
               onClick={() => setCurrentView(i)}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                i === currentView ? "bg-[#6452db] w-4" : "bg-white/20 hover:bg-white/30"
+                i === currentView ? "bg-[#0066B1] w-4" : "bg-white/20 hover:bg-white/30"
               }`}
             />
           ))}

@@ -42,9 +42,9 @@ interface QuotePreviewProps {
 
 const statusColors: Record<string, string> = {
   draft: "bg-white/10 text-white/50",
-  sent: "bg-[#5683da]/20 text-[#5683da]",
-  accepted: "bg-[#8dc572]/20 text-[#8dc572]",
-  rejected: "bg-[#be6464]/20 text-[#be6464]",
+  sent: "bg-[#00BFFF]/20 text-[#00BFFF]",
+  accepted: "bg-[#0066B1]/20 text-[#0066B1]",
+  rejected: "bg-[#E63946]/20 text-[#E63946]",
 };
 
 export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePreviewProps) {
@@ -197,7 +197,7 @@ export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePre
 
           {quote.status === "draft" && (
             <div className="flex gap-2">
-              <Button onClick={() => updateStatus("sent")} className="flex-1 bg-[#5683da] text-white hover:bg-[#5683da]/90">
+              <Button onClick={() => updateStatus("sent")} className="flex-1 bg-[#00BFFF] text-white hover:bg-[#00BFFF]/90">
                 <Send className="w-4 h-4 mr-2" />
                 Mark as Sent
               </Button>
@@ -206,11 +206,11 @@ export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePre
 
           {quote.status === "sent" && (
             <div className="flex gap-2">
-              <Button onClick={() => updateStatus("accepted")} className="flex-1 bg-[#8dc572] text-black hover:bg-[#8dc572]/90">
+              <Button onClick={() => updateStatus("accepted")} className="flex-1 bg-[#0066B1] text-white hover:bg-[#0066B1]/90">
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Mark Accepted
               </Button>
-              <Button onClick={() => updateStatus("rejected")} variant="outline" className="flex-1 border-[#be6464]/30 text-[#be6464] hover:bg-[#be6464]/10">
+              <Button onClick={() => updateStatus("rejected")} variant="outline" className="flex-1 border-[#E63946]/30 text-[#E63946] hover:bg-[#E63946]/10">
                 <XCircle className="w-4 h-4 mr-2" />
                 Mark Rejected
               </Button>

@@ -69,32 +69,32 @@ export function GoalForm({ onSubmit, onCancel }: GoalFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pt-4">
       <div className="space-y-2">
-        <Label className="text-white/70">Objective</Label>
+        <Label>Objective</Label>
         <Input
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="bg-[#0b0d10] border-white/10 text-white"
+          className="bg-muted border-border"
           placeholder="Increase monthly recurring revenue"
         />
       </div>
       <div className="space-y-2">
-        <Label className="text-white/70">Description</Label>
+        <Label>Description</Label>
         <Input
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="bg-[#0b0d10] border-white/10 text-white"
+          className="bg-muted border-border"
           placeholder="Grow revenue through expansion and new customers"
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-white/70">Period</Label>
+          <Label>Period</Label>
           <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+            <SelectTrigger className="bg-muted border-border">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectContent className="bg-card border-border">
               <SelectItem value="Q1 2024">Q1 2024</SelectItem>
               <SelectItem value="Q2 2024">Q2 2024</SelectItem>
               <SelectItem value="Q3 2024">Q3 2024</SelectItem>
@@ -104,12 +104,12 @@ export function GoalForm({ onSubmit, onCancel }: GoalFormProps) {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label className="text-white/70">Initial Status</Label>
+          <Label>Initial Status</Label>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+            <SelectTrigger className="bg-muted border-border">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectContent className="bg-card border-border">
               <SelectItem value="on_track">On Track</SelectItem>
               <SelectItem value="at_risk">At Risk</SelectItem>
               <SelectItem value="behind">Behind</SelectItem>
@@ -120,13 +120,13 @@ export function GoalForm({ onSubmit, onCancel }: GoalFormProps) {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-white/70">Key Results</Label>
+          <Label>Key Results</Label>
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={addKR}
-            className="text-[#6452db] hover:text-[#6452db] hover:bg-[#6452db]/10"
+            className="text-primary hover:text-primary hover:bg-primary/10"
           >
             <Plus className="w-4 h-4 mr-1" />
             Add KR
@@ -135,13 +135,13 @@ export function GoalForm({ onSubmit, onCancel }: GoalFormProps) {
         {keyResults.map((kr, i) => (
           <div
             key={i}
-            className="p-3 rounded-lg bg-[#0b0d10] border border-white/5 space-y-2"
+            className="p-3 rounded-lg bg-muted border border-border space-y-2"
           >
             <div className="flex items-center gap-2">
               <Input
                 value={kr.name}
                 onChange={(e) => updateKR(i, "name", e.target.value)}
-                className="bg-[#18191b] border-white/10 text-white flex-1"
+                className="bg-card border-border flex-1"
                 placeholder="Achieve $100K MRR"
               />
               {keyResults.length > 1 && (
@@ -150,7 +150,7 @@ export function GoalForm({ onSubmit, onCancel }: GoalFormProps) {
                   variant="ghost"
                   size="icon"
                   onClick={() => removeKR(i)}
-                  className="text-white/30 hover:text-[#be6464] h-8 w-8"
+                  className="text-muted-foreground hover:text-destructive h-8 w-8"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -161,24 +161,24 @@ export function GoalForm({ onSubmit, onCancel }: GoalFormProps) {
                 type="number"
                 value={kr.current_value}
                 onChange={(e) => updateKR(i, "current_value", e.target.value)}
-                className="bg-[#18191b] border-white/10 text-white"
+                className="bg-card border-border"
                 placeholder="Current"
               />
               <Input
                 type="number"
                 value={kr.target_value}
                 onChange={(e) => updateKR(i, "target_value", e.target.value)}
-                className="bg-[#18191b] border-white/10 text-white"
+                className="bg-card border-border"
                 placeholder="Target"
               />
               <Select
                 value={kr.unit}
                 onValueChange={(v) => updateKR(i, "unit", v)}
               >
-                <SelectTrigger className="bg-[#18191b] border-white/10 text-white">
+                <SelectTrigger className="bg-card border-border">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                <SelectContent className="bg-card border-border">
                   <SelectItem value="%">%</SelectItem>
                   <SelectItem value="$">$</SelectItem>
                   <SelectItem value="#">#</SelectItem>
@@ -192,7 +192,7 @@ export function GoalForm({ onSubmit, onCancel }: GoalFormProps) {
       <div className="flex gap-2">
         <Button
           type="submit"
-          className="flex-1 bg-[#6452db] text-white hover:bg-[#6452db]/90"
+          className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
         >
           Create OKR
         </Button>
@@ -200,7 +200,7 @@ export function GoalForm({ onSubmit, onCancel }: GoalFormProps) {
           type="button"
           variant="ghost"
           onClick={onCancel}
-          className="text-white/70 hover:text-white"
+          className="text-muted-foreground hover:text-foreground"
         >
           Cancel
         </Button>

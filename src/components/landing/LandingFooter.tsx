@@ -26,7 +26,7 @@ export default function LandingFooter() {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#6452db] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#0066B1] flex items-center justify-center">
                 <Building2 className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-semibold text-white">StartOps</span>

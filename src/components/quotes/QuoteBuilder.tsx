@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Loader2, FileText, DollarSign, Percent, Calendar } from "lucide-react";
+import { Plus, Trash2, Loader2, FileText, DollarSign } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -187,10 +187,10 @@ export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: Qu
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border text-card-foreground max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-white flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[#6452db]" />
+          <DialogTitle className="text-foreground flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" />
             Create Quote
           </DialogTitle>
         </DialogHeader>
@@ -198,23 +198,23 @@ export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: Qu
         <form onSubmit={saveQuote} className="space-y-6 pt-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-white/70">Quote #</Label>
-              <Input value={quoteNumber} onChange={(e) => setQuoteNumber(e.target.value)} className="bg-[#0b0d10] border-white/10 text-white font-mono" required />
+              <Label>Quote #</Label>
+              <Input value={quoteNumber} onChange={(e) => setQuoteNumber(e.target.value)} className="bg-muted border-border font-mono" required />
             </div>
             <div className="space-y-2">
-              <Label className="text-white/70">Title</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Proposal for Enterprise License" />
+              <Label>Title</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-muted border-border" placeholder="Proposal for Enterprise License" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-white/70">Contact</Label>
+              <Label>Contact</Label>
               <Select value={selectedContact} onValueChange={setSelectedContact}>
-                <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                <SelectTrigger className="bg-muted border-border">
                   <SelectValue placeholder="Select contact" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                <SelectContent className="bg-card border-border">
                   {contacts.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.first_name} {c.last_name}
@@ -224,12 +224,12 @@ export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: Qu
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-white/70">Deal (optional)</Label>
+              <Label>Deal (optional)</Label>
               <Select value={selectedDeal} onValueChange={setSelectedDeal}>
-                <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                <SelectTrigger className="bg-muted border-border">
                   <SelectValue placeholder="Select deal" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                <SelectContent className="bg-card border-border">
                   {deals.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
                       {d.name}
@@ -242,38 +242,38 @@ export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: Qu
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-white/70">Valid Until</Label>
-              <Input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="bg-[#0b0d10] border-white/10 text-white" />
+              <Label>Valid Until</Label>
+              <Input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="bg-muted border-border" />
             </div>
             <div className="space-y-2">
-              <Label className="text-white/70">Tax Rate (%)</Label>
-              <Input type="number" value={taxRate} onChange={(e) => setTaxRate(e.target.value)} className="bg-[#0b0d10] border-white/10 text-white" min="0" max="100" />
+              <Label>Tax Rate (%)</Label>
+              <Input type="number" value={taxRate} onChange={(e) => setTaxRate(e.target.value)} className="bg-muted border-border" min="0" max="100" />
             </div>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-white/70">Line Items</Label>
-              <Button type="button" variant="ghost" size="sm" onClick={addItem} className="text-[#6452db] hover:text-[#6452db] hover:bg-[#6452db]/10">
+              <Label>Line Items</Label>
+              <Button type="button" variant="ghost" size="sm" onClick={addItem} className="text-primary hover:text-primary hover:bg-primary/10">
                 <Plus className="w-4 h-4 mr-1" />
                 Add Item
               </Button>
             </div>
 
             {items.length === 0 && (
-              <div className="text-center py-6 text-sm text-white/40 border border-dashed border-white/10 rounded-md">
+              <div className="text-center py-6 text-sm text-muted-foreground border border-dashed border-border rounded-md">
                 No items yet. Add your first line item above.
               </div>
             )}
 
             {items.map((item, index) => (
-              <div key={index} className="p-3 rounded-lg bg-[#0b0d10] border border-white/5 space-y-3">
+              <div key={index} className="p-3 rounded-lg bg-muted border border-border space-y-3">
                 <div className="flex items-center gap-2">
                   <Select value={item.product_id} onValueChange={(v) => updateItem(index, { product_id: v })}>
-                    <SelectTrigger className="bg-[#18191b] border-white/10 text-white flex-1">
+                    <SelectTrigger className="bg-card border-border flex-1">
                       <SelectValue placeholder="Select product" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectContent className="bg-card border-border">
                       {products.map((p) => (
                         <SelectItem key={p.id} value={p.id}>
                           {p.name} — ${(p.unit_price || 0).toLocaleString()}
@@ -281,16 +281,16 @@ export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: Qu
                       ))}
                     </SelectContent>
                   </Select>
-                  <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-white/30 hover:text-[#be6464] h-8 w-8">
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-muted-foreground hover:text-destructive h-8 w-8">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
-                <Input value={item.description} onChange={(e) => updateItem(index, { description: e.target.value })} className="bg-[#18191b] border-white/10 text-white" placeholder="Description" />
+                <Input value={item.description} onChange={(e) => updateItem(index, { description: e.target.value })} className="bg-card border-border" placeholder="Description" />
                 <div className="grid grid-cols-4 gap-2">
-                  <Input type="number" value={item.quantity} onChange={(e) => updateItem(index, { quantity: parseInt(e.target.value) || 0 })} className="bg-[#18191b] border-white/10 text-white" placeholder="Qty" />
-                  <Input type="number" value={item.unit_price} onChange={(e) => updateItem(index, { unit_price: parseFloat(e.target.value) || 0 })} className="bg-[#18191b] border-white/10 text-white" placeholder="Price" />
-                  <Input type="number" value={item.discount_percent} onChange={(e) => updateItem(index, { discount_percent: parseFloat(e.target.value) || 0 })} className="bg-[#18191b] border-white/10 text-white" placeholder="Discount %" />
-                  <div className="flex items-center justify-end text-sm text-white font-medium">
+                  <Input type="number" value={item.quantity} onChange={(e) => updateItem(index, { quantity: parseInt(e.target.value) || 0 })} className="bg-card border-border" placeholder="Qty" />
+                  <Input type="number" value={item.unit_price} onChange={(e) => updateItem(index, { unit_price: parseFloat(e.target.value) || 0 })} className="bg-card border-border" placeholder="Price" />
+                  <Input type="number" value={item.discount_percent} onChange={(e) => updateItem(index, { discount_percent: parseFloat(e.target.value) || 0 })} className="bg-card border-border" placeholder="Discount %" />
+                  <div className="flex items-center justify-end text-sm text-foreground font-medium">
                     ${calculateItemTotal(item).toLocaleString()}
                   </div>
                 </div>
@@ -298,38 +298,38 @@ export function QuoteBuilder({ open, onClose, onSuccess, dealId, contactId }: Qu
             ))}
           </div>
 
-          <div className="p-4 rounded-lg bg-[#0b0d10] border border-white/5 space-y-2">
+          <div className="p-4 rounded-lg bg-muted border border-border space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-white/50">Subtotal</span>
-              <span className="text-white">${subtotal.toLocaleString()}</span>
+              <span className="text-muted-foreground">Subtotal</span>
+              <span className="text-foreground">${subtotal.toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-white/50">Tax ({taxRate}%)</span>
-              <span className="text-white">${taxAmount.toLocaleString()}</span>
+              <span className="text-muted-foreground">Tax ({taxRate}%)</span>
+              <span className="text-foreground">${taxAmount.toLocaleString()}</span>
             </div>
-            <div className="h-px bg-white/10" />
+            <div className="h-px bg-border" />
             <div className="flex items-center justify-between">
-              <span className="text-base font-medium text-white">Total</span>
-              <span className="text-lg font-semibold text-[#ff8964]">${total.toLocaleString()}</span>
+              <span className="text-base font-medium text-foreground">Total</span>
+              <span className="text-lg font-semibold text-primary">${total.toLocaleString()}</span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white/70">Notes</Label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full bg-[#0b0d10] border border-white/10 rounded-md p-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50 min-h-[60px] resize-y" placeholder="Additional notes for the customer..." />
+            <Label>Notes</Label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full bg-muted border border-border rounded-md p-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 min-h-[60px] resize-y" placeholder="Additional notes for the customer..." />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-white/70">Terms & Conditions</Label>
-            <textarea value={terms} onChange={(e) => setTerms(e.target.value)} className="w-full bg-[#0b0d10] border border-white/10 rounded-md p-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50 min-h-[60px] resize-y" />
+            <Label>Terms & Conditions</Label>
+            <textarea value={terms} onChange={(e) => setTerms(e.target.value)} className="w-full bg-muted border border-border rounded-md p-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 min-h-[60px] resize-y" />
           </div>
 
           <div className="flex gap-2">
-            <Button type="submit" disabled={loading} className="flex-1 bg-[#6452db] text-white hover:bg-[#6452db]/90">
+            <Button type="submit" disabled={loading} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
               {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <FileText className="w-4 h-4 mr-2" />}
               Create Quote
             </Button>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-white/70 hover:text-white">
+            <Button type="button" variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground">
               Cancel
             </Button>
           </div>

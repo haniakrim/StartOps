@@ -85,7 +85,7 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-[#6452db] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#0066B1] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -95,19 +95,19 @@ export function CommunicationsReport({ range }: { range: DateRange }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <ReportStatCard
           icon={Mail}
-          iconColor="#6452db"
+          iconColor="#0066B1"
           value={stats.totalComms.toString()}
           label="Total Communications"
         />
         <ReportStatCard
           icon={TrendingUp}
-          iconColor="#8dc572"
+          iconColor="#00BFFF"
           value={stats.positive.toString()}
           label="Positive"
         />
         <ReportStatCard
           icon={MessageSquare}
-          iconColor="#5683da"
+          iconColor="#00BFFF"
           value={stats.neutral.toString()}
           label="Neutral"
         />

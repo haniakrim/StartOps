@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, CheckCircle2, AlertCircle, Calendar, Phone, Mail, MessageSquare, Activity, MoreHorizontal, Trash2, Pencil } from "lucide-react";
+import { Clock, CheckCircle2, AlertCircle, Calendar, Phone, Mail, MessageSquare, Activity, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,9 +26,9 @@ interface ActivityBoardProps {
 }
 
 const columns = [
-  { id: "pending", label: "To Do", color: "#0066B1", icon: Clock },
-  { id: "in_progress", label: "In Progress", color: "#00BFFF", icon: AlertCircle },
-  { id: "completed", label: "Done", color: "#0066B1", icon: CheckCircle2 },
+  { id: "pending", label: "To Do", color: "hsl(var(--primary))", icon: Clock },
+  { id: "in_progress", label: "In Progress", color: "hsl(var(--chart-2))", icon: AlertCircle },
+  { id: "completed", label: "Done", color: "hsl(var(--chart-4))", icon: CheckCircle2 },
 ];
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -40,9 +40,9 @@ const typeColors: Record<string, string> = {
 };
 
 const priorityColors: Record<string, string> = {
-  high: "bg-[#E63946]/20 text-[#E63946]",
-  medium: "bg-[#00BFFF]/20 text-[#00BFFF]",
-  low: "bg-[#0066B1]/20 text-[#0066B1]",
+  high: "bg-red-500/15 text-red-600 dark:text-red-400",
+  medium: "bg-orange-500/15 text-orange-600 dark:text-orange-400",
+  low: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
 };
 
 export function ActivityBoard({ activities, onUpdate }: ActivityBoardProps) {
@@ -106,21 +106,21 @@ export function ActivityBoard({ activities, onUpdate }: ActivityBoardProps) {
         return (
           <div
             key={col.id}
-            className="bg-[#0A1628] rounded-lg border border-white/5 p-3 min-h-[400px]"
+            className="bg-card rounded-lg border border-border p-3 min-h-[400px]"
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, col.id)}
           >
             <div className="flex items-center justify-between mb-3 px-1">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: col.color }} />
-                <span className="text-sm font-medium text-white">{col.label}</span>
+                <span className="text-sm font-medium text-foreground">{col.label}</span>
               </div>
-              <Badge variant="secondary" className="bg-white/10 text-white/50 text-xs">{items.length}</Badge>
+              <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">{items.length}</Badge>
             </div>
 
             <div className="space-y-2">
               {items.length === 0 && (
-                <div className="text-center py-8 text-xs text-white/20 border border-dashed border-white/10 rounded-md">Drop activities here</div>
+                <div className="text-center py-8 text-xs text-muted-foreground border border-dashed border-border rounded-md">Drop activities here</div>
               )}
               {items.map((activity) => {
                 const TypeIcon = typeIcons[activity.type] || Activity;
@@ -131,7 +131,7 @@ export function ActivityBoard({ activities, onUpdate }: ActivityBoardProps) {
                     key={activity.id}
                     draggable
                     onDragStart={() => handleDragStart(activity)}
-                    className="bg-[#1A2332] border-white/10 cursor-grab active:cursor-grabbing hover:border-white/20 transition-colors"
+                    className="bg-card border-border cursor-grab active:cursor-grabbing hover:border-primary/20 transition-colors"
                   >
                     <CardContent className="p-3">
                       <div className="flex items-start justify-between mb-2">
@@ -139,27 +139,27 @@ export function ActivityBoard({ activities, onUpdate }: ActivityBoardProps) {
                           <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${color}15` }}>
                             <TypeIcon className="w-3.5 h-3.5" style={{ color }} />
                           </div>
-                          <p className="text-sm font-medium text-white truncate">{activity.subject}</p>
+                          <p className="text-sm font-medium text-foreground truncate">{activity.subject}</p>
                         </div>
                         <div className="flex items-center gap-1 ml-2">
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-white/30 hover:text-[#be6464]" onClick={() => deleteActivity(activity.id)}>
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-destructive" onClick={() => deleteActivity(activity.id)}>
                             <Trash2 className="w-3 h-3" />
                           </Button>
                         </div>
                       </div>
 
                       {activity.description && (
-                        <p className="text-xs text-white/40 mb-2 line-clamp-2">{activity.description}</p>
+                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{activity.description}</p>
                       )}
 
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant="secondary" className={`text-xs ${priorityColors[activity.priority] || priorityColors.medium}`}>
                           {activity.priority}
                         </Badge>
-                        <span className="text-xs text-white/30 capitalize">{activity.type}</span>
+                        <span className="text-xs text-muted-foreground capitalize">{activity.type}</span>
                       </div>
 
-                      <div className="flex items-center justify-between text-xs text-white/30">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
                         {activity.contacts && (
                           <span>{activity.contacts.first_name} {activity.contacts.last_name}</span>
                         )}

@@ -24,36 +24,36 @@ interface CommandItem {
 }
 
 const navItems = [
-  { path: "/dashboard", icon: TrendingUp, label: "Dashboard", color: "#6452db" },
-  { path: "/contacts", icon: User, label: "Contacts", color: "#5683da" },
-  { path: "/companies", icon: Building2, label: "Companies", color: "#ff8964" },
-  { path: "/deals", icon: GitBranch, label: "Deals", color: "#8dc572" },
-  { path: "/activities", icon: Activity, label: "Activities", color: "#f0ad4e" },
-  { path: "/projects", icon: FolderKanban, label: "Projects", color: "#6452db" },
-  { path: "/finance", icon: DollarSign, label: "Finance", color: "#8dc572" },
-  { path: "/inventory", icon: Package, label: "Inventory", color: "#ff8964" },
-  { path: "/employees", icon: Briefcase, label: "People", color: "#5683da" },
-  { path: "/communications", icon: Mail, label: "Communications", color: "#6452db" },
-  { path: "/calendar", icon: Calendar, label: "Calendar", color: "#f0ad4e" },
-  { path: "/forecasts", icon: Target, label: "Forecasts", color: "#8dc572" },
-  { path: "/timesheets", icon: Clock, label: "Timesheets", color: "#ff8964" },
-  { path: "/goals", icon: CheckCircle2, label: "Goals", color: "#6452db" },
-  { path: "/analytics", icon: BarChart3, label: "Analytics", color: "#5683da" },
-  { path: "/reports", icon: FileText, label: "Reports", color: "#f0ad4e" },
-  { path: "/workflows", icon: Zap, label: "Workflows", color: "#8dc572" },
-  { path: "/assistant", icon: Sparkles, label: "AI Assistant", color: "#ff8964" },
-  { path: "/settings", icon: Settings, label: "Settings", color: "#6452db" },
-  { path: "/security", icon: Shield, label: "Security", color: "#5683da" },
-  { path: "/support", icon: LifeBuoy, label: "Support", color: "#f0ad4e" },
+  { path: "/dashboard", icon: TrendingUp, label: "Dashboard", color: "#0066B1" },
+  { path: "/contacts", icon: User, label: "Contacts", color: "#00BFFF" },
+  { path: "/companies", icon: Building2, label: "Companies", color: "#E63946" },
+  { path: "/deals", icon: GitBranch, label: "Deals", color: "#0066B1" },
+  { path: "/activities", icon: Activity, label: "Activities", color: "#00BFFF" },
+  { path: "/projects", icon: FolderKanban, label: "Projects", color: "#0066B1" },
+  { path: "/finance", icon: DollarSign, label: "Finance", color: "#0066B1" },
+  { path: "/inventory", icon: Package, label: "Inventory", color: "#E63946" },
+  { path: "/employees", icon: Briefcase, label: "People", color: "#00BFFF" },
+  { path: "/communications", icon: Mail, label: "Communications", color: "#0066B1" },
+  { path: "/calendar", icon: Calendar, label: "Calendar", color: "#00BFFF" },
+  { path: "/forecasts", icon: Target, label: "Forecasts", color: "#0066B1" },
+  { path: "/timesheets", icon: Clock, label: "Timesheets", color: "#E63946" },
+  { path: "/goals", icon: CheckCircle2, label: "Goals", color: "#0066B1" },
+  { path: "/analytics", icon: BarChart3, label: "Analytics", color: "#00BFFF" },
+  { path: "/reports", icon: FileText, label: "Reports", color: "#00BFFF" },
+  { path: "/workflows", icon: Zap, label: "Workflows", color: "#0066B1" },
+  { path: "/assistant", icon: Sparkles, label: "AI Assistant", color: "#E63946" },
+  { path: "/settings", icon: Settings, label: "Settings", color: "#0066B1" },
+  { path: "/security", icon: Shield, label: "Security", color: "#00BFFF" },
+  { path: "/support", icon: LifeBuoy, label: "Support", color: "#00BFFF" },
 ];
 
 const createActions = [
-  { type: "contact", title: "New Contact", subtitle: "Add a new contact to your CRM", icon: User, color: "#5683da", path: "/contacts" },
-  { type: "deal", title: "New Deal", subtitle: "Create a new sales opportunity", icon: GitBranch, color: "#8dc572", path: "/deals" },
-  { type: "activity", title: "New Activity", subtitle: "Log a task, call, or meeting", icon: Activity, color: "#f0ad4e", path: "/activities" },
-  { type: "project", title: "New Project", subtitle: "Start a new project", icon: FolderKanban, color: "#6452db", path: "/projects" },
-  { type: "invoice", title: "New Invoice", subtitle: "Create a customer invoice", icon: DollarSign, color: "#8dc572", path: "/finance" },
-  { type: "goal", title: "New Goal", subtitle: "Set an OKR objective", icon: CheckCircle2, color: "#ff8964", path: "/goals" },
+  { type: "contact", title: "New Contact", subtitle: "Add a new contact to your CRM", icon: User, color: "#00BFFF", path: "/contacts" },
+  { type: "deal", title: "New Deal", subtitle: "Create a new sales opportunity", icon: GitBranch, color: "#0066B1", path: "/deals" },
+  { type: "activity", title: "New Activity", subtitle: "Log a task, call, or meeting", icon: Activity, color: "#00BFFF", path: "/activities" },
+  { type: "project", title: "New Project", subtitle: "Start a new project", icon: FolderKanban, color: "#0066B1", path: "/projects" },
+  { type: "invoice", title: "New Invoice", subtitle: "Create a customer invoice", icon: DollarSign, color: "#0066B1", path: "/finance" },
+  { type: "goal", title: "New Goal", subtitle: "Set an OKR objective", icon: CheckCircle2, color: "#E63946", path: "/goals" },
 ];
 
 export function CommandPalette() {
@@ -74,7 +74,7 @@ export function CommandPalette() {
         title: item.title,
         subtitle: item.subtitle,
         icon: navItems.find((n) => n.path === item.path)?.icon || ArrowRight,
-        iconColor: navItems.find((n) => n.path === item.path)?.color || "#6452db",
+        iconColor: navItems.find((n) => n.path === item.path)?.color || "#0066B1",
         action: () => navigate(item.path),
       }));
     } catch {
@@ -119,7 +119,7 @@ export function CommandPalette() {
       title: "Refresh Data",
       subtitle: "Reload all dashboard data",
       icon: TrendingUp,
-      iconColor: "#6452db",
+      iconColor: "#0066B1",
       action: () => {
         window.location.reload();
         setOpen(false);
@@ -131,7 +131,7 @@ export function CommandPalette() {
       title: "Open Profile",
       subtitle: "View your account settings",
       icon: User,
-      iconColor: "#5683da",
+      iconColor: "#00BFFF",
       action: () => {
         navigate("/profile");
         setOpen(false);
@@ -217,9 +217,9 @@ export function CommandPalette() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="bg-[#18191b] border-white/10 text-white p-0 gap-0 max-w-2xl overflow-hidden">
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
-          <Search className="w-5 h-5 text-white/40" />
+      <DialogContent className="bg-card border-border text-card-foreground p-0 gap-0 max-w-2xl overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+          <Search className="w-5 h-5 text-muted-foreground" />
           <input
             ref={inputRef}
             type="text"
@@ -229,11 +229,11 @@ export function CommandPalette() {
               setSelectedIndex(0);
             }}
             placeholder="Search commands, pages, or actions..."
-            className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none"
+            className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground/50 focus:outline-none"
           />
           <div className="flex items-center gap-1.5">
-            <kbd className="px-1.5 py-0.5 rounded text-[10px] text-white/40 bg-white/5 border border-white/10">ESC</kbd>
-            <button onClick={() => setOpen(false)} className="text-white/40 hover:text-white">
+            <kbd className="px-1.5 py-0.5 rounded text-[10px] text-muted-foreground bg-muted border border-border">ESC</kbd>
+            <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -241,7 +241,7 @@ export function CommandPalette() {
 
         <div className="max-h-[60vh] overflow-y-auto py-2">
           {flatItems.length === 0 && query.trim() && (
-            <div className="py-8 text-center text-sm text-white/40">
+            <div className="py-8 text-center text-sm text-muted-foreground">
               No results for "{query}"
             </div>
           )}
@@ -259,10 +259,10 @@ export function CommandPalette() {
 
             return (
               <div key={type}>
-                <div className="px-4 py-1.5 text-[10px] font-medium text-white/30 uppercase tracking-wider">
+                <div className="px-4 py-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                   {label}
                 </div>
-                {items.map((item, i) => {
+                {items.map((item) => {
                   const globalIndex = flatItems.findIndex((fi) => fi.id === item.id);
                   const isSelected = globalIndex === selectedIndex;
                   const Icon = item.icon;
@@ -276,7 +276,7 @@ export function CommandPalette() {
                       }}
                       onMouseEnter={() => setSelectedIndex(globalIndex)}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                        isSelected ? "bg-[#6452db]/20" : "hover:bg-white/5"
+                        isSelected ? "bg-primary/10" : "hover:bg-accent"
                       }`}
                     >
                       <div
@@ -286,17 +286,17 @@ export function CommandPalette() {
                         <Icon className="w-4 h-4" style={{ color: item.iconColor }} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white">{item.title}</p>
-                        <p className="text-xs text-white/40">{item.subtitle}</p>
+                        <p className="text-sm text-foreground">{item.title}</p>
+                        <p className="text-xs text-muted-foreground">{item.subtitle}</p>
                       </div>
                       {item.type === "navigate" && (
-                        <ArrowRight className="w-4 h-4 text-white/20" />
+                        <ArrowRight className="w-4 h-4 text-muted-foreground/30" />
                       )}
                       {item.type === "create" && (
-                        <Plus className="w-4 h-4 text-white/20" />
+                        <Plus className="w-4 h-4 text-muted-foreground/30" />
                       )}
                       {isSelected && (
-                        <kbd className="px-1.5 py-0.5 rounded text-[10px] text-white/40 bg-white/5 border border-white/10">↵</kbd>
+                        <kbd className="px-1.5 py-0.5 rounded text-[10px] text-muted-foreground bg-muted border border-border">↵</kbd>
                       )}
                     </button>
                   );
@@ -306,10 +306,10 @@ export function CommandPalette() {
           })}
         </div>
 
-        <div className="px-4 py-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/30">
+        <div className="px-4 py-2 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1"><kbd className="px-1 rounded bg-white/5 border border-white/10">↑↓</kbd> Navigate</span>
-            <span className="flex items-center gap-1"><kbd className="px-1 rounded bg-white/5 border border-white/10">↵</kbd> Select</span>
+            <span className="flex items-center gap-1"><kbd className="px-1 rounded bg-muted border border-border">↑↓</kbd> Navigate</span>
+            <span className="flex items-center gap-1"><kbd className="px-1 rounded bg-muted border border-border">↵</kbd> Select</span>
           </div>
           <span>{flatItems.length} commands</span>
         </div>

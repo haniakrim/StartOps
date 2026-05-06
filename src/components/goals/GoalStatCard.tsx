@@ -15,11 +15,11 @@ export function GoalStatCard({
   label,
 }: GoalStatCardProps) {
   return (
-    <Card className="bg-[#18191b] border-white/10">
+    <Card className="bg-card border-border">
       <CardContent className="p-5">
         <Icon className="w-5 h-5 mb-3" style={{ color: iconColor }} />
-        <p className="text-2xl font-semibold text-white">{value}</p>
-        <p className="text-sm text-white/50">{label}</p>
+        <p className="text-2xl font-semibold text-foreground">{value}</p>
+        <p className="text-sm text-muted-foreground">{label}</p>
       </CardContent>
     </Card>
   );

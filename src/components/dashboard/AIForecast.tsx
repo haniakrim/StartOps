@@ -110,8 +110,8 @@ export function AIForecast() {
                 <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorWeighted" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8dc572" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#8dc572" stopOpacity={0} />
+                <stop offset="5%" stopColor="#0066B1" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#0066B1" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -127,7 +127,7 @@ export function AIForecast() {
               formatter={(value: number) => [`$${value.toLocaleString()}`]}
             />
             <Area type="monotone" dataKey="projected" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorProjected)" name="Projected" />
-            <Area type="monotone" dataKey="weighted" stroke="#8dc572" strokeWidth={2} fillOpacity={1} fill="url(#colorWeighted)" name="Weighted" />
+            <Area type="monotone" dataKey="weighted" stroke="#0066B1" strokeWidth={2} fillOpacity={1} fill="url(#colorWeighted)" name="Weighted" />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>

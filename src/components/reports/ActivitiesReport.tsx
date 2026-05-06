@@ -85,7 +85,7 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-[#6452db] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#0066B1] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -95,25 +95,25 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <ReportStatCard
           icon={Activity}
-          iconColor="#6452db"
+          iconColor="#0066B1"
           value={stats.totalActivities.toString()}
           label="Total Activities"
         />
         <ReportStatCard
           icon={CheckCircle2}
-          iconColor="#8dc572"
+          iconColor="#00BFFF"
           value={stats.completed.toString()}
           label="Completed"
         />
         <ReportStatCard
           icon={Calendar}
-          iconColor="#f0ad4e"
+          iconColor="#00BFFF"
           value={stats.pending.toString()}
           label="Pending"
         />
         <ReportStatCard
           icon={TrendingUp}
-          iconColor="#5683da"
+          iconColor="#0066B1"
           value={stats.completionRate}
           label="Completion Rate"
         />
@@ -166,7 +166,7 @@ export function ActivitiesReport({ range }: { range: DateRange }) {
                     color: "#fff",
                   }}
                 />
-                <Bar dataKey="value" fill="#ff8964" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="value" fill="#E63946" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

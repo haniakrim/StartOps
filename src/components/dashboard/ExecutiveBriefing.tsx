@@ -115,7 +115,7 @@ export function ExecutiveBriefing() {
         <div className="space-y-3">
           {briefing.map((item, i) => {
             const Icon = item.type === "warning" ? AlertTriangle : item.type === "action" ? Lightbulb : TrendingUp;
-            const color = item.type === "warning" ? "#f0ad4e" : item.type === "action" ? "#6452db" : "#8dc572";
+            const color = item.type === "warning" ? "#00BFFF" : item.type === "action" ? "#0066B1" : "#0066B1";
             return (
               <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${color}15` }}>
