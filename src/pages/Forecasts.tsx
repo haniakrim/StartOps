@@ -125,6 +125,9 @@ export default function Forecasts() {
   async function generateAIForecast() {
     try {
       setLoading(true);
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      
       const { data: deals } = await supabase
         .from("deals")
         .select("value, probability, stage, status, expected_close_date")
@@ -145,6 +148,7 @@ export default function Forecasts() {
         weighted_revenue: weighted,
         confidence_low: Math.max(0, weighted - stdDev * 1.5),
         confidence_high: weighted + stdDev * 1.5,
+        organization_id: userId,
         factors: [
           { name: "Pipeline Value", value: totalValue },
           { name: "Win Probability", value: deals?.length ? Math.round(deals.reduce((s, d) => s + (d.probability || 0), 0) / deals.length) : 0 },
