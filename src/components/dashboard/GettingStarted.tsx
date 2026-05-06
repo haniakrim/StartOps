@@ -121,35 +121,35 @@ export function GettingStarted() {
   if (dismissed || allComplete) return null;
 
   return (
-    <Card className="bg-[#18191b] border-[#6452db]/20">
+    <Card className="bg-card border-primary/20">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#6452db]" />
+          <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary" />
             Getting Started
           </CardTitle>
           <Button
             variant="ghost"
             size="sm"
             onClick={dismiss}
-            className="text-white/40 hover:text-white text-xs h-7"
+            className="text-muted-foreground hover:text-foreground text-xs h-7"
           >
             Dismiss
           </Button>
         </div>
-        <p className="text-xs text-white/40 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Complete these steps to get the most out of StartOps
         </p>
       </CardHeader>
       <CardContent>
         <div className="mb-4">
           <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="text-white/50">
+            <span className="text-muted-foreground">
               {completedCount} of {items.length} completed
             </span>
-            <span className="text-[#6452db] font-medium">{progress}%</span>
+            <span className="text-primary font-medium">{progress}%</span>
           </div>
-          <Progress value={progress} className="h-1.5 bg-white/10" />
+          <Progress value={progress} className="h-1.5 bg-muted" />
         </div>
 
         <div className="space-y-1">
@@ -159,36 +159,36 @@ export function GettingStarted() {
               <button
                 key={item.id}
                 onClick={() => toggleItem(item.id)}
-                className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors text-left group"
+                className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-accent transition-colors text-left group"
               >
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
                     item.completed
-                      ? "bg-[#8dc572]/20"
-                      : "bg-white/5 group-hover:bg-white/10"
+                      ? "bg-emerald-500/15"
+                      : "bg-muted group-hover:bg-muted/80"
                   }`}
                 >
                   {item.completed ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#8dc572]" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   ) : (
-                    <Circle className="w-4 h-4 text-white/20" />
+                    <Circle className="w-4 h-4 text-muted-foreground/30" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
                     className={`text-sm ${
                       item.completed
-                        ? "text-white/40 line-through"
-                        : "text-white"
+                        ? "text-muted-foreground line-through"
+                        : "text-foreground"
                     }`}
                   >
                     {item.label}
                   </p>
-                  <p className="text-xs text-white/30">{item.description}</p>
+                  <p className="text-xs text-muted-foreground/70">{item.description}</p>
                 </div>
                 {!item.completed && (
                   <ArrowRight
-                    className="w-4 h-4 text-white/20 group-hover:text-white/40 transition-colors"
+                    className="w-4 h-4 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(item.path);

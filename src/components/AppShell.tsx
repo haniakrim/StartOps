@@ -48,7 +48,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { CommandPalette } from "@/components/CommandPalette";
 import { RealtimeNotifications } from "@/components/RealtimeNotifications";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
 
 interface NavItem {
   path: string;
@@ -148,13 +147,13 @@ function SidebarNavItem({
         "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative",
         isActive
           ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+          : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
       )}
     >
       <item.icon
         className={cn(
           "w-[18px] h-[18px] flex-shrink-0 transition-colors",
-          isActive ? "text-primary" : "text-muted-foreground/60 group-hover:text-muted-foreground"
+          isActive ? "text-primary" : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/70"
         )}
       />
       {!collapsed && (
@@ -214,7 +213,7 @@ function NavGroupSection({
         onClick={() => toggleGroup(group.label)}
         className={cn(
           "flex items-center gap-2 w-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
-          hasActiveItem ? "text-primary/80" : "text-muted-foreground/40 hover:text-muted-foreground/60"
+          hasActiveItem ? "text-primary/80" : "text-sidebar-foreground/30 hover:text-sidebar-foreground/50"
         )}
       >
         <span className="flex-1 text-left">{group.label}</span>
@@ -281,7 +280,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   );
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
-  const isDemoUser = user?.email === "demo@example.com";
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => {
@@ -379,7 +377,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </button>
 
           {/* User profile */}
-          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-accent transition-colors group">
+          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-sidebar-accent transition-colors group">
             <Avatar className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 ring-2 ring-border">
               <AvatarFallback className="bg-transparent text-primary-foreground text-xs font-medium">
                 {userInitials}
@@ -394,7 +392,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   <p className="text-sm font-medium text-sidebar-foreground/90 truncate group-hover:text-sidebar-foreground transition-colors">
                     {userName}
                   </p>
-                  <p className="text-[11px] text-muted-foreground truncate capitalize">
+                  <p className="text-[11px] text-sidebar-foreground/50 truncate capitalize">
                     {userRole}
                   </p>
                 </button>
@@ -414,25 +412,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         <CommandPalette />
-
-        {/* Demo Mode Banner */}
-        {isDemoUser && (
-          <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-2 flex items-center justify-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-              Demo Mode — You're exploring with sample data
-            </span>
-            <button
-              onClick={async () => {
-                await supabase.functions.invoke("seed-demo");
-                window.location.reload();
-              }}
-              className="text-xs font-medium text-amber-600 dark:text-amber-400 underline underline-offset-2 hover:text-amber-700 dark:hover:text-amber-300 ml-2"
-            >
-              Reset data
-            </button>
-          </div>
-        )}
 
         {/* Header */}
         <header className="h-16 flex items-center gap-4 px-6 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-30">

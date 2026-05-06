@@ -101,8 +101,8 @@ export function useDashboardData() {
       setRecentActivity(
         (activityData || []).map((d: any) => ({
           ...d,
-          contacts: d.contacts?.[0] ?? null,
-          deals: d.deals?.[0] ?? null,
+          contacts: d.contacts ?? null,
+          deals: d.deals ?? null,
         }))
       );
 
@@ -126,7 +126,7 @@ export function useDashboardData() {
       setTopDeals(
         (topDealsData || []).map((d: any) => ({
           ...d,
-          contacts: d.contacts?.[0] ?? null,
+          contacts: d.contacts ?? null,
         }))
       );
     } catch (error: any) {
