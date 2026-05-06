@@ -146,14 +146,14 @@ function SidebarNavItem({
       className={cn(
         "group flex items-center gap-3 px-3 py-2 rounded-expo-lg text-sm font-medium transition-all duration-200 relative",
         isActive
-          ? "bg-expo-blue/10 text-expo-blue"
+          ? "bg-startops-blue/10 text-startops-blue"
           : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
       )}
     >
       <item.icon
         className={cn(
           "w-[18px] h-[18px] flex-shrink-0 transition-colors",
-          isActive ? "text-expo-blue" : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/70"
+          isActive ? "text-startops-blue" : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/70"
         )}
       />
       {!collapsed && (
@@ -162,13 +162,13 @@ function SidebarNavItem({
           {item.badge && (
             <Badge
               variant="secondary"
-              className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-expo-blue/15 text-expo-blue border-0"
+              className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-startops-blue/15 text-startops-blue border-0"
             >
               {item.badge}
             </Badge>
           )}
           {isActive && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-expo-blue" />
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-startops-blue" />
           )}
         </>
       )}
@@ -324,7 +324,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       >
         {/* Logo */}
         <div className="h-16 flex items-center px-4 border-b border-border flex-shrink-0">
-          <div className="w-8 h-8 rounded-expo-lg bg-expo-blue flex items-center justify-center flex-shrink-0 shadow-expo-sm">
+          <div className="w-8 h-8 rounded-lg bg-startops-blue flex items-center justify-center flex-shrink-0 shadow-sm">
             <span className="text-white font-bold text-sm">S</span>
           </div>
           {!collapsed && (
@@ -378,7 +378,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* User profile */}
           <div className="flex items-center gap-3 px-2 py-2 rounded-expo-lg hover:bg-sidebar-accent transition-colors group">
-            <Avatar className="w-8 h-8 bg-expo-blue ring-2 ring-border">
+            <Avatar className="w-8 h-8 bg-startops-blue ring-2 ring-border">
               <AvatarFallback className="bg-transparent text-primary-foreground text-xs font-medium">
                 {userInitials}
               </AvatarFallback>
@@ -439,7 +439,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 type="text"
                 readOnly
                 placeholder="Search commands, pages, actions..."
-                className="w-full bg-muted border border-border rounded-expo-lg pl-9 pr-16 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-expo-blue/30 focus:ring-1 focus:ring-expo-blue/20 cursor-pointer transition-all"
+                className="w-full bg-muted border border-border rounded-lg pl-9 pr-16 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-startops-blue/30 focus:ring-1 focus:ring-startops-blue/20 cursor-pointer transition-all"
               />
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground/40 bg-muted px-1.5 py-0.5 rounded border border-border">
                 ⌘K

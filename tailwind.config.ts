@@ -62,7 +62,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Expo Design System Colors
+        // StartOps Brand Colors (Original)
+        startops: {
+          dark: "#0A1628",
+          blue: "#0066B1",
+          light: "#00BFFF",
+          red: "#E63946",
+          gray: "#1A2332",
+        },
+        // Expo Design System Colors (available as utilities)
         expo: {
           black: "#000000",
           white: "#FFFFFF",

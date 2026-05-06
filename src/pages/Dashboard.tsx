@@ -61,7 +61,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
+        <Loader2 className="w-8 h-8 text-startops-blue animate-spin" />
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function Dashboard() {
             Welcome back. Here's what's happening today.
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-muted rounded-expo-lg p-1">
+        <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
           {(["week", "month", "quarter", "year"] as const).map((range) => (
             <Button
               key={range}
@@ -87,8 +87,8 @@ export default function Dashboard() {
               onClick={() => setTimeRange(range)}
               className={
                 timeRange === range
-                  ? "bg-expo-blue text-white hover:bg-expo-blue/90 rounded-expo-md"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent rounded-expo-md"
+                  ? "bg-startops-blue text-white hover:bg-startops-blue/90 rounded-md"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent rounded-md"
               }
             >
               {range.charAt(0).toUpperCase() + range.slice(1)}

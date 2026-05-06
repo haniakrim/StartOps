@@ -4,29 +4,29 @@
 
 @layer base {
   :root {
-    /* Expo Light Theme */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 211 100% 50%;
+    /* StartOps Dark Blue Theme (Original) */
+    --background: 216 50% 9%;
+    --foreground: 0 0% 100%;
+    --card: 216 35% 12%;
+    --card-foreground: 0 0% 100%;
+    --popover: 216 35% 12%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 207 100% 35%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 6% 97%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 240 6% 97%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 240 6% 97%;
-    --accent-foreground: 0 0% 0%;
+    --secondary: 216 30% 16%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 216 30% 16%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 216 30% 16%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 349 100% 59%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 211 100% 50%;
+    --border: 216 20% 20%;
+    --input: 216 20% 20%;
+    --ring: 207 100% 35%;
     --radius: 0.625rem;
 
-    /* Expo Custom Colors */
+    /* Expo Custom Colors (available as utilities) */
     --expo-blue: 211 100% 50%;
     --expo-blue-light: 199 94% 67%;
     --expo-indigo: 240 60% 59%;
@@ -38,54 +38,54 @@
     --expo-teal: 174 62% 47%;
 
     /* Chart colors */
-    --chart-1: 211 100% 50%;
-    --chart-2: 240 60% 59%;
-    --chart-3: 280 60% 60%;
+    --chart-1: 207 100% 35%;
+    --chart-2: 195 100% 50%;
+    --chart-3: 349 100% 59%;
     --chart-4: 135 59% 49%;
     --chart-5: 35 100% 50%;
 
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 211 100% 50%;
+    --sidebar-background: 216 50% 9%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 207 100% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 6% 97%;
-    --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 211 100% 50%;
+    --sidebar-accent: 216 30% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 216 20% 20%;
+    --sidebar-ring: 207 100% 35%;
   }
 
-  .dark {
-    /* Expo Dark Theme */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    --card: 240 6% 11%;
-    --card-foreground: 0 0% 100%;
-    --popover: 240 6% 11%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 211 100% 50%;
+  .light {
+    /* StartOps Light Theme */
+    --background: 0 0% 100%;
+    --foreground: 216 50% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 216 50% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 50% 9%;
+    --primary: 207 100% 35%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 16%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 5% 16%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 240 5% 16%;
-    --accent-foreground: 0 0% 100%;
+    --secondary: 216 20% 96%;
+    --secondary-foreground: 216 50% 9%;
+    --muted: 216 20% 96%;
+    --muted-foreground: 216 10% 45%;
+    --accent: 216 20% 96%;
+    --accent-foreground: 216 50% 9%;
     --destructive: 349 100% 59%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 4% 22%;
-    --input: 240 4% 22%;
-    --ring: 211 100% 50%;
+    --border: 216 20% 90%;
+    --input: 216 20% 90%;
+    --ring: 207 100% 35%;
 
-    /* Sidebar Dark */
-    --sidebar-background: 0 0% 0%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 211 100% 50%;
+    /* Sidebar Light */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 216 50% 9%;
+    --sidebar-primary: 207 100% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 16%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 240 4% 22%;
-    --sidebar-ring: 211 100% 50%;
+    --sidebar-accent: 216 20% 96%;
+    --sidebar-accent-foreground: 216 50% 9%;
+    --sidebar-border: 216 20% 90%;
+    --sidebar-ring: 207 100% 35%;
   }
 }
 
@@ -102,7 +102,7 @@
   }
 }
 
-/* Custom scrollbar - Expo style */
+/* Custom scrollbar - StartOps style */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

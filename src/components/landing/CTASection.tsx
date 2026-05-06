@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 export default function CTASection() {
@@ -37,20 +36,19 @@ export default function CTASection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button
+          <button
             onClick={() => navigate("/login")}
-            className="bg-[#0066B1] text-white hover:bg-[#0066B1]/90 h-12 px-8 text-base"
+            className="flex items-center gap-2 px-8 h-12 text-base bg-[#0066B1] text-white hover:bg-[#0066B1]/90 rounded-lg transition-colors"
           >
             Get Started Free
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-          <Button
-            variant="outline"
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => navigate("/login")}
-            className="border-white/10 text-white hover:bg-white/5 h-12 px-8 text-base"
+            className="px-8 h-12 text-base border border-white/10 text-white hover:bg-white/5 rounded-lg transition-colors"
           >
             Sign In
-          </Button>
+          </button>
         </div>
       </div>
     </motion.div>

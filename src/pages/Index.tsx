@@ -37,19 +37,18 @@ export default function Index() {
             ))}
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
+            <button
               onClick={() => navigate("/login")}
-              className="text-white/60 hover:text-white hover:bg-white/5"
+              className="px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
             >
               Sign In
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={() => navigate("/login")}
-              className="bg-[#0066B1] text-white hover:bg-[#0066B1]/90"
+              className="px-4 py-2 text-sm bg-[#0066B1] text-white hover:bg-[#0066B1]/90 rounded-lg transition-colors"
             >
               Get Started
-            </Button>
+            </button>
           </div>
         </div>
       </nav>
@@ -86,20 +85,19 @@ export default function Index() {
 
               <FadeIn delay={0.3}>
                 <div className="flex flex-col sm:flex-row items-start gap-4">
-                  <Button
+                  <button
                     onClick={() => navigate("/login")}
-                    className="bg-[#0066B1] text-white hover:bg-[#0066B1]/90 h-12 px-8 text-base"
+                    className="flex items-center gap-2 px-8 h-12 text-base bg-[#0066B1] text-white hover:bg-[#0066B1]/90 rounded-lg transition-colors"
                   >
                     Start Free Trial
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-white/10 text-white hover:bg-white/5 h-12 px-8 text-base"
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    className="flex items-center gap-2 px-8 h-12 text-base border border-white/10 text-white hover:bg-white/5 rounded-lg transition-colors"
                   >
-                    <Play className="w-4 h-4 mr-2" />
+                    <Play className="w-4 h-4" />
                     Watch Demo
-                  </Button>
+                  </button>
                 </div>
               </FadeIn>
 
