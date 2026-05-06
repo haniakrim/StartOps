@@ -2,17 +2,15 @@ import { useState, useEffect } from "react";
 import { Target, TrendingUp, CheckCircle2, Zap, Search, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Card, CardContent } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GoalStatCard } from "@/components/goals/GoalStatCard";
 import { GoalChart } from "@/components/goals/GoalChart";
-import { GoalCard, type Goal, type KeyResult } from "@/components/goals/GoalCard";
+import { GoalCard, type Goal } from "@/components/goals/GoalCard";
 import { GoalForm } from "@/components/goals/GoalForm";
 
 const STORAGE_KEY = "startops_goals";
 
-function loadLocalGoals(): Goal[] {
+function loadGoals(): Goal[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
@@ -22,7 +20,7 @@ function loadLocalGoals(): Goal[] {
   }
 }
 
-function saveLocalGoals(goals: Goal[]) {
+function saveGoals(goals: Goal[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
 }
 
@@ -31,200 +29,77 @@ export default function Goals() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dbReady, setDbReady] = useState(true);
 
   useEffect(() => {
-    fetchGoals();
+    const saved = loadGoals();
+    setGoals(saved);
+    setLoading(false);
   }, []);
 
-  async function fetchGoals() {
-    try {
-      setLoading(true);
-      const { data: goalsData, error: goalsError } = await supabase
-        .from("goals")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (goalsError) {
-        if (
-          goalsError.message?.includes("Could not find the table") ||
-          goalsError.message?.includes("relation") ||
-          goalsError.code === "PGRST116"
-        ) {
-          setDbReady(false);
-          setGoals(loadLocalGoals());
-          return;
-        }
-        throw goalsError;
-      }
-
-      setDbReady(true);
-
-      const goalsWithKRs = await Promise.all(
-        (goalsData || []).map(async (goal: any) => {
-          const { data: krs } = await supabase
-            .from("key_results")
-            .select("*")
-            .eq("goal_id", goal.id);
-          return { ...goal, key_results: krs || [] };
-        })
-      );
-
-      setGoals(goalsWithKRs);
-      saveLocalGoals(goalsWithKRs);
-    } catch (error: any) {
-      toast.error("Failed to load goals: " + error.message);
-      setGoals(loadLocalGoals());
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function createGoal(data: {
+  function createGoal(data: {
     name: string;
     description: string;
     period: string;
     status: string;
     key_results: { name: string; current_value: string; target_value: string; unit: string }[];
   }) {
-    if (!dbReady) {
-      const newGoal: Goal = {
+    const newGoal: Goal = {
+      id: crypto.randomUUID(),
+      name: data.name,
+      description: data.description || null,
+      period: data.period,
+      status: data.status,
+      progress: 0,
+      owner_id: null,
+      created_at: new Date().toISOString(),
+      key_results: data.key_results.map((kr) => ({
         id: crypto.randomUUID(),
-        name: data.name,
-        description: data.description || null,
-        period: data.period,
-        status: data.status,
-        progress: 0,
-        owner_id: null,
-        created_at: new Date().toISOString(),
-        key_results: data.key_results.map((kr) => ({
-          id: crypto.randomUUID(),
-          goal_id: "",
-          name: kr.name,
-          current_value: parseFloat(kr.current_value) || 0,
-          target_value: parseFloat(kr.target_value) || 100,
-          unit: kr.unit,
-          status: "on_track",
-          progress: 0,
-        })),
-      };
-      newGoal.key_results.forEach((kr) => (kr.goal_id = newGoal.id));
-      const updated = [newGoal, ...goals];
-      setGoals(updated);
-      saveLocalGoals(updated);
-      toast.success("Goal created locally (database unavailable)");
-      setDialogOpen(false);
-      return;
-    }
-
-    try {
-      const { data: goalData, error: goalError } = await supabase
-        .from("goals")
-        .insert({
-          name: data.name,
-          description: data.description || null,
-          period: data.period,
-          status: data.status,
-          progress: 0,
-        })
-        .select()
-        .single();
-
-      if (goalError) throw goalError;
-
-      const krsToInsert = data.key_results.map((kr) => ({
-        goal_id: goalData.id,
+        goal_id: "",
         name: kr.name,
         current_value: parseFloat(kr.current_value) || 0,
         target_value: parseFloat(kr.target_value) || 100,
         unit: kr.unit,
-        progress: 0,
         status: "on_track",
-      }));
+        progress: 0,
+      })),
+    };
 
-      if (krsToInsert.length > 0) {
-        const { error: krError } = await supabase.from("key_results").insert(krsToInsert);
-        if (krError) throw krError;
-      }
+    newGoal.key_results.forEach((kr) => (kr.goal_id = newGoal.id));
 
-      toast.success("Goal created with key results");
-      setDialogOpen(false);
-      fetchGoals();
-    } catch (error: any) {
-      toast.error("Failed to create goal: " + error.message);
-    }
+    const updated = [newGoal, ...goals];
+    setGoals(updated);
+    saveGoals(updated);
+    toast.success("Goal created with key results");
+    setDialogOpen(false);
   }
 
-  async function updateGoalProgress(goalId: string, krId: string, newCurrent: number) {
-    const goal = goals.find((g) => g.id === goalId);
-    if (!goal) return;
+  function updateGoalProgress(goalId: string, krId: string, newCurrent: number) {
+    const updated = goals.map((goal) => {
+      if (goal.id !== goalId) return goal;
 
-    const kr = goal.key_results.find((k) => k.id === krId);
-    if (!kr) return;
+      const updatedKRs = goal.key_results.map((kr) => {
+        if (kr.id !== krId) return kr;
+        const progress = kr.target_value > 0 ? Math.min(100, (newCurrent / kr.target_value) * 100) : 0;
+        const status = progress >= 100 ? "completed" : progress >= 70 ? "on_track" : progress >= 40 ? "at_risk" : "behind";
+        return { ...kr, current_value: newCurrent, progress, status };
+      });
 
-    const progress = kr.target_value > 0 ? Math.min(100, (newCurrent / kr.target_value) * 100) : 0;
-    const status = progress >= 100 ? "completed" : progress >= 70 ? "on_track" : progress >= 40 ? "at_risk" : "behind";
-
-    const updatedGoals = goals.map((g) => {
-      if (g.id !== goalId) return g;
-      const updatedKRs = g.key_results.map((k) =>
-        k.id === krId ? { ...k, current_value: newCurrent, progress, status } : k
-      );
       const avgProgress = updatedKRs.reduce((sum, k) => sum + (k.target_value > 0 ? Math.min(100, (k.current_value / k.target_value) * 100) : 0), 0) / (updatedKRs.length || 1);
       const goalStatus = avgProgress >= 100 ? "completed" : avgProgress >= 70 ? "on_track" : avgProgress >= 40 ? "at_risk" : "behind";
-      return { ...g, key_results: updatedKRs, progress: Math.round(avgProgress), status: goalStatus };
+
+      return { ...goal, key_results: updatedKRs, progress: Math.round(avgProgress), status: goalStatus };
     });
 
-    setGoals(updatedGoals);
-    saveLocalGoals(updatedGoals);
-
-    if (!dbReady) {
-      toast.success("Progress updated locally");
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from("key_results")
-        .update({ current_value: newCurrent, progress, status })
-        .eq("id", krId);
-      if (error) throw error;
-
-      const avgProgress = goal.key_results.reduce((sum, k) => {
-        if (k.id === krId) return sum + progress;
-        return sum + (k.target_value > 0 ? Math.min(100, (k.current_value / k.target_value) * 100) : 0);
-      }, 0) / (goal.key_results.length || 1);
-
-      const goalStatus = avgProgress >= 100 ? "completed" : avgProgress >= 70 ? "on_track" : avgProgress >= 40 ? "at_risk" : "behind";
-
-      await supabase
-        .from("goals")
-        .update({ progress: Math.round(avgProgress), status: goalStatus })
-        .eq("id", goalId);
-
-      toast.success("Progress updated");
-    } catch (error: any) {
-      toast.error("Failed to sync progress: " + error.message);
-    }
+    setGoals(updated);
+    saveGoals(updated);
+    toast.success("Progress updated");
   }
 
-  async function deleteGoal(id: string) {
+  function deleteGoal(id: string) {
     const updated = goals.filter((g) => g.id !== id);
     setGoals(updated);
-    saveLocalGoals(updated);
-
-    if (!dbReady) {
-      toast.success("Goal deleted locally");
-      return;
-    }
-
-    try {
-      const { error } = await supabase.from("goals").delete().eq("id", id);
-      if (error) throw error;
-      toast.success("Goal deleted");
-    } catch (error: any) {
-      toast.error("Failed to delete goal: " + error.message);
-    }
+    saveGoals(updated);
+    toast.success("Goal deleted");
   }
 
   const filtered = goals.filter(
@@ -293,24 +168,6 @@ export default function Goals() {
           </DialogContent>
         </Dialog>
       </div>
-
-      {!dbReady && (
-        <Card className="bg-[#f0ad4e]/5 border-[#f0ad4e]/20">
-          <CardContent className="p-5">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#f0ad4e]/20 flex items-center justify-center flex-shrink-0">
-                <Target className="w-5 h-5 text-[#f0ad4e]" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-white">Database Setup Required</h3>
-                <p className="text-xs text-white/50 mt-1">
-                  The goals and key_results tables need to be created in Supabase. Run the SQL provided in the chat to enable OKR tracking.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <GoalStatCard
