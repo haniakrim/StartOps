@@ -30,7 +30,7 @@ export default function Dashboard() {
       change: "+12.5%",
       trend: "up" as const,
       icon: DollarSign,
-      color: "#007AFF",
+      color: "#0066B1",
     },
     {
       title: "Active Deals",
@@ -38,7 +38,7 @@ export default function Dashboard() {
       change: "+8.2%",
       trend: "up" as const,
       icon: Target,
-      color: "#5856D6",
+      color: "#E63946",
     },
     {
       title: "Contacts",
@@ -46,7 +46,7 @@ export default function Dashboard() {
       change: "+24.1%",
       trend: "up" as const,
       icon: Users,
-      color: "#AF52DE",
+      color: "#00BFFF",
     },
     {
       title: "Companies",
@@ -54,14 +54,14 @@ export default function Dashboard() {
       change: "-2.4%",
       trend: "down" as const,
       icon: Building2,
-      color: "#34C759",
+      color: "#0066B1",
     },
   ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-startops-blue animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -87,7 +87,7 @@ export default function Dashboard() {
               onClick={() => setTimeRange(range)}
               className={
                 timeRange === range
-                  ? "bg-startops-blue text-white hover:bg-startops-blue/90 rounded-md"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
                   : "text-muted-foreground hover:text-foreground hover:bg-accent rounded-md"
               }
             >
