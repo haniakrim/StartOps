@@ -29,7 +29,7 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
   async function fetchContact() {
     try {
       setLoading(true);
-      const { data, error } = await supabase.from("contacts").select("*").eq("id", contactId).single();
+      const { data, error } = await supabase.from("contacts").select("*").eq("id", contactId).maybeSingle();
       if (error) throw error;
       setContact(data);
 

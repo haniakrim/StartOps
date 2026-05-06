@@ -53,10 +53,9 @@ export function GlobalSearch() {
       setLoading(true);
       const term = `%${q}%`;
 
-      const [contactsRes, dealsRes, companiesRes, projectsRes, employeesRes, invoicesRes, commsRes, productsRes] = await Promise.all([
+      const [contactsRes, dealsRes, projectsRes, employeesRes, invoicesRes, commsRes, productsRes] = await Promise.all([
         supabase.from("contacts").select("id, first_name, last_name, company, email").or(`first_name.ilike.${term},last_name.ilike.${term},company.ilike.${term},email.ilike.${term}`).limit(4),
         supabase.from("deals").select("id, name, stage").ilike("name", term).limit(4),
-        supabase.from("companies").select("id, name, industry").or(`name.ilike.${term},industry.ilike.${term}`).limit(4),
         supabase.from("projects").select("id, name, status").ilike("name", term).limit(3),
         supabase.from("employees").select("id, first_name, last_name, title").or(`first_name.ilike.${term},last_name.ilike.${term}`).limit(3),
         supabase.from("invoices").select("id, invoice_number, status").ilike("invoice_number", term).limit(3),
@@ -67,7 +66,6 @@ export function GlobalSearch() {
       const mapped: SearchResult[] = [
         ...(contactsRes.data || []).map((c: any) => ({ id: c.id, type: "contact" as const, title: `${c.first_name} ${c.last_name}`, subtitle: c.company || c.email || "No company" })),
         ...(dealsRes.data || []).map((d: any) => ({ id: d.id, type: "deal" as const, title: d.name, subtitle: d.stage })),
-        ...(companiesRes.data || []).map((c: any) => ({ id: c.id, type: "company" as const, title: c.name, subtitle: c.industry || "No industry" })),
         ...(projectsRes.data || []).map((p: any) => ({ id: p.id, type: "project" as const, title: p.name, subtitle: p.status })),
         ...(employeesRes.data || []).map((e: any) => ({ id: e.id, type: "employee" as const, title: `${e.first_name} ${e.last_name}`, subtitle: e.title || "No title" })),
         ...(invoicesRes.data || []).map((i: any) => ({ id: i.id, type: "invoice" as const, title: `Invoice ${i.invoice_number}`, subtitle: i.status })),
@@ -88,7 +86,6 @@ export function GlobalSearch() {
     setQuery("");
     if (result.type === "contact") navigate(`/contacts`);
     else if (result.type === "deal") navigate(`/deals`);
-    else if (result.type === "company") navigate(`/companies`);
     else if (result.type === "project") navigate(`/projects`);
     else if (result.type === "employee") navigate(`/employees`);
     else if (result.type === "invoice") navigate(`/finance`);
@@ -128,9 +125,8 @@ export function GlobalSearch() {
               {results.map((result, i) => {
                 const Icon =
                   result.type === "contact" ? User
-                  : result.type === "deal" ? GitBranch
-                  : result.type === "company" ? Building2
-                  : result.type === "project" ? FolderKanban
+                    : result.type === "deal" ? GitBranch
+                    : result.type === "project" ? FolderKanban
                   : result.type === "employee" ? Briefcase
                   : result.type === "invoice" ? FileText
                   : result.type === "communication" ? Mail

@@ -49,12 +49,12 @@ export default function Analytics() {
       const { count: contactsCount, error: contactsError } = await supabase.from("contacts").select("*", { count: "exact", head: true });
       if (contactsError) throw contactsError;
 
-      const { data: companiesData, error: companiesError } = await supabase.from("companies").select("*", { count: "exact", head: true });
-      if (companiesError) throw companiesError;
+      const { data: contactsWithCompany } = await supabase.from("contacts").select("company").not("company", "is", null);
+      const distinctCompanies = new Set((contactsWithCompany || []).map((c: any) => c.company).filter(Boolean)).size;
 
       setStats({
         totalRevenue, activeDeals, totalContacts: contactsCount || 0,
-        totalCompanies: companiesData?.length ?? 0, conversionRate, avgDealSize, winRate,
+        totalCompanies: distinctCompanies, conversionRate, avgDealSize, winRate,
       });
 
       // Revenue by month

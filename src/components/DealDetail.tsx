@@ -36,9 +36,9 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
         .from("deals")
         .select(`*, contacts:contact_id (first_name, last_name, company, email, phone)`)
         .eq("id", dealId)
-        .single();
+        .maybeSingle();
       if (error) throw error;
-      setDeal({ ...data, contacts: data.contacts?.[0] ?? null });
+      setDeal(data ? { ...data, contacts: data.contacts?.[0] ?? null } : null);
 
       const [{ data: pipeline }, { data: history }, { data: comms }, { data: acts }] = await Promise.all([
         supabase.from("pipelines").select("stages").limit(1).single(),
