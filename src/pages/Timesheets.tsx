@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { TimeTracker } from "@/components/timesheets/TimeTracker";
+import { RecentSessions } from "@/components/timesheets/RecentSessions";
 
 interface TimeEntry {
   id: string;
@@ -159,7 +161,7 @@ export default function Timesheets() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
-              <Plus className="w-4 h-4 mr-2" />Log Time
+              <Plus className="w-4 h-4 mr-2" />Manual Entry
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-[#18191b] border-white/10 text-white">
@@ -210,6 +212,9 @@ export default function Timesheets() {
         </Dialog>
       </div>
 
+      {/* Timer */}
+      <TimeTracker projects={projects} tasks={tasks} onEntryCreated={fetchData} />
+
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-[#18191b] border-white/10">
@@ -234,6 +239,8 @@ export default function Timesheets() {
           </CardContent>
         </Card>
       </div>
+
+      <RecentSessions sessions={entries} />
 
       <Tabs defaultValue="entries" className="w-full">
         <TabsList className="bg-[#18191b] border border-white/10">
