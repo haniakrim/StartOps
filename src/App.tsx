@@ -33,6 +33,7 @@ import Forecasts from "./pages/Forecasts";
 import Timesheets from "./pages/Timesheets";
 import Calendar from "./pages/Calendar";
 import Reports from "./pages/Reports";
+import Goals from "./pages/Goals";
 
 const queryClient = new QueryClient();
 
@@ -150,6 +151,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Reports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/goals"
+              element={
+                <ProtectedRoute>
+                  <Goals />
                 </ProtectedRoute>
               }
             />
