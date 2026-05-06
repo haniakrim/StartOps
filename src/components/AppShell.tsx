@@ -13,15 +13,12 @@ import {
   FileText,
   CreditCard,
   Send,
-  ChevronLeft,
-  ChevronRight,
   Bell,
   Search,
   LogOut,
   Menu,
   X,
   Activity,
-  UserCircle,
   Cog,
   Sparkles,
   DollarSign,
@@ -37,6 +34,10 @@ import {
   Target,
   Sun,
   BookOpen,
+  ChevronDown,
+  ChevronRight,
+  FolderOpen,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -44,49 +45,222 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { CommandPalette } from "@/components/CommandPalette";
 import { RealtimeNotifications } from "@/components/RealtimeNotifications";
+import { cn } from "@/lib/utils";
 
-const navItems = [
-  { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { path: "/today", icon: Sun, label: "Today" },
-  { path: "/contacts", icon: Users, label: "Contacts" },
-  { path: "/companies", icon: Building2, label: "Companies" },
-  { path: "/deals", icon: GitBranch, label: "Deals" },
-  { path: "/activities", icon: Activity, label: "Activities" },
-  { path: "/finance", icon: DollarSign, label: "Finance" },
-  { path: "/inventory", icon: Package, label: "Inventory" },
-  { path: "/projects", icon: FolderKanban, label: "Projects" },
-  { path: "/employees", icon: Briefcase, label: "People" },
-  { path: "/communications", icon: Mail, label: "Communications" },
-  { path: "/workflows", icon: Zap, label: "Workflows" },
-  { path: "/custom-fields", icon: ListFilter, label: "Custom Fields" },
-  { path: "/calendar", icon: CalendarIcon, label: "Calendar" },
-  { path: "/forecasts", icon: BrainCircuit, label: "Forecasts" },
-  { path: "/timesheets", icon: Clock, label: "Timesheets" },
-  { path: "/quotes", icon: FileText, label: "Quotes" },
-  { path: "/documents", icon: FileText, label: "Documents" },
-  { path: "/email-templates", icon: BookOpen, label: "Email Templates" },
-  { path: "/goals", icon: Target, label: "Goals" },
-  { path: "/organization", icon: Settings, label: "Organization" },
-  { path: "/security", icon: Shield, label: "Security" },
-  { path: "/analytics", icon: BarChart3, label: "Analytics" },
-  { path: "/reports", icon: FileText, label: "Reports" },
-  { path: "/api", icon: Webhook, label: "API & Webhooks" },
-  { path: "/audit", icon: FileText, label: "Audit Logs" },
-  { path: "/support", icon: LifeBuoy, label: "Support" },
-  { path: "/assistant", icon: Sparkles, label: "AI Assistant" },
-  { path: "/notifications", icon: Bell, label: "Notifications" },
-  { path: "/settings", icon: Cog, label: "Settings" },
-  { path: "/subscriptions", icon: CreditCard, label: "Subscriptions" },
-  { path: "/campaigns", icon: Send, label: "Campaigns" },
+interface NavItem {
+  path: string;
+  icon: LucideIcon;
+  label: string;
+  badge?: string;
+}
+
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+      { path: "/today", icon: Sun, label: "Today" },
+      { path: "/activities", icon: Activity, label: "Activities" },
+    ],
+  },
+  {
+    label: "CRM",
+    items: [
+      { path: "/contacts", icon: Users, label: "Contacts" },
+      { path: "/companies", icon: Building2, label: "Companies" },
+      { path: "/deals", icon: GitBranch, label: "Deals" },
+      { path: "/quotes", icon: FileText, label: "Quotes" },
+      { path: "/communications", icon: Mail, label: "Communications" },
+      { path: "/calendar", icon: CalendarIcon, label: "Calendar" },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { path: "/projects", icon: FolderKanban, label: "Projects" },
+      { path: "/inventory", icon: Package, label: "Inventory" },
+      { path: "/finance", icon: DollarSign, label: "Finance" },
+      { path: "/timesheets", icon: Clock, label: "Timesheets" },
+      { path: "/employees", icon: Briefcase, label: "People" },
+    ],
+  },
+  {
+    label: "Insights",
+    items: [
+      { path: "/forecasts", icon: BrainCircuit, label: "Forecasts" },
+      { path: "/goals", icon: Target, label: "Goals" },
+      { path: "/analytics", icon: BarChart3, label: "Analytics" },
+      { path: "/reports", icon: FileText, label: "Reports" },
+    ],
+  },
+  {
+    label: "Automation",
+    items: [
+      { path: "/workflows", icon: Zap, label: "Workflows" },
+      { path: "/campaigns", icon: Send, label: "Campaigns" },
+      { path: "/email-templates", icon: BookOpen, label: "Email Templates" },
+      { path: "/custom-fields", icon: ListFilter, label: "Custom Fields" },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { path: "/documents", icon: FolderOpen, label: "Documents" },
+      { path: "/assistant", icon: Sparkles, label: "AI Assistant" },
+      { path: "/notifications", icon: Bell, label: "Notifications" },
+      { path: "/subscriptions", icon: CreditCard, label: "Subscriptions" },
+    ],
+  },
+  {
+    label: "Admin",
+    items: [
+      { path: "/organization", icon: Settings, label: "Organization" },
+      { path: "/security", icon: Shield, label: "Security" },
+      { path: "/api", icon: Webhook, label: "API & Webhooks" },
+      { path: "/audit", icon: FileText, label: "Audit Logs" },
+      { path: "/support", icon: LifeBuoy, label: "Support" },
+      { path: "/settings", icon: Cog, label: "Settings" },
+    ],
+  },
 ];
+
+function SidebarNavItem({
+  item,
+  collapsed,
+  isActive,
+}: {
+  item: NavItem;
+  collapsed: boolean;
+  isActive: boolean;
+}) {
+  return (
+    <NavLink
+      to={item.path}
+      className={cn(
+        "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative",
+        isActive
+          ? "bg-[#6452db]/15 text-[#ff8964]"
+          : "text-white/50 hover:text-white hover:bg-white/[0.04]"
+      )}
+    >
+      <item.icon
+        className={cn(
+          "w-[18px] h-[18px] flex-shrink-0 transition-colors",
+          isActive ? "text-[#ff8964]" : "text-white/40 group-hover:text-white/60"
+        )}
+      />
+      {!collapsed && (
+        <>
+          <span className="truncate">{item.label}</span>
+          {item.badge && (
+            <Badge
+              variant="secondary"
+              className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-[#ff8964]/20 text-[#ff8964] border-0"
+            >
+              {item.badge}
+            </Badge>
+          )}
+          {isActive && (
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#ff8964]" />
+          )}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
+function NavGroupSection({
+  group,
+  collapsed,
+  locationPathname,
+  expandedGroups,
+  toggleGroup,
+}: {
+  group: NavGroup;
+  collapsed: boolean;
+  locationPathname: string;
+  expandedGroups: Set<string>;
+  toggleGroup: (label: string) => void;
+}) {
+  const isExpanded = expandedGroups.has(group.label);
+  const hasActiveItem = group.items.some((item) => item.path === locationPathname);
+
+  if (collapsed) {
+    return (
+      <div className="space-y-1">
+        {group.items.map((item) => (
+          <SidebarNavItem
+            key={item.path}
+            item={item}
+            collapsed={collapsed}
+            isActive={item.path === locationPathname}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-1">
+      <button
+        onClick={() => toggleGroup(group.label)}
+        className={cn(
+          "flex items-center gap-2 w-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
+          hasActiveItem ? "text-[#ff8964]/80" : "text-white/25 hover:text-white/40"
+        )}
+      >
+        <span className="flex-1 text-left">{group.label}</span>
+        <ChevronDown
+          className={cn(
+            "w-3.5 h-3.5 transition-transform duration-200",
+            !isExpanded && "-rotate-90"
+          )}
+        />
+      </button>
+      <div
+        className={cn(
+          "space-y-0.5 overflow-hidden transition-all duration-200",
+          isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        {group.items.map((item) => (
+          <SidebarNavItem
+            key={item.path}
+            item={item}
+            collapsed={collapsed}
+            isActive={item.path === locationPathname}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
+    () => new Set(navGroups.map((g) => g.label))
+  );
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
 
-  const isActive = (path: string) => location.pathname === path;
+  const toggleGroup = (label: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) {
+        next.delete(label);
+      } else {
+        next.add(label);
+      }
+      return next;
+    });
+  };
 
   const userName = profile
     ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim()
@@ -101,135 +275,155 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#0b0d10] text-white flex">
+      {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
+      {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 bg-[#0b0d10] border-r border-white/10 transition-all duration-300 flex flex-col ${
-          collapsed ? "w-16" : "w-64"
-        } ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        className={cn(
+          "fixed lg:static inset-y-0 left-0 z-50 bg-[#0d0f12] border-r border-white/[0.06] transition-all duration-300 ease-out flex flex-col",
+          collapsed ? "w-[72px]" : "w-[260px]",
+          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        )}
       >
-        <div className="h-16 flex items-center px-4 border-b border-white/10">
-          <div className="w-8 h-8 rounded-lg bg-[#6452db] flex items-center justify-center flex-shrink-0">
+        {/* Logo */}
+        <div className="h-16 flex items-center px-4 border-b border-white/[0.06] flex-shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#6452db] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#6452db]/20">
             <span className="text-white font-bold text-sm">S</span>
           </div>
           {!collapsed && (
-            <span className="ml-3 font-semibold text-white tracking-tight">
-              StartOps
-            </span>
+            <div className="ml-3 flex items-center gap-2">
+              <span className="font-semibold text-white tracking-tight text-[15px]">
+                StartOps
+              </span>
+              <Badge className="bg-[#6452db]/20 text-[#a78bfa] border-[#6452db]/30 text-[10px] px-1.5 py-0 h-4 hover:bg-[#6452db]/20">
+                Pro
+              </Badge>
+            </div>
           )}
           <button
             onClick={() => setMobileOpen(false)}
-            className="lg:hidden ml-auto text-white/60 hover:text-white"
+            className="lg:hidden ml-auto text-white/40 hover:text-white p-1"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const active = isActive(item.path);
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-[#18191b] text-[#ff8964]"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
-                {active && !collapsed && (
-                  <div className="ml-auto w-1 h-5 rounded-full bg-[#ff8964]" />
-                )}
-              </NavLink>
-            );
-          })}
+        {/* Navigation */}
+        <nav className="flex-1 py-3 px-2 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          {navGroups.map((group) => (
+            <NavGroupSection
+              key={group.label}
+              group={group}
+              collapsed={collapsed}
+              locationPathname={location.pathname}
+              expandedGroups={expandedGroups}
+              toggleGroup={toggleGroup}
+            />
+          ))}
         </nav>
 
-        <div className="p-3 border-t border-white/10">
+        {/* Bottom section */}
+        <div className="p-3 border-t border-white/[0.06] flex-shrink-0">
+          {/* Collapse toggle */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex w-full items-center justify-center p-2 rounded-md text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+            className="hidden lg:flex w-full items-center justify-center p-2 rounded-lg text-white/25 hover:text-white/50 hover:bg-white/[0.04] transition-all mb-2"
           >
             {collapsed ? (
               <ChevronRight className="w-4 h-4" />
             ) : (
-              <ChevronLeft className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-xs">
+                <ChevronRight className="w-4 h-4 rotate-180" />
+                <span>Collapse sidebar</span>
+              </div>
             )}
           </button>
-          <div className="flex items-center gap-3 mt-2 px-2">
-            <Avatar className="w-8 h-8 bg-[#6452db]">
-              <AvatarFallback className="bg-[#6452db] text-white text-xs">
+
+          {/* User profile */}
+          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/[0.04] transition-colors group">
+            <Avatar className="w-8 h-8 bg-gradient-to-br from-[#6452db] to-[#8b5cf6] ring-2 ring-white/5">
+              <AvatarFallback className="bg-transparent text-white text-xs font-medium">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
             {!collapsed && (
-              <button
-                onClick={() => window.location.href = "/profile"}
-                className="flex-1 min-w-0 text-left"
-              >
-                <p className="text-sm font-medium text-white truncate">
-                  {userName}
-                </p>
-                <p className="text-xs text-white/40 truncate capitalize">
-                  {userRole}
-                </p>
-              </button>
-            )}
-            {!collapsed && (
-              <button
-                onClick={signOut}
-                className="text-white/30 hover:text-[#be6464] transition-colors"
-                title="Sign out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+              <>
+                <button
+                  onClick={() => (window.location.href = "/profile")}
+                  className="flex-1 min-w-0 text-left"
+                >
+                  <p className="text-sm font-medium text-white/90 truncate group-hover:text-white transition-colors">
+                    {userName}
+                  </p>
+                  <p className="text-[11px] text-white/30 truncate capitalize">
+                    {userRole}
+                  </p>
+                </button>
+                <button
+                  onClick={signOut}
+                  className="text-white/20 hover:text-[#be6464] transition-colors p-1.5 rounded-lg hover:bg-white/[0.04]"
+                  title="Sign out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </>
             )}
           </div>
         </div>
       </aside>
 
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         <CommandPalette />
 
-        <header className="h-16 flex items-center gap-4 px-6 border-b border-white/10 bg-[#0b0d10]/80 backdrop-blur-sm sticky top-0 z-30">
+        {/* Header */}
+        <header className="h-16 flex items-center gap-4 px-6 border-b border-white/[0.06] bg-[#0b0d10]/80 backdrop-blur-xl sticky top-0 z-30">
           <button
             onClick={() => setMobileOpen(true)}
-            className="lg:hidden text-white/60 hover:text-white"
+            className="lg:hidden text-white/40 hover:text-white p-2 -ml-2 rounded-lg hover:bg-white/[0.04] transition-colors"
           >
             <Menu className="w-5 h-5" />
           </button>
 
+          {/* Search */}
           <div className="flex-1 max-w-md">
-            <div className="relative cursor-pointer" onClick={() => {
-              const event = new KeyboardEvent("keydown", { key: "k", metaKey: true });
-              window.dispatchEvent(event);
-            }}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <div
+              className="relative cursor-pointer group"
+              onClick={() => {
+                const event = new KeyboardEvent("keydown", {
+                  key: "k",
+                  metaKey: true,
+                });
+                window.dispatchEvent(event);
+              }}
+            >
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-hover:text-white/40 transition-colors" />
               <input
                 type="text"
                 readOnly
-                placeholder="Search commands, pages, actions... (⌘K)"
-                className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50 cursor-pointer"
+                placeholder="Search commands, pages, actions..."
+                className="w-full bg-[#13151a] border border-white/[0.06] rounded-xl pl-9 pr-16 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#6452db]/30 focus:ring-1 focus:ring-[#6452db]/20 cursor-pointer transition-all"
               />
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-white/20 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">
+                ⌘K
+              </kbd>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Actions */}
+          <div className="flex items-center gap-1">
             <RealtimeNotifications />
             <Button
               variant="ghost"
               size="icon"
               onClick={signOut}
-              className="text-white/60 hover:text-[#be6464] hover:bg-white/5"
+              className="text-white/40 hover:text-[#be6464] hover:bg-white/[0.04] rounded-xl"
               title="Sign out"
             >
               <LogOut className="w-5 h-5" />
@@ -237,6 +431,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
+        {/* Page content */}
         <main className="flex-1 overflow-auto p-6">{children}</main>
       </div>
     </div>
