@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import {
   Package, AlertTriangle, ShoppingCart, Plus, Search, Loader2,
-  TrendingDown, CheckCircle2
+  TrendingDown, CheckCircle2, Download
 } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Product {
   id: string;
@@ -32,8 +34,10 @@ export default function Inventory() {
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({ name: "", sku: "", category: "", unit_price: "", cost_price: "", quantity_on_hand: "", reorder_point: "" });
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => { fetchProducts(); }, []);
+  useRealtimeTable("products", fetchProducts);
 
   async function fetchProducts() {
     try {
@@ -74,9 +78,10 @@ export default function Inventory() {
   const totalValue = products.reduce((s, p) => s + ((p.quantity_on_hand || 0) * (p.cost_price || 0)), 0);
 
   const filtered = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    (p.name.toLowerCase().includes(search.toLowerCase()) ||
     (p.sku?.toLowerCase() || "").includes(search.toLowerCase()) ||
-    (p.category?.toLowerCase() || "").includes(search.toLowerCase())
+    (p.category?.toLowerCase() || "").includes(search.toLowerCase())) &&
+    (statusFilter === "all" || (statusFilter === "active" && p.is_active) || (statusFilter === "inactive" && !p.is_active))
   );
 
   if (loading) {
@@ -94,7 +99,23 @@ export default function Inventory() {
           <h1 className="text-2xl font-semibold text-white tracking-tight">Inventory & Procurement</h1>
           <p className="text-sm text-white/50 mt-1">Product tracking and intelligent reordering</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = products.map(p => ({
+              "Name": p.name,
+              "SKU": p.sku || "",
+              "Category": p.category || "",
+              "Unit Price": p.unit_price,
+              "Cost Price": p.cost_price,
+              "Quantity": p.quantity_on_hand,
+              "Reorder Point": p.reorder_point,
+              "Status": p.is_active ? "Active" : "Inactive",
+            }));
+            exportToCSV(exportData, "inventory");
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />Add Product
@@ -199,6 +220,20 @@ export default function Inventory() {
       )}
 
       {/* Products Table */}
+      <div className="flex items-center gap-3 mb-4">
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+            <Filter className="w-3 h-3 mr-2" />
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <Card className="bg-[#18191b] border-white/10">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">

@@ -4,6 +4,7 @@ import {
   TrendingUp, AlertTriangle, CheckCircle2, XCircle, RefreshCw,
   MoreHorizontal, Filter, Download
 } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Subscription {
   id: string;
@@ -55,6 +57,7 @@ export default function Subscriptions() {
   });
 
   useEffect(() => { fetchSubscriptions(); }, []);
+  useRealtimeTable("subscriptions", fetchSubscriptions);
 
   async function fetchSubscriptions() {
     try {
@@ -302,7 +305,21 @@ export default function Subscriptions() {
         <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5">
           <Filter className="w-4 h-4 mr-2" />Filter
         </Button>
-        <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5">
+        <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+          const exportData = subscriptions.map(s => ({
+            "Customer": s.customer_name,
+            "Email": s.customer_email,
+            "Plan": s.plan_name,
+            "Price": s.plan_price,
+            "Billing Cycle": s.billing_cycle,
+            "Status": s.status,
+            "MRR": s.mrr,
+            "ARR": s.arr,
+            "Payment Method": s.payment_method,
+            "Next Billing": s.next_billing_date,
+          }));
+          exportToCSV(exportData, "subscriptions");
+        }}>
           <Download className="w-4 h-4 mr-2" />Export
         </Button>
       </div>

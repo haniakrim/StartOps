@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   FolderKanban, Clock, Users, AlertTriangle, CheckCircle2, Plus,
-  Search, Loader2, TrendingUp, BarChart3, Calendar, LayoutGrid
+  Search, Loader2, TrendingUp, BarChart3, Calendar, LayoutGrid, Download, Filter, Trash2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ProjectBoard } from "@/components/projects/ProjectBoard";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Project {
   id: string;
@@ -68,8 +69,12 @@ export default function Projects() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [newProject, setNewProject] = useState({ name: "", description: "", budget: "", priority: "medium", start_date: "", end_date: "" });
+  const [selected, setSelected] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => { fetchProjects(); }, []);
+  useRealtimeTable("projects", fetchProjects);
+  useRealtimeTable("project_tasks", fetchProjects);
 
   async function fetchProjects() {
     try {
@@ -139,7 +144,26 @@ export default function Projects() {
           <h1 className="text-2xl font-semibold text-white tracking-tight">Projects</h1>
           <p className="text-sm text-white/50 mt-1">Project delivery intelligence and resource optimization</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = projects.map(p => ({
+              "Name": p.name,
+              "Status": p.status,
+              "Priority": p.priority,
+              "Progress": p.progress,
+              "Budget": p.budget,
+              "Actual Cost": p.actual_cost,
+              "Start Date": p.start_date,
+              "End Date": p.end_date,
+              "Client": p.contacts ? `${p.contacts.first_name} ${p.contacts.last_name}` : "",
+            }));
+            import("@/lib/export").then(({ exportToCSV }) => {
+              exportToCSV(exportData, "projects");
+            });
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />New Project
@@ -205,6 +229,44 @@ export default function Projects() {
         </Card>
       )}
 
+      {selected.length > 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#6452db]/10 border border-[#6452db]/20">
+          <span className="text-sm text-white">{selected.length} selected</span>
+          <div className="flex-1" />
+          <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={async () => {
+            try {
+              const { error } = await supabase.from("projects").delete().in("id", selected);
+              if (error) throw error;
+              toast.success(`${selected.length} projects deleted`);
+              setSelected([]);
+              fetchProjects();
+            } catch (error: any) {
+              toast.error("Failed to delete: " + error.message);
+            }
+          }}>
+            <Trash2 className="w-4 h-4 mr-1" />Delete
+          </Button>
+          <Button variant="ghost" size="sm" className="text-white/50 hover:text-white h-8" onClick={() => setSelected([])}>Clear</Button>
+        </div>
+      )}
+
+      <div className="flex items-center gap-3 mb-4">
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+            <Filter className="w-3 h-3 mr-2" />
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="planning">Planning</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="on_hold">On Hold</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <Tabs defaultValue="active" className="w-full">
         <TabsList className="bg-[#18191b] border border-white/10">
           <TabsTrigger value="active" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><FolderKanban className="w-4 h-4 mr-2" />Active</TabsTrigger>
@@ -214,9 +276,10 @@ export default function Projects() {
         </TabsList>
 
         {["active", "planning", "completed"].map(tab => {
-          const filtered = tab === "active" ? projects.filter(p => p.status === "active" || p.status === "on_hold")
+          const filtered = (tab === "active" ? projects.filter(p => p.status === "active" || p.status === "on_hold")
             : tab === "planning" ? projects.filter(p => p.status === "planning")
-            : projects.filter(p => p.status === "completed" || p.status === "cancelled");
+            : projects.filter(p => p.status === "completed" || p.status === "cancelled"))
+            .filter(p => statusFilter === "all" || p.status === statusFilter);
           return (
             <TabsContent key={tab} value={tab} className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -229,6 +292,13 @@ export default function Projects() {
                     <Card key={project.id} className={`bg-[#18191b] border-white/10 hover:border-white/20 transition-colors cursor-pointer ${isAtRisk ? "border-[#f0ad4e]/30" : ""}`} onClick={() => setSelectedProjectId(project.id)}>
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between mb-3">
+                          <input
+                            type="checkbox"
+                            className="rounded border-white/20 bg-transparent mr-2"
+                            checked={selected.includes(project.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, project.id] : prev.filter((id) => id !== project.id))}
+                          />
                           <Badge variant="secondary" className={`text-xs ${statusColors[project.status] || statusColors.planning}`}>{project.status}</Badge>
                           <Badge variant="secondary" className={`text-xs ${priorityColors[project.priority] || priorityColors.medium}`}>{project.priority}</Badge>
                         </div>

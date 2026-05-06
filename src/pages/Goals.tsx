@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Target, TrendingUp, CheckCircle2, Zap, Search, Plus, Loader2 } from "lucide-react";
+import { Target, TrendingUp, CheckCircle2, Zap, Search, Plus, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { GoalStatCard } from "@/components/goals/GoalStatCard";
 import { GoalChart } from "@/components/goals/GoalChart";
 import { GoalCard, type Goal } from "@/components/goals/GoalCard";
 import { GoalForm } from "@/components/goals/GoalForm";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 export default function Goals() {
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -18,6 +19,8 @@ export default function Goals() {
   useEffect(() => {
     fetchGoals();
   }, []);
+  useRealtimeTable("goals", fetchGoals);
+  useRealtimeTable("key_results", fetchGoals);
 
   async function fetchGoals() {
     try {
@@ -219,7 +222,23 @@ export default function Goals() {
             Track objectives and key results across your organization
           </p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = goals.map(g => ({
+              "Name": g.name,
+              "Description": g.description || "",
+              "Period": g.period,
+              "Status": g.status,
+              "Progress": g.progress,
+              "Key Results": (g.key_results || []).map((kr: any) => kr.name).join("; "),
+            }));
+            import("@/lib/export").then(({ exportToCSV }) => {
+              exportToCSV(exportData, "goals");
+            });
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />

@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
 
 interface Invoice {
@@ -82,6 +83,9 @@ export default function Finance() {
     fetchVendors();
     detectAnomalies();
   }, []);
+  useRealtimeTable("invoices", fetchFinanceData);
+  useRealtimeTable("expenses", fetchFinanceData);
+  useRealtimeTable("vendors", fetchVendors);
 
   async function fetchFinanceData() {
     try {

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -12,6 +13,8 @@ import {
   BarChart3,
   Shield,
   Zap,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HeroDashboardPreview from "@/components/landing/HeroDashboardPreview";
@@ -22,10 +25,13 @@ import FeatureSection from "@/components/landing/FeatureSection";
 import CTASection from "@/components/landing/CTASection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import FadeIn from "@/components/landing/FadeIn";
+import { cn } from "@/lib/utils";
 
 export default function Index() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   useEffect(() => {
     if (!loading && user) {
@@ -35,8 +41,8 @@ export default function Index() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0b0d10] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#6452db] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -44,27 +50,48 @@ export default function Index() {
   if (user) return null;
 
   return (
-    <div className="min-h-screen bg-[#0b0d10] text-white overflow-x-hidden">
+    <div className={cn("min-h-screen overflow-x-hidden", isDark ? "bg-[#0b0d10] text-white" : "bg-background text-foreground")}>
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0b0d10]/80 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#6452db] flex items-center justify-center">
-              <Building2 className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <Building2 className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-white tracking-tight">StartOps</span>
+            <span className="font-semibold text-foreground tracking-tight">StartOps</span>
           </div>
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl"
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              <Sun
+                className={cn(
+                  "w-[18px] h-[18px] absolute transition-all duration-300",
+                  isDark ? "opacity-0 rotate-90 scale-0" : "opacity-100 rotate-0 scale-100"
+                )}
+              />
+              <Moon
+                className={cn(
+                  "w-[18px] h-[18px] transition-all duration-300",
+                  isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-0"
+                )}
+              />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => navigate("/login")}
-              className="text-white/60 hover:text-white hover:bg-white/5"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               Sign In
             </Button>
             <Button
               onClick={() => navigate("/login")}
-              className="bg-[#6452db] text-white hover:bg-[#6452db]/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Get Started
             </Button>
@@ -80,21 +107,21 @@ export default function Index() {
             className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] opacity-20"
             style={{
               background:
-                "radial-gradient(ellipse, #6452db30 0%, transparent 70%)",
+                "radial-gradient(ellipse, hsl(var(--primary) / 0.2) 0%, transparent 70%)",
             }}
           />
           <div
             className="absolute top-40 right-0 w-[400px] h-[400px] opacity-10"
             style={{
               background:
-                "radial-gradient(circle, #ff896420 0%, transparent 70%)",
+                "radial-gradient(circle, hsl(var(--chart-1) / 0.15) 0%, transparent 70%)",
             }}
           />
           <div
             className="absolute bottom-0 left-0 w-[300px] h-[300px] opacity-10"
             style={{
               background:
-                "radial-gradient(circle, #5683da20 0%, transparent 70%)",
+                "radial-gradient(circle, hsl(var(--chart-2) / 0.15) 0%, transparent 70%)",
             }}
           />
         </div>
@@ -107,10 +134,10 @@ export default function Index() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#6452db]/10 border border-[#6452db]/20 mb-6"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6"
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#6452db]" />
-                <span className="text-xs text-[#6452db] font-medium">
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs text-primary font-medium">
                   Now with AI-powered insights
                 </span>
               </motion.div>
@@ -119,7 +146,7 @@ export default function Index() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-5"
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-5 text-foreground"
               >
                 Everything your startup{" "}
                 <span className="relative">
@@ -127,7 +154,7 @@ export default function Index() {
                     className="bg-clip-text text-transparent"
                     style={{
                       backgroundImage:
-                        "linear-gradient(135deg, #6452db, #ff8964)",
+                        "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--chart-1)))",
                     }}
                   >
                     needs to grow
@@ -139,7 +166,7 @@ export default function Index() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-lg text-white/50 max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed"
+                className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed"
               >
                 The all-in-one platform for startups. Manage contacts, track
                 deals, run your finances, and get AI insights — all in one
@@ -154,7 +181,7 @@ export default function Index() {
               >
                 <Button
                   onClick={() => navigate("/login")}
-                  className="bg-[#6452db] text-white hover:bg-[#6452db]/90 h-12 px-8 text-base"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8 text-base"
                 >
                   Get Started Free
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -162,7 +189,7 @@ export default function Index() {
                 <Button
                   variant="outline"
                   onClick={() => navigate("/login")}
-                  className="border-white/10 text-white hover:bg-white/5 h-12 px-8 text-base"
+                  className="border-border text-foreground hover:bg-accent h-12 px-8 text-base"
                 >
                   Sign In
                 </Button>
@@ -181,7 +208,7 @@ export default function Index() {
                 ].map((item) => (
                   <div
                     key={item.label}
-                    className="flex items-center gap-2 text-white/30"
+                    className="flex items-center gap-2 text-muted-foreground/60"
                   >
                     <item.icon className="w-4 h-4" />
                     <span className="text-xs">{item.label}</span>
@@ -199,9 +226,9 @@ export default function Index() {
       </section>
 
       {/* Logo Cloud */}
-      <section className="py-8 border-y border-white/5">
+      <section className="py-8 border-y border-border">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-xs text-white/20 uppercase tracking-widest mb-4">
+          <p className="text-center text-xs text-muted-foreground/50 uppercase tracking-widest mb-4">
             Trusted by innovative teams
           </p>
           <LogoCloud />
@@ -209,7 +236,7 @@ export default function Index() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 border-y border-white/5">
+      <section className="py-16 border-y border-border">
         <div className="max-w-6xl mx-auto px-6">
           <StatsSection />
         </div>
@@ -219,14 +246,14 @@ export default function Index() {
       <section className="py-20 lg:py-28">
         <div className="max-w-6xl mx-auto px-6">
           <FadeIn className="text-center mb-14">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-4">
-              <Zap className="w-3.5 h-3.5 text-[#f0ad4e]" />
-              <span className="text-xs text-white/50">One platform, endless possibilities</span>
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent border border-border mb-4">
+              <Zap className="w-3.5 h-3.5 text-chart-5" />
+              <span className="text-xs text-muted-foreground">One platform, endless possibilities</span>
             </span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-white tracking-tight mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground tracking-tight mb-4">
               30+ modules, zero compromises
             </h2>
-            <p className="text-base text-white/50 max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground max-w-2xl mx-auto">
               From CRM to finance, project management to AI analytics — every
               tool your startup needs, deeply integrated and ready to scale.
             </p>
@@ -237,29 +264,28 @@ export default function Index() {
       </section>
 
       {/* Feature Highlights */}
-      <section className="py-20 lg:py-28 border-y border-white/5">
+      <section className="py-20 lg:py-28 border-y border-border">
         <div className="max-w-6xl mx-auto px-6 space-y-20">
-          {/* Feature 1: AI Insights */}
           <FeatureSection
             title="AI-powered insights that actually matter"
             description="Stop guessing. Start knowing. Our AI analyzes your pipeline, identifies at-risk deals, forecasts revenue, and surfaces anomalies before they become problems."
           >
-            <div className="bg-[#18191b] border border-white/10 rounded-xl p-5 space-y-3">
+            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
               {[
                 {
                   icon: BarChart3,
                   text: "Revenue forecast: $1.2M (+23% QoQ)",
-                  color: "#8dc572",
+                  color: "hsl(var(--chart-4))",
                 },
                 {
                   icon: BrainCircuit,
                   text: "3 deals flagged as at-risk",
-                  color: "#f0ad4e",
+                  color: "hsl(var(--chart-5))",
                 },
                 {
                   icon: Users,
                   text: "Lead conversion up 18% this month",
-                  color: "#5683da",
+                  color: "hsl(var(--chart-2))",
                 },
               ].map((item, i) => (
                 <motion.div
@@ -268,49 +294,48 @@ export default function Index() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/5"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border"
                 >
                   <div
                     className="p-1.5 rounded-md"
-                    style={{ backgroundColor: `${item.color}15` }}
+                    style={{ backgroundColor: `${item.color}20` }}
                   >
                     <item.icon
                       className="w-4 h-4"
                       style={{ color: item.color }}
                     />
                   </div>
-                  <span className="text-sm text-white/70">{item.text}</span>
+                  <span className="text-sm text-muted-foreground">{item.text}</span>
                 </motion.div>
               ))}
             </div>
           </FeatureSection>
 
-          {/* Feature 2: Pipeline */}
           <FeatureSection
             title="Visual pipeline that moves as fast as you do"
             description="Drag-and-drop deals across stages. See pipeline value at a glance. Track probability, expected close dates, and lead sources — all in a beautiful Kanban view."
             reversed
           >
-            <div className="bg-[#18191b] border border-white/10 rounded-xl p-5">
+            <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {[
-                  { name: "Lead", count: 12, color: "#5683da", value: "$240K" },
+                  { name: "Lead", count: 12, color: "hsl(var(--chart-2))", value: "$240K" },
                   {
                     name: "Qualified",
                     count: 8,
-                    color: "#6452db",
+                    color: "hsl(var(--chart-3))",
                     value: "$480K",
                   },
                   {
                     name: "Proposal",
                     count: 5,
-                    color: "#ff8964",
+                    color: "hsl(var(--chart-1))",
                     value: "$320K",
                   },
                   {
                     name: "Closed",
                     count: 3,
-                    color: "#8dc572",
+                    color: "hsl(var(--chart-4))",
                     value: "$180K",
                   },
                 ].map((stage) => (
@@ -323,10 +348,10 @@ export default function Index() {
                         className="w-2 h-2 rounded-full"
                         style={{ backgroundColor: stage.color }}
                       />
-                      <span className="text-xs text-white/60">
+                      <span className="text-xs text-muted-foreground">
                         {stage.name}
                       </span>
-                      <span className="text-[10px] text-white/30 ml-auto">
+                      <span className="text-[10px] text-muted-foreground/50 ml-auto">
                         {stage.count}
                       </span>
                     </div>
@@ -339,15 +364,15 @@ export default function Index() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            className="bg-[#0b0d10] border border-white/5 rounded-md p-2"
+                            className="bg-muted border border-border rounded-md p-2"
                           >
-                            <div className="h-1.5 w-16 bg-white/10 rounded mb-1" />
-                            <div className="h-1 w-10 bg-white/5 rounded" />
+                            <div className="h-1.5 w-16 bg-muted-foreground/20 rounded mb-1" />
+                            <div className="h-1 w-10 bg-muted-foreground/10 rounded" />
                           </motion.div>
                         )
                       )}
                     </div>
-                    <p className="text-xs text-white/40 text-center">
+                    <p className="text-xs text-muted-foreground/60 text-center">
                       {stage.value}
                     </p>
                   </div>
@@ -356,22 +381,21 @@ export default function Index() {
             </div>
           </FeatureSection>
 
-          {/* Feature 3: Finance */}
           <FeatureSection
             title="Finance that keeps up with your ambition"
             description="Invoices, expenses, vendor management, and cash flow forecasting — all with AI anomaly detection that catches issues before they cost you."
           >
-            <div className="bg-[#18191b] border border-white/10 rounded-xl p-5 space-y-4">
+            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: "Revenue", value: "$94,200", color: "#8dc572" },
-                  { label: "Outstanding", value: "$32,400", color: "#5683da" },
+                  { label: "Revenue", value: "$94,200", color: "hsl(var(--chart-4))" },
+                  { label: "Outstanding", value: "$32,400", color: "hsl(var(--chart-2))" },
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className="bg-[#0b0d10] border border-white/5 rounded-lg p-3"
+                    className="bg-muted border border-border rounded-lg p-3"
                   >
-                    <p className="text-[10px] text-white/40 mb-1">{stat.label}</p>
+                    <p className="text-[10px] text-muted-foreground/60 mb-1">{stat.label}</p>
                     <p
                       className="text-lg font-semibold"
                       style={{ color: stat.color }}
@@ -389,14 +413,14 @@ export default function Index() {
                     whileInView={{ height: `${v}%` }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.05, duration: 0.4 }}
-                    className="flex-1 rounded-t-sm bg-[#6452db]/40"
+                    className="flex-1 rounded-t-sm bg-primary/40"
                     style={{ minHeight: "4px" }}
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-[#be6464]/5 border border-[#be6464]/10">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#be6464]" />
-                <span className="text-xs text-white/50">
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-destructive/5 border border-destructive/10">
+                <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                <span className="text-xs text-muted-foreground">
                   AI detected: Duplicate invoice #INV-2045
                 </span>
               </div>

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import {
   Users, Star, TrendingUp, Award, Plus, Search, Loader2,
-  Building2, BarChart3, Zap
+  Building2, BarChart3, Zap, Download
 } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Employee {
   id: string;
@@ -53,6 +55,9 @@ export default function Employees() {
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => { fetchData(); }, []);
+  useRealtimeTable("employees", fetchData);
+  useRealtimeTable("skills", fetchData);
+  useRealtimeTable("employee_skills", fetchData);
 
   async function fetchData() {
     try {
@@ -127,7 +132,23 @@ export default function Employees() {
           <h1 className="text-2xl font-semibold text-white tracking-tight">People & Projects</h1>
           <p className="text-sm text-white/50 mt-1">Workforce intelligence and skill graph</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = employees.map(e => ({
+              "First Name": e.first_name,
+              "Last Name": e.last_name,
+              "Email": e.email,
+              "Title": e.title || "",
+              "Department": e.departments?.name || "",
+              "Team": e.teams?.name || "",
+              "Utilization": e.utilization_target,
+              "Status": e.is_active ? "Active" : "Inactive",
+            }));
+            exportToCSV(exportData, "employees");
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />Add Employee

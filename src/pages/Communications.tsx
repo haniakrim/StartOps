@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   Mail, Phone, MessageSquare, BrainCircuit, TrendingUp, TrendingDown,
-  Minus, Search, Filter, Plus, Loader2, Send, Clock, User, Building2
+  Minus, Search, Filter, Plus, Loader2, Send, Clock, User, Building2, Download, Trash2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Communication {
   id: string;
@@ -58,11 +59,17 @@ export default function Communications() {
     contact_id: "",
     deal_id: "",
   });
+  const [selected, setSelected] = useState<string[]>([]);
   const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [sentimentFilter, setSentimentFilter] = useState("all");
 
   useEffect(() => {
     fetchEmailTemplates();
   }, []);
+  useRealtimeTable("communications", fetchCommunications);
+  useRealtimeTable("contacts", fetchContactsAndDeals);
+  useRealtimeTable("deals", fetchContactsAndDeals);
 
   async function fetchEmailTemplates() {
     try {
@@ -182,10 +189,12 @@ export default function Communications() {
   }
 
   const filtered = communications.filter(c =>
-    (c.subject?.toLowerCase() || "").includes(search.toLowerCase()) ||
+    ((c.subject?.toLowerCase() || "").includes(search.toLowerCase()) ||
     (c.content?.toLowerCase() || "").includes(search.toLowerCase()) ||
     (c.summary?.toLowerCase() || "").includes(search.toLowerCase()) ||
-    (c.contacts?.first_name?.toLowerCase() || "").includes(search.toLowerCase())
+    (c.contacts?.first_name?.toLowerCase() || "").includes(search.toLowerCase())) &&
+    (typeFilter === "all" || c.type === typeFilter) &&
+    (sentimentFilter === "all" || c.sentiment === sentimentFilter)
   );
 
   const emails = filtered.filter(c => c.type === "email");
@@ -207,7 +216,26 @@ export default function Communications() {
           <h1 className="text-2xl font-semibold text-white tracking-tight">Communications</h1>
           <p className="text-sm text-white/50 mt-1">AI-powered conversation tracking and sentiment analysis</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = communications.map(c => ({
+              "Type": c.type,
+              "Direction": c.direction,
+              "Subject": c.subject || "",
+              "Content": c.content || "",
+              "Summary": c.summary || "",
+              "Sentiment": c.sentiment || "neutral",
+              "Contact": c.contacts ? `${c.contacts.first_name} ${c.contacts.last_name}` : "",
+              "Deal": c.deals?.name || "",
+              "Date": c.occurred_at,
+            }));
+            import("@/lib/export").then(({ exportToCSV }) => {
+              exportToCSV(exportData, "communications");
+            });
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />Log Communication
@@ -350,12 +378,56 @@ export default function Communications() {
         </Card>
       </div>
 
+      {selected.length > 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#6452db]/10 border border-[#6452db]/20">
+          <span className="text-sm text-white">{selected.length} selected</span>
+          <div className="flex-1" />
+          <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={async () => {
+            try {
+              const { error } = await supabase.from("communications").delete().in("id", selected);
+              if (error) throw error;
+              toast.success(`${selected.length} communications deleted`);
+              setSelected([]);
+              fetchCommunications();
+            } catch (error: any) {
+              toast.error("Failed to delete: " + error.message);
+            }
+          }}>
+            <Trash2 className="w-4 h-4 mr-1" />Delete
+          </Button>
+          <Button variant="ghost" size="sm" className="text-white/50 hover:text-white h-8" onClick={() => setSelected([])}>Clear</Button>
+        </div>
+      )}
+
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
           <input type="text" placeholder="Search communications..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
         </div>
-        <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"><Filter className="w-4 h-4 mr-2" />Filter</Button>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+            <Filter className="w-3 h-3 mr-2" />
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="email">Email</SelectItem>
+            <SelectItem value="call">Call</SelectItem>
+            <SelectItem value="meeting">Meeting</SelectItem>
+            <SelectItem value="note">Note</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sentimentFilter} onValueChange={setSentimentFilter}>
+          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+            <SelectValue placeholder="Sentiment" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectItem value="all">All Sentiments</SelectItem>
+            <SelectItem value="positive">Positive</SelectItem>
+            <SelectItem value="neutral">Neutral</SelectItem>
+            <SelectItem value="negative">Negative</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
@@ -379,6 +451,12 @@ export default function Communications() {
                     <Card key={comm.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
+                          <input
+                            type="checkbox"
+                            className="mt-2 rounded border-white/20 bg-transparent"
+                            checked={selected.includes(comm.id)}
+                            onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, comm.id] : prev.filter((id) => id !== comm.id))}
+                          />
                           <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                             <Icon className="w-5 h-5 text-white/40" />
                           </div>

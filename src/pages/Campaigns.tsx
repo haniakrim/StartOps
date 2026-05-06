@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import {
   Mail, Plus, Search, Loader2, Send, Users, Eye, MousePointer,
   TrendingUp, AlertTriangle, CheckCircle2, Clock, Calendar,
-  MoreHorizontal, Filter, Copy, Trash2, Pause, Play
+  MoreHorizontal, Filter, Copy, Trash2, Pause, Play, Download
 } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Campaign {
   id: string;
@@ -53,6 +55,7 @@ export default function Campaigns() {
   });
 
   useEffect(() => { fetchCampaigns(); }, []);
+  useRealtimeTable("campaigns", fetchCampaigns);
 
   async function fetchCampaigns() {
     try {
@@ -141,7 +144,24 @@ export default function Campaigns() {
           <h1 className="text-2xl font-semibold text-white tracking-tight">Email Campaigns</h1>
           <p className="text-sm text-white/50 mt-1">Create and track email marketing campaigns</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = campaigns.map(c => ({
+              "Name": c.name,
+              "Subject": c.subject,
+              "Type": c.type,
+              "Status": c.status,
+              "Recipients": c.recipient_count,
+              "Opens": c.open_count,
+              "Clicks": c.click_count,
+              "Bounces": c.bounce_count,
+              "Sent At": c.sent_at,
+            }));
+            exportToCSV(exportData, "campaigns");
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />New Campaign

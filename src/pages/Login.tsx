@@ -2,13 +2,18 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Building2, Eye, EyeOff, Loader2, Shield, UserPlus, LogIn, Lock, Mail } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Building2, Eye, EyeOff, Loader2, Shield, UserPlus, LogIn, Lock, Mail, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 function AnimatedHero() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       <svg
@@ -19,8 +24,8 @@ function AnimatedHero() {
       >
         <defs>
           <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1a1d23" />
-            <stop offset="100%" stopColor="#0f1115" />
+            <stop offset="0%" stopColor={isDark ? "#1a1d23" : "#f8fafc"} />
+            <stop offset="100%" stopColor={isDark ? "#0f1115" : "#e2e8f0"} />
           </linearGradient>
           <linearGradient id="barGrad1" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#6452db" />
@@ -36,21 +41,18 @@ function AnimatedHero() {
           </linearGradient>
         </defs>
 
-        {/* Background */}
         <rect width="800" height="600" fill="url(#heroGrad)" />
 
-        {/* Stars/dots */}
-        <circle cx="100" cy="80" r="1.5" fill="white" className="twinkle" style={{ animationDelay: "0s" }} />
-        <circle cx="250" cy="120" r="1" fill="white" className="twinkle" style={{ animationDelay: "1.2s" }} />
-        <circle cx="400" cy="60" r="2" fill="white" className="twinkle" style={{ animationDelay: "0.5s" }} />
-        <circle cx="550" cy="150" r="1" fill="white" className="twinkle" style={{ animationDelay: "2s" }} />
-        <circle cx="700" cy="90" r="1.5" fill="white" className="twinkle" style={{ animationDelay: "0.8s" }} />
-        <circle cx="150" cy="200" r="1" fill="white" className="twinkle" style={{ animationDelay: "1.5s" }} />
-        <circle cx="650" cy="220" r="1" fill="white" className="twinkle" style={{ animationDelay: "0.3s" }} />
-        <circle cx="300" cy="40" r="1" fill="white" className="twinkle" style={{ animationDelay: "2.5s" }} />
-        <circle cx="500" cy="100" r="1.5" fill="white" className="twinkle" style={{ animationDelay: "1.8s" }} />
+        <circle cx="100" cy="80" r="1.5" fill={isDark ? "white" : "#6452db"} className="twinkle" style={{ animationDelay: "0s" }} />
+        <circle cx="250" cy="120" r="1" fill={isDark ? "white" : "#ff8964"} className="twinkle" style={{ animationDelay: "1.2s" }} />
+        <circle cx="400" cy="60" r="2" fill={isDark ? "white" : "#8dc572"} className="twinkle" style={{ animationDelay: "0.5s" }} />
+        <circle cx="550" cy="150" r="1" fill={isDark ? "white" : "#6452db"} className="twinkle" style={{ animationDelay: "2s" }} />
+        <circle cx="700" cy="90" r="1.5" fill={isDark ? "white" : "#ff8964"} className="twinkle" style={{ animationDelay: "0.8s" }} />
+        <circle cx="150" cy="200" r="1" fill={isDark ? "white" : "#8dc572"} className="twinkle" style={{ animationDelay: "1.5s" }} />
+        <circle cx="650" cy="220" r="1" fill={isDark ? "white" : "#6452db"} className="twinkle" style={{ animationDelay: "0.3s" }} />
+        <circle cx="300" cy="40" r="1" fill={isDark ? "white" : "#ff8964"} className="twinkle" style={{ animationDelay: "2.5s" }} />
+        <circle cx="500" cy="100" r="1.5" fill={isDark ? "white" : "#8dc572"} className="twinkle" style={{ animationDelay: "1.8s" }} />
 
-        {/* Connection lines */}
         <line x1="200" y1="300" x2="350" y2="220" stroke="#6452db" strokeWidth="1" className="pulse-line" />
         <line x1="350" y1="220" x2="500" y2="280" stroke="#6452db" strokeWidth="1" className="pulse-line" style={{ animationDelay: "0.5s" }} />
         <line x1="500" y1="280" x2="650" y2="200" stroke="#6452db" strokeWidth="1" className="pulse-line" style={{ animationDelay: "1s" }} />
@@ -58,7 +60,6 @@ function AnimatedHero() {
         <line x1="200" y1="300" x2="300" y2="400" stroke="#8dc572" strokeWidth="1" className="pulse-line" style={{ animationDelay: "0.7s" }} />
         <line x1="500" y1="280" x2="600" y2="380" stroke="#ff8964" strokeWidth="1" className="pulse-line" style={{ animationDelay: "1.2s" }} />
 
-        {/* Floating nodes */}
         <circle cx="200" cy="300" r="8" fill="#6452db" className="float" style={{ animationDelay: "0s" }} />
         <circle cx="350" cy="220" r="10" fill="#ff8964" className="float" style={{ animationDelay: "1s" }} />
         <circle cx="500" cy="280" r="7" fill="#8dc572" className="float" style={{ animationDelay: "2s" }} />
@@ -67,8 +68,7 @@ function AnimatedHero() {
         <circle cx="300" cy="400" r="5" fill="#8dc572" className="float" style={{ animationDelay: "0.3s" }} />
         <circle cx="600" cy="380" r="7" fill="#6452db" className="float" style={{ animationDelay: "2.5s" }} />
 
-        {/* Building silhouettes */}
-        <g fill="#0b0d10" opacity="0.8">
+        <g fill={isDark ? "#0b0d10" : "#e2e8f0"} opacity="0.8">
           <rect x="50" y="380" width="60" height="220" rx="2" />
           <rect x="120" y="340" width="50" height="260" rx="2" />
           <rect x="180" y="360" width="70" height="240" rx="2" />
@@ -81,7 +81,6 @@ function AnimatedHero() {
           <rect x="700" y="360" width="50" height="240" rx="2" />
         </g>
 
-        {/* Building windows */}
         <g fill="#6452db" opacity="0.4">
           <rect x="65" y="400" width="8" height="12" rx="1" className="twinkle" style={{ animationDelay: "0.2s" }} />
           <rect x="85" y="400" width="8" height="12" rx="1" className="twinkle" style={{ animationDelay: "1.1s" }} />
@@ -105,7 +104,6 @@ function AnimatedHero() {
           <rect x="735" y="380" width="8" height="12" rx="1" className="twinkle" style={{ animationDelay: "1.7s" }} />
         </g>
 
-        {/* Bar chart */}
         <g transform="translate(320, 480)">
           <rect x="0" y="40" width="24" height="60" rx="3" fill="url(#barGrad1)" className="grow-bar" style={{ animationDelay: "0s", transformOrigin: "12px 100px" }} />
           <rect x="32" y="20" width="24" height="80" rx="3" fill="url(#barGrad2)" className="grow-bar" style={{ animationDelay: "0.3s", transformOrigin: "44px 100px" }} />
@@ -115,26 +113,25 @@ function AnimatedHero() {
         </g>
       </svg>
 
-      {/* Brand text overlay */}
       <div className="absolute bottom-12 left-12 right-12">
-        <h2 className="text-4xl font-bold text-white mb-3 tracking-tight">
+        <h2 className={cn("text-4xl font-bold mb-3 tracking-tight", isDark ? "text-white" : "text-foreground")}>
           StartOps
         </h2>
-        <p className="text-lg text-white/60 leading-relaxed max-w-md">
+        <p className={cn("text-lg leading-relaxed max-w-md", isDark ? "text-white/60" : "text-muted-foreground")}>
           The intelligent CRM platform that helps teams close more deals, manage relationships, and grow revenue — all in one place.
         </p>
         <div className="flex items-center gap-6 mt-8">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-[#8dc572]" />
-            <span className="text-sm text-white/50">Real-time sync</span>
+            <span className={cn("text-sm", isDark ? "text-white/50" : "text-muted-foreground")}>Real-time sync</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-[#ff8964]" />
-            <span className="text-sm text-white/50">AI-powered insights</span>
+            <span className={cn("text-sm", isDark ? "text-white/50" : "text-muted-foreground")}>AI-powered insights</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-[#6452db]" />
-            <span className="text-sm text-white/50">Enterprise security</span>
+            <span className={cn("text-sm", isDark ? "text-white/50" : "text-muted-foreground")}>Enterprise security</span>
           </div>
         </div>
       </div>
@@ -145,6 +142,8 @@ function AnimatedHero() {
 export default function Login() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -158,7 +157,6 @@ export default function Login() {
     if (user) {
       navigate("/dashboard");
     }
-    // Trigger form entrance animation
     const timer = setTimeout(() => setFormVisible(true), 100);
     return () => clearTimeout(timer);
   }, [user, navigate]);
@@ -274,41 +272,72 @@ export default function Login() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-[#0b0d10] flex">
+      <div className={cn("min-h-screen flex", isDark ? "bg-[#0b0d10]" : "bg-background")}>
         {/* Left panel - Animated Hero */}
         <div className="hidden md:flex md:w-1/2 relative">
           <AnimatedHero />
         </div>
 
         {/* Right panel - Form */}
-        <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className={cn(
+              "absolute top-6 right-6 p-2.5 rounded-xl transition-all duration-300",
+              isDark
+                ? "text-white/40 hover:text-white hover:bg-white/5"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent"
+            )}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            <Sun
+              className={cn(
+                "w-5 h-5 absolute transition-all duration-300",
+                isDark ? "opacity-0 rotate-90 scale-0" : "opacity-100 rotate-0 scale-100"
+              )}
+            />
+            <Moon
+              className={cn(
+                "w-5 h-5 transition-all duration-300",
+                isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-0"
+              )}
+            />
+            <span className="sr-only">Toggle theme</span>
+          </button>
+
           <div
             className={`w-full max-w-[420px] ${formVisible ? "form-enter" : "opacity-0"}`}
           >
             {/* Mobile logo */}
             <div className="md:hidden text-center mb-8">
-              <div className="w-12 h-12 rounded-xl bg-[#6452db] flex items-center justify-center mx-auto mb-4">
-                <Building2 className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
+                <Building2 className="w-6 h-6 text-primary-foreground" />
               </div>
-              <h1 className="text-2xl font-semibold text-white tracking-tight">
+              <h1 className="text-2xl font-semibold text-foreground tracking-tight">
                 StartOps
               </h1>
             </div>
 
-            <div className="bg-[#18191b] border border-white/10 rounded-xl p-6 sm:p-8 shadow-xl shadow-black/20">
+            <div className={cn(
+              "border rounded-xl p-6 sm:p-8 shadow-xl",
+              isDark
+                ? "bg-[#18191b] border-white/10 shadow-black/20"
+                : "bg-card border-border shadow-black/5"
+            )}>
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="text-xl font-semibold text-foreground">
                   {isSignUp ? "Create your account" : "Welcome back"}
                 </h2>
-                <p className="text-sm text-white/50 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {isSignUp ? "Sign up to get started with your workspace" : "Sign in to your workspace"}
                 </p>
               </div>
 
               {isSignUp && (
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#8dc572]/10 border border-[#8dc572]/20">
-                  <Shield className="w-4 h-4 text-[#8dc572]" />
-                  <span className="text-xs text-[#8dc572] font-medium">New accounts are automatically assigned admin role</span>
+                <div className="mb-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <Shield className="w-4 h-4 text-emerald-500" />
+                  <span className="text-xs text-emerald-500 font-medium">New accounts are automatically assigned admin role</span>
                 </div>
               )}
 
@@ -316,21 +345,19 @@ export default function Login() {
                 {isSignUp && (
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">First Name</Label>
+                      <Label className="text-sm">First Name</Label>
                       <Input
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        className="bg-[#0b0d10] border-white/10 text-white focus:border-[#6452db] focus:ring-[#6452db]/20"
                         placeholder="John"
                         required={isSignUp}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70 text-sm">Last Name</Label>
+                      <Label className="text-sm">Last Name</Label>
                       <Input
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        className="bg-[#0b0d10] border-white/10 text-white focus:border-[#6452db] focus:ring-[#6452db]/20"
                         placeholder="Doe"
                         required={isSignUp}
                       />
@@ -339,14 +366,14 @@ export default function Login() {
                 )}
 
                 <div className="space-y-2">
-                  <Label className="text-white/70 text-sm">Email</Label>
+                  <Label className="text-sm">Email</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="bg-[#0b0d10] border-white/10 text-white pl-10 focus:border-[#6452db] focus:ring-[#6452db]/20"
+                      className="pl-10"
                       placeholder="admin@company.com"
                       required
                     />
@@ -354,14 +381,14 @@ export default function Login() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-white/70 text-sm">Password</Label>
+                  <Label className="text-sm">Password</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                     <Input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="bg-[#0b0d10] border-white/10 text-white pl-10 pr-10 focus:border-[#6452db] focus:ring-[#6452db]/20"
+                      className="pl-10 pr-10"
                       placeholder="••••••••"
                       required
                       minLength={6}
@@ -369,7 +396,7 @@ export default function Login() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -379,7 +406,7 @@ export default function Login() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90 h-11 text-sm font-medium transition-all"
+                  className="w-full h-11 text-sm font-medium transition-all"
                 >
                   {loading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -401,7 +428,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setIsSignUp(!isSignUp)}
-                  className="text-sm text-[#ff8964] hover:text-[#ff8964]/80 transition-colors"
+                  className="text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up as admin"}
                 </button>
@@ -409,17 +436,17 @@ export default function Login() {
             </div>
 
             {/* Security badges */}
-            <div className="mt-6 flex items-center justify-center gap-4 text-white/30">
+            <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground/50">
               <div className="flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5" />
                 <span className="text-xs">SSL Secured</span>
               </div>
-              <div className="w-1 h-1 rounded-full bg-white/20" />
+              <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
               <div className="flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5" />
                 <span className="text-xs">Encrypted</span>
               </div>
-              <div className="w-1 h-1 rounded-full bg-white/20" />
+              <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
               <div className="flex items-center gap-1.5">
                 <Building2 className="w-3.5 h-3.5" />
                 <span className="text-xs">SOC 2</span>

@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ReferenceLine } from "recharts";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Forecast {
   id: string;
@@ -49,6 +50,7 @@ export default function Forecasts() {
   const [scenarioData, setScenarioData] = useState<any[]>([]);
 
   useEffect(() => { fetchForecasts(); }, []);
+  useRealtimeTable("forecasts", fetchForecasts);
 
   async function fetchForecasts() {
     try {

@@ -23,6 +23,7 @@ import {
 import { EmailTemplateForm } from "@/components/email-templates/EmailTemplateForm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface EmailTemplate {
   id: string;
@@ -52,6 +53,7 @@ export default function EmailTemplates() {
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
 
   useEffect(() => { fetchTemplates(); }, []);
+  useRealtimeTable("email_templates", fetchTemplates);
 
   async function fetchTemplates() {
     try {

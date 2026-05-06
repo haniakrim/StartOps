@@ -30,7 +30,7 @@ export default function Dashboard() {
       change: "+12.5%",
       trend: "up" as const,
       icon: DollarSign,
-      color: "#ff8964",
+      color: "hsl(var(--chart-1))",
     },
     {
       title: "Active Deals",
@@ -38,7 +38,7 @@ export default function Dashboard() {
       change: "+8.2%",
       trend: "up" as const,
       icon: Target,
-      color: "#5683da",
+      color: "hsl(var(--chart-2))",
     },
     {
       title: "Contacts",
@@ -46,7 +46,7 @@ export default function Dashboard() {
       change: "+24.1%",
       trend: "up" as const,
       icon: Users,
-      color: "#6452db",
+      color: "hsl(var(--chart-3))",
     },
     {
       title: "Companies",
@@ -54,27 +54,27 @@ export default function Dashboard() {
       change: "-2.4%",
       trend: "down" as const,
       icon: Building2,
-      color: "#8dc572",
+      color: "hsl(var(--chart-4))",
     },
   ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in-up">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">
             Dashboard
           </h1>
-          <p className="text-sm text-white/50 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Welcome back. Here's what's happening today.
           </p>
         </div>
@@ -87,8 +87,8 @@ export default function Dashboard() {
               onClick={() => setTimeRange(range)}
               className={
                 timeRange === range
-                  ? "bg-[#6452db] text-white hover:bg-[#6452db]/90"
-                  : "text-white/50 hover:text-white hover:bg-white/5"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
               }
             >
               {range.charAt(0).toUpperCase() + range.slice(1)}

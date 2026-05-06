@@ -14,6 +14,7 @@ import {
   Pencil,
   Trash2,
   LayoutGrid,
+  Download,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ActivityBoard } from "@/components/activities/ActivityBoard";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface ActivityItem {
   id: string;
@@ -79,6 +81,8 @@ export default function Activities() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [contacts, setContacts] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
   const [deals, setDeals] = useState<{ id: string; name: string }[]>([]);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [newActivity, setNewActivity] = useState({
     type: "task",
     subject: "",
@@ -88,8 +92,12 @@ export default function Activities() {
     contact_id: "",
     deal_id: "",
   });
+  const [selected, setSelected] = useState<string[]>([]);
 
   useEffect(() => { fetchActivities(); fetchContactsAndDeals(); }, []);
+  useRealtimeTable("activities", fetchActivities);
+  useRealtimeTable("contacts", fetchContactsAndDeals);
+  useRealtimeTable("deals", fetchContactsAndDeals);
 
   async function fetchActivities() {
     try {
@@ -197,8 +205,10 @@ export default function Activities() {
 
   const filtered = activities.filter(
     (a) =>
-      a.subject.toLowerCase().includes(search.toLowerCase()) ||
-      (a.description?.toLowerCase() || "").includes(search.toLowerCase())
+      (a.subject.toLowerCase().includes(search.toLowerCase()) ||
+      (a.description?.toLowerCase() || "").includes(search.toLowerCase())) &&
+      (statusFilter === "all" || a.status === statusFilter) &&
+      (typeFilter === "all" || a.type === typeFilter)
   );
 
   const pending = filtered.filter((a) => a.status !== "completed");
@@ -223,7 +233,25 @@ export default function Activities() {
             Manage tasks, calls, meetings, and emails
           </p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = activities.map(a => ({
+              "Subject": a.subject,
+              "Type": a.type,
+              "Priority": a.priority,
+              "Status": a.status,
+              "Description": a.description || "",
+              "Due Date": a.due_date,
+              "Contact": a.contacts ? `${a.contacts.first_name} ${a.contacts.last_name}` : "",
+              "Deal": a.deals?.name || "",
+            }));
+            import("@/lib/export").then(({ exportToCSV }) => {
+              exportToCSV(exportData, "activities");
+            });
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button
               size="sm"
@@ -366,7 +394,42 @@ export default function Activities() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
+
+      {selected.length > 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#6452db]/10 border border-[#6452db]/20">
+          <span className="text-sm text-white">{selected.length} selected</span>
+          <div className="flex-1" />
+          <Button variant="ghost" size="sm" className="text-[#8dc572] hover:text-[#8dc572] hover:bg-[#8dc572]/10 h-8" onClick={async () => {
+            try {
+              const { error } = await supabase.from("activities").update({ status: "completed", completed_at: new Date().toISOString() }).in("id", selected);
+              if (error) throw error;
+              toast.success(`${selected.length} activities completed`);
+              setSelected([]);
+              fetchActivities();
+            } catch (error: any) {
+              toast.error("Failed to update: " + error.message);
+            }
+          }}>
+            <Check className="w-4 h-4 mr-1" />Complete
+          </Button>
+          <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={async () => {
+            try {
+              const { error } = await supabase.from("activities").delete().in("id", selected);
+              if (error) throw error;
+              toast.success(`${selected.length} activities deleted`);
+              setSelected([]);
+              fetchActivities();
+            } catch (error: any) {
+              toast.error("Failed to delete: " + error.message);
+            }
+          }}>
+            <Trash2 className="w-4 h-4 mr-1" />Delete
+          </Button>
+          <Button variant="ghost" size="sm" className="text-white/50 hover:text-white h-8" onClick={() => setSelected([])}>Clear</Button>
+        </div>
+      )}
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
@@ -379,14 +442,30 @@ export default function Activities() {
             className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50"
           />
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"
-        >
-          <Filter className="w-4 h-4 mr-2" />
-          Filters
-        </Button>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+            <Filter className="w-3 h-3 mr-2" />
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-36 h-9 text-xs">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="task">Task</SelectItem>
+            <SelectItem value="call">Call</SelectItem>
+            <SelectItem value="meeting">Meeting</SelectItem>
+            <SelectItem value="email">Email</SelectItem>
+            <SelectItem value="note">Note</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
@@ -446,6 +525,12 @@ export default function Activities() {
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
+                          <input
+                            type="checkbox"
+                            className="mt-0.5 rounded border-white/20 bg-transparent"
+                            checked={selected.includes(activity.id)}
+                            onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, activity.id] : prev.filter((id) => id !== activity.id))}
+                          />
                           <button
                             onClick={() =>
                               toggleComplete(activity.id, activity.status)

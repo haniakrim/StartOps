@@ -4,6 +4,7 @@ import {
   File, Image, FileSpreadsheet, FileCode, MoreHorizontal, Filter,
   Clock, User, Building2, Tag
 } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Document {
   id: string;
@@ -73,6 +75,7 @@ export default function Documents() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
   const [newDoc, setNewDoc] = useState({
     name: "",
     category: "general",
@@ -82,6 +85,7 @@ export default function Documents() {
   });
 
   useEffect(() => { fetchDocuments(); }, []);
+  useRealtimeTable("documents", fetchDocuments);
 
   async function fetchDocuments() {
     try {
@@ -158,7 +162,21 @@ export default function Documents() {
           <h1 className="text-2xl font-semibold text-white tracking-tight">Documents</h1>
           <p className="text-sm text-white/50 mt-1">Manage files, contracts, and attachments</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = documents.map(d => ({
+              "Name": d.name,
+              "Category": d.category,
+              "Type": d.type,
+              "Size (KB)": d.size,
+              "Tags": (d.tags || []).join(", "),
+              "Created": d.created_at,
+            }));
+            exportToCSV(exportData, "documents");
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />Add Document
@@ -267,6 +285,27 @@ export default function Documents() {
         </Select>
       </div>
 
+      {selected.length > 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#6452db]/10 border border-[#6452db]/20">
+          <span className="text-sm text-white">{selected.length} selected</span>
+          <div className="flex-1" />
+          <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={async () => {
+            try {
+              const { error } = await supabase.from("documents").delete().in("id", selected);
+              if (error) throw error;
+              toast.success(`${selected.length} documents deleted`);
+              setSelected([]);
+              fetchDocuments();
+            } catch (error: any) {
+              toast.error("Failed to delete: " + error.message);
+            }
+          }}>
+            <Trash2 className="w-4 h-4 mr-1" />Delete
+          </Button>
+          <Button variant="ghost" size="sm" className="text-white/50 hover:text-white h-8" onClick={() => setSelected([])}>Clear</Button>
+        </div>
+      )}
+
       <Tabs defaultValue="grid" className="w-full">
         <TabsList className="bg-[#18191b] border border-white/10">
           <TabsTrigger value="grid" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50">Grid</TabsTrigger>
@@ -281,8 +320,14 @@ export default function Documents() {
               const color = fileColors[ext] || "#6452db";
               return (
                 <Card key={doc.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors group">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <input
+                          type="checkbox"
+                          className="rounded border-white/20 bg-transparent"
+                          checked={selected.includes(doc.id)}
+                          onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, doc.id] : prev.filter((id) => id !== doc.id))}
+                        />
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
                         <Icon className="w-5 h-5" style={{ color }} />
                       </div>

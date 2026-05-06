@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import AppShell from "@/components/AppShell";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -49,8 +50,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0b0d10] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#6452db] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -67,8 +68,8 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0b0d10] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#6452db] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -82,290 +83,292 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/today"
-              element={
-                <ProtectedRoute>
-                  <Today />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/contacts"
-              element={
-                <ProtectedRoute>
-                  <Contacts />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/companies"
-              element={
-                <ProtectedRoute>
-                  <Companies />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/deals"
-              element={
-                <ProtectedRoute>
-                  <Deals />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/organization"
-              element={
-                <ProtectedRoute>
-                  <Organization />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/security"
-              element={
-                <ProtectedRoute>
-                  <Security />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports"
-              element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/goals"
-              element={
-                <ProtectedRoute>
-                  <Goals />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/notifications"
-              element={
-                <ProtectedRoute>
-                  <Notifications />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/api"
-              element={
-                <ProtectedRoute>
-                  <Api />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/audit"
-              element={
-                <ProtectedRoute>
-                  <Audit />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/support"
-              element={
-                <ProtectedRoute>
-                  <Support />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/activities"
-              element={
-                <ProtectedRoute>
-                  <Activities />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/assistant"
-              element={
-                <ProtectedRoute>
-                  <Assistant />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/finance"
-              element={
-                <ProtectedRoute>
-                  <Finance />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/inventory"
-              element={
-                <ProtectedRoute>
-                  <Inventory />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/projects"
-              element={
-                <ProtectedRoute>
-                  <Projects />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/employees"
-              element={
-                <ProtectedRoute>
-                  <Employees />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/workflows"
-              element={
-                <ProtectedRoute>
-                  <Workflows />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/custom-fields"
-              element={
-                <ProtectedRoute>
-                  <CustomFields />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/communications"
-              element={
-                <ProtectedRoute>
-                  <Communications />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/calendar"
-              element={
-                <ProtectedRoute>
-                  <Calendar />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/forecasts"
-              element={
-                <ProtectedRoute>
-                  <Forecasts />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/timesheets"
-              element={
-                <ProtectedRoute>
-                  <Timesheets />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/quotes"
-              element={
-                <ProtectedRoute>
-                  <Quotes />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/email-templates"
-              element={
-                <ProtectedRoute>
-                  <EmailTemplates />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/documents"
-              element={
-                <ProtectedRoute>
-                  <Documents />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/subscriptions"
-              element={
-                <ProtectedRoute>
-                  <Subscriptions />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/campaigns"
-              element={
-                <ProtectedRoute>
-                  <Campaigns />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/today"
+                element={
+                  <ProtectedRoute>
+                    <Today />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contacts"
+                element={
+                  <ProtectedRoute>
+                    <Contacts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/companies"
+                element={
+                  <ProtectedRoute>
+                    <Companies />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/deals"
+                element={
+                  <ProtectedRoute>
+                    <Deals />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/organization"
+                element={
+                  <ProtectedRoute>
+                    <Organization />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/security"
+                element={
+                  <ProtectedRoute>
+                    <Security />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analytics"
+                element={
+                  <ProtectedRoute>
+                    <Analytics />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports"
+                element={
+                  <ProtectedRoute>
+                    <Reports />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/goals"
+                element={
+                  <ProtectedRoute>
+                    <Goals />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Notifications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/api"
+                element={
+                  <ProtectedRoute>
+                    <Api />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/audit"
+                element={
+                  <ProtectedRoute>
+                    <Audit />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/support"
+                element={
+                  <ProtectedRoute>
+                    <Support />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/activities"
+                element={
+                  <ProtectedRoute>
+                    <Activities />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/assistant"
+                element={
+                  <ProtectedRoute>
+                    <Assistant />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/finance"
+                element={
+                  <ProtectedRoute>
+                    <Finance />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/inventory"
+                element={
+                  <ProtectedRoute>
+                    <Inventory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/projects"
+                element={
+                  <ProtectedRoute>
+                    <Projects />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/employees"
+                element={
+                  <ProtectedRoute>
+                    <Employees />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/workflows"
+                element={
+                  <ProtectedRoute>
+                    <Workflows />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/custom-fields"
+                element={
+                  <ProtectedRoute>
+                    <CustomFields />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/communications"
+                element={
+                  <ProtectedRoute>
+                    <Communications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/calendar"
+                element={
+                  <ProtectedRoute>
+                    <Calendar />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/forecasts"
+                element={
+                  <ProtectedRoute>
+                    <Forecasts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/timesheets"
+                element={
+                  <ProtectedRoute>
+                    <Timesheets />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/quotes"
+                element={
+                  <ProtectedRoute>
+                    <Quotes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/email-templates"
+                element={
+                  <ProtectedRoute>
+                    <EmailTemplates />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/documents"
+                element={
+                  <ProtectedRoute>
+                    <Documents />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/subscriptions"
+                element={
+                  <ProtectedRoute>
+                    <Subscriptions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/campaigns"
+                element={
+                  <ProtectedRoute>
+                    <Campaigns />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

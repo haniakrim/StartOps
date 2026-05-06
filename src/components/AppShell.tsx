@@ -33,6 +33,7 @@ import {
   Clock,
   Target,
   Sun,
+  Moon,
   BookOpen,
   ChevronDown,
   ChevronRight,
@@ -43,6 +44,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { CommandPalette } from "@/components/CommandPalette";
 import { RealtimeNotifications } from "@/components/RealtimeNotifications";
 import { cn } from "@/lib/utils";
@@ -144,14 +146,14 @@ function SidebarNavItem({
       className={cn(
         "group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative",
         isActive
-          ? "bg-[#6452db]/15 text-[#ff8964]"
-          : "text-white/50 hover:text-white hover:bg-white/[0.04]"
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:text-foreground hover:bg-accent"
       )}
     >
       <item.icon
         className={cn(
           "w-[18px] h-[18px] flex-shrink-0 transition-colors",
-          isActive ? "text-[#ff8964]" : "text-white/40 group-hover:text-white/60"
+          isActive ? "text-primary" : "text-muted-foreground/60 group-hover:text-muted-foreground"
         )}
       />
       {!collapsed && (
@@ -160,13 +162,13 @@ function SidebarNavItem({
           {item.badge && (
             <Badge
               variant="secondary"
-              className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-[#ff8964]/20 text-[#ff8964] border-0"
+              className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-primary/15 text-primary border-0"
             >
               {item.badge}
             </Badge>
           )}
           {isActive && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#ff8964]" />
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
           )}
         </>
       )}
@@ -211,7 +213,7 @@ function NavGroupSection({
         onClick={() => toggleGroup(group.label)}
         className={cn(
           "flex items-center gap-2 w-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors",
-          hasActiveItem ? "text-[#ff8964]/80" : "text-white/25 hover:text-white/40"
+          hasActiveItem ? "text-primary/80" : "text-muted-foreground/40 hover:text-muted-foreground/60"
         )}
       >
         <span className="flex-1 text-left">{group.label}</span>
@@ -238,6 +240,35 @@ function NavGroupSection({
         ))}
       </div>
     </div>
+  );
+}
+
+function ThemeToggle() {
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleTheme}
+      className="relative w-9 h-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-300"
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+    >
+      <Sun
+        className={cn(
+          "w-[18px] h-[18px] absolute transition-all duration-300",
+          isDark ? "opacity-0 rotate-90 scale-0" : "opacity-100 rotate-0 scale-100"
+        )}
+      />
+      <Moon
+        className={cn(
+          "w-[18px] h-[18px] absolute transition-all duration-300",
+          isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-0"
+        )}
+      />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   );
 }
 
@@ -274,11 +305,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const userRole = profile?.role || "Member";
 
   return (
-    <div className="min-h-screen bg-[#0b0d10] text-white flex">
+    <div className="min-h-screen bg-background text-foreground flex">
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -286,36 +317,36 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-50 bg-[#0d0f12] border-r border-white/[0.06] transition-all duration-300 ease-out flex flex-col",
+          "fixed lg:static inset-y-0 left-0 z-50 bg-sidebar border-r border-border transition-all duration-300 ease-out flex flex-col",
           collapsed ? "w-[72px]" : "w-[260px]",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-4 border-b border-white/[0.06] flex-shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#6452db] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#6452db]/20">
-            <span className="text-white font-bold text-sm">S</span>
+        <div className="h-16 flex items-center px-4 border-b border-border flex-shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
+            <span className="text-primary-foreground font-bold text-sm">S</span>
           </div>
           {!collapsed && (
             <div className="ml-3 flex items-center gap-2">
-              <span className="font-semibold text-white tracking-tight text-[15px]">
+              <span className="font-semibold text-sidebar-foreground tracking-tight text-[15px]">
                 StartOps
               </span>
-              <Badge className="bg-[#6452db]/20 text-[#a78bfa] border-[#6452db]/30 text-[10px] px-1.5 py-0 h-4 hover:bg-[#6452db]/20">
+              <Badge className="bg-primary/15 text-primary border-primary/20 text-[10px] px-1.5 py-0 h-4 hover:bg-primary/15">
                 Pro
               </Badge>
             </div>
           )}
           <button
             onClick={() => setMobileOpen(false)}
-            className="lg:hidden ml-auto text-white/40 hover:text-white p-1"
+            className="lg:hidden ml-auto text-muted-foreground hover:text-foreground p-1"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-3 px-2 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <nav className="flex-1 py-3 px-2 overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
           {navGroups.map((group) => (
             <NavGroupSection
               key={group.label}
@@ -329,11 +360,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Bottom section */}
-        <div className="p-3 border-t border-white/[0.06] flex-shrink-0">
+        <div className="p-3 border-t border-border flex-shrink-0">
           {/* Collapse toggle */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex w-full items-center justify-center p-2 rounded-lg text-white/25 hover:text-white/50 hover:bg-white/[0.04] transition-all mb-2"
+            className="hidden lg:flex w-full items-center justify-center p-2 rounded-lg text-muted-foreground/40 hover:text-muted-foreground hover:bg-accent transition-all mb-2"
           >
             {collapsed ? (
               <ChevronRight className="w-4 h-4" />
@@ -346,9 +377,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </button>
 
           {/* User profile */}
-          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/[0.04] transition-colors group">
-            <Avatar className="w-8 h-8 bg-gradient-to-br from-[#6452db] to-[#8b5cf6] ring-2 ring-white/5">
-              <AvatarFallback className="bg-transparent text-white text-xs font-medium">
+          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-accent transition-colors group">
+            <Avatar className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 ring-2 ring-border">
+              <AvatarFallback className="bg-transparent text-primary-foreground text-xs font-medium">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
@@ -358,16 +389,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   onClick={() => (window.location.href = "/profile")}
                   className="flex-1 min-w-0 text-left"
                 >
-                  <p className="text-sm font-medium text-white/90 truncate group-hover:text-white transition-colors">
+                  <p className="text-sm font-medium text-sidebar-foreground/90 truncate group-hover:text-sidebar-foreground transition-colors">
                     {userName}
                   </p>
-                  <p className="text-[11px] text-white/30 truncate capitalize">
+                  <p className="text-[11px] text-muted-foreground truncate capitalize">
                     {userRole}
                   </p>
                 </button>
                 <button
                   onClick={signOut}
-                  className="text-white/20 hover:text-[#be6464] transition-colors p-1.5 rounded-lg hover:bg-white/[0.04]"
+                  className="text-muted-foreground/40 hover:text-destructive transition-colors p-1.5 rounded-lg hover:bg-accent"
                   title="Sign out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -383,10 +414,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <CommandPalette />
 
         {/* Header */}
-        <header className="h-16 flex items-center gap-4 px-6 border-b border-white/[0.06] bg-[#0b0d10]/80 backdrop-blur-xl sticky top-0 z-30">
+        <header className="h-16 flex items-center gap-4 px-6 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-30">
           <button
             onClick={() => setMobileOpen(true)}
-            className="lg:hidden text-white/40 hover:text-white p-2 -ml-2 rounded-lg hover:bg-white/[0.04] transition-colors"
+            className="lg:hidden text-muted-foreground hover:text-foreground p-2 -ml-2 rounded-lg hover:bg-accent transition-colors"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -403,14 +434,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 window.dispatchEvent(event);
               }}
             >
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-hover:text-white/40 transition-colors" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 group-hover:text-muted-foreground/70 transition-colors" />
               <input
                 type="text"
                 readOnly
                 placeholder="Search commands, pages, actions..."
-                className="w-full bg-[#13151a] border border-white/[0.06] rounded-xl pl-9 pr-16 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#6452db]/30 focus:ring-1 focus:ring-[#6452db]/20 cursor-pointer transition-all"
+                className="w-full bg-muted border border-border rounded-xl pl-9 pr-16 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/30 focus:ring-1 focus:ring-primary/20 cursor-pointer transition-all"
               />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-white/20 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground/40 bg-muted px-1.5 py-0.5 rounded border border-border">
                 ⌘K
               </kbd>
             </div>
@@ -418,12 +449,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Actions */}
           <div className="flex items-center gap-1">
+            <ThemeToggle />
             <RealtimeNotifications />
             <Button
               variant="ghost"
               size="icon"
               onClick={signOut}
-              className="text-white/40 hover:text-[#be6464] hover:bg-white/[0.04] rounded-xl"
+              className="text-muted-foreground hover:text-destructive hover:bg-accent rounded-xl"
               title="Sign out"
             >
               <LogOut className="w-5 h-5" />

@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DealDetail } from "@/components/DealDetail";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Deal {
   id: string;
@@ -56,6 +57,8 @@ export default function Deals() {
   const [contacts, setContacts] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
 
   useEffect(() => { fetchPipelineAndDeals(); fetchContactsForSelect(); }, []);
+  useRealtimeTable("deals", fetchPipelineAndDeals);
+  useRealtimeTable("contacts", fetchContactsForSelect);
 
   async function fetchPipelineAndDeals() {
     try {

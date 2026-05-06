@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import {
   Clock, Plus, Search, Loader2, Calendar, Briefcase, User,
-  TrendingUp, CheckCircle2, AlertCircle, Trash2
+  TrendingUp, CheckCircle2, AlertCircle, Trash2, Download
 } from "lucide-react";
+import { exportToCSV } from "@/lib/export";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { TimeTracker } from "@/components/timesheets/TimeTracker";
 import { RecentSessions } from "@/components/timesheets/RecentSessions";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface TimeEntry {
   id: string;
@@ -60,6 +62,8 @@ export default function Timesheets() {
   });
 
   useEffect(() => { fetchData(); }, []);
+  useRealtimeTable("time_entries", fetchData);
+  useRealtimeTable("projects", fetchData);
 
   async function fetchData() {
     try {
@@ -158,7 +162,21 @@ export default function Timesheets() {
           <h1 className="text-2xl font-semibold text-white tracking-tight">Timesheets</h1>
           <p className="text-sm text-white/50 mt-1">Track time across projects and tasks</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+            const exportData = entries.map(e => ({
+              "Date": e.date,
+              "Project": e.projects?.name || "",
+              "Task": e.project_tasks?.name || "",
+              "Description": e.description || "",
+              "Hours": e.hours,
+              "Billable": e.billable ? "Yes" : "No",
+            }));
+            exportToCSV(exportData, "timesheets");
+          }}>
+            <Download className="w-4 h-4 mr-2" />Export
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
               <Plus className="w-4 h-4 mr-2" />Manual Entry
