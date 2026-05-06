@@ -59,6 +59,7 @@ const navItems = [
   { path: "/organization", icon: Settings, label: "Organization" },
   { path: "/security", icon: Shield, label: "Security" },
   { path: "/analytics", icon: BarChart3, label: "Analytics" },
+  { path: "/reports", icon: FileText, label: "Reports" },
   { path: "/api", icon: Webhook, label: "API & Webhooks" },
   { path: "/audit", icon: FileText, label: "Audit Logs" },
   { path: "/support", icon: LifeBuoy, label: "Support" },
