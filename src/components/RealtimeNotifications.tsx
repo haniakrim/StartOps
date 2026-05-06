@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface RealtimeNotification {
   id: string;
@@ -15,6 +16,7 @@ interface RealtimeNotification {
 }
 
 export function RealtimeNotifications() {
+  const { organizationId } = useOrganization();
   const [notifications, setNotifications] = useState<RealtimeNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
@@ -30,20 +32,25 @@ export function RealtimeNotifications() {
     const channels = [
       supabase.channel("deals-changes")
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "deals" }, (payload) => {
+          const newRecord = payload.new as Record<string, any>;
+          if (organizationId && newRecord.organization_id && newRecord.organization_id !== organizationId) return;
           addNotification({
             type: "success",
             title: "New Deal Created",
-            message: `Deal "${(payload.new as any).name}" was created`,
+            message: `Deal "${newRecord.name}" was created`,
           });
         })
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "deals" }, (payload) => {
-          const oldStage = (payload.old as any).stage;
-          const newStage = (payload.new as any).stage;
+          const newRecord = payload.new as Record<string, any>;
+          const oldRecord = payload.old as Record<string, any>;
+          if (organizationId && newRecord.organization_id && newRecord.organization_id !== organizationId) return;
+          const oldStage = oldRecord.stage;
+          const newStage = newRecord.stage;
           if (oldStage !== newStage) {
             addNotification({
               type: "info",
               title: "Deal Stage Changed",
-              message: `"${(payload.new as any).name}" moved from ${oldStage} to ${newStage}`,
+              message: `"${newRecord.name}" moved from ${oldStage} to ${newStage}`,
             });
           }
         })
@@ -51,20 +58,24 @@ export function RealtimeNotifications() {
 
       supabase.channel("contacts-changes")
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "contacts" }, (payload) => {
+          const newRecord = payload.new as Record<string, any>;
+          if (organizationId && newRecord.organization_id && newRecord.organization_id !== organizationId) return;
           addNotification({
             type: "info",
             title: "New Contact Added",
-            message: `${(payload.new as any).first_name} ${(payload.new as any).last_name} was added`,
+            message: `${newRecord.first_name} ${newRecord.last_name} was added`,
           });
         })
         .subscribe(),
 
       supabase.channel("activities-changes")
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "activities" }, (payload) => {
+          const newRecord = payload.new as Record<string, any>;
+          if (organizationId && newRecord.organization_id && newRecord.organization_id !== organizationId) return;
           addNotification({
             type: "warning",
             title: "New Activity",
-            message: `New ${(payload.new as any).type}: ${(payload.new as any).subject}`,
+            message: `New ${newRecord.type}: ${newRecord.subject}`,
           });
         })
         .subscribe(),
@@ -73,7 +84,7 @@ export function RealtimeNotifications() {
     return () => {
       channels.forEach(ch => ch.unsubscribe());
     };
-  }, []);
+  }, [organizationId]);
 
   function addNotification(notification: Omit<RealtimeNotification, "id" | "created_at" | "read">) {
     const newNotification: RealtimeNotification = {

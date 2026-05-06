@@ -21,6 +21,41 @@ interface WebhookItem {
   created_at: string;
 }
 
+function isValidWebhookUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return false;
+    }
+    const hostname = parsed.hostname.toLowerCase();
+    if (hostname === "localhost" || hostname.endsWith(".localhost")) {
+      return false;
+    }
+    // Reject private IP ranges
+    const privateRanges = [
+      /^127\./,
+      /^10\./,
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+      /^192\.168\./,
+      /^169\.254\./,
+      /^0\./,
+      /^::1$/,
+      /^fc00:/i,
+      /^fe80:/i,
+    ];
+    if (privateRanges.some((regex) => regex.test(hostname))) {
+      return false;
+    }
+    // Reject metadata endpoints
+    if (hostname === "169.254.169.254" || hostname.endsWith(".internal") || hostname.endsWith(".local")) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function Api() {
   const { organizationId } = useOrganization();
   const [webhooks, setWebhooks] = useState<WebhookItem[]>([]);
@@ -60,6 +95,10 @@ export default function Api() {
     try {
       if (!organizationId) {
         toast.error("No organization found. Please sign out and sign in again.");
+        return;
+      }
+      if (!isValidWebhookUrl(newWebhook.url)) {
+        toast.error("Invalid webhook URL. URLs must use http/https, and cannot point to localhost, private IP addresses, or internal metadata endpoints.");
         return;
       }
       const { error } = await supabase.from("webhooks").insert({

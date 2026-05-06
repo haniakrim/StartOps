@@ -1,0 +1,1 @@
+ALTER TABLE comments ADD COLUMN IF NOT EXISTS organization_id UUID;

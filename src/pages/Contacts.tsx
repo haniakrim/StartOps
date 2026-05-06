@@ -67,7 +67,7 @@ export default function Contacts() {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   useEffect(() => { fetchContacts(); }, [organizationId]);
-  useRealtimeTable("contacts", fetchContacts);
+  useRealtimeTable("contacts", fetchContacts, [organizationId], organizationId);
 
   async function fetchContacts() {
     try {
@@ -197,8 +197,16 @@ export default function Contacts() {
   }
 
   async function bulkDelete() {
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
-      const { error } = await supabase.from("contacts").delete().in("id", selected);
+      const { error } = await supabase
+        .from("contacts")
+        .delete()
+        .eq("organization_id", organizationId)
+        .in("id", selected);
       if (error) throw error;
       toast.success(`${selected.length} contacts deleted`);
       setSelected([]);
@@ -209,8 +217,16 @@ export default function Contacts() {
   }
 
   async function bulkUpdateStatus(status: string) {
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
-      const { error } = await supabase.from("contacts").update({ status }).in("id", selected);
+      const { error } = await supabase
+        .from("contacts")
+        .update({ status })
+        .eq("organization_id", organizationId)
+        .in("id", selected);
       if (error) throw error;
       toast.success(`${selected.length} contacts updated`);
       setSelected([]);

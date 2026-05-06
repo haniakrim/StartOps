@@ -152,9 +152,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-  const [failedAttempts, setFailedAttempts] = useState(0);
-  const [isRateLimited, setIsRateLimited] = useState(false);
-  const [rateLimitTimer, setRateLimitTimer] = useState(0);
 
   useEffect(() => {
     if (user) {
@@ -163,22 +160,6 @@ export default function Login() {
     const timer = setTimeout(() => setFormVisible(true), 100);
     return () => clearTimeout(timer);
   }, [user, navigate]);
-
-  useEffect(() => {
-    if (rateLimitTimer > 0) {
-      const timer = setTimeout(() => {
-        setRateLimitTimer((prev) => {
-          const next = prev - 1;
-          if (next <= 0) {
-            setIsRateLimited(false);
-            return 0;
-          }
-          return next;
-        });
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [rateLimitTimer]);
 
   function validatePassword(pw: string): string | null {
     if (pw.length < 8) return "Password must be at least 8 characters";
@@ -191,11 +172,6 @@ export default function Login() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
-    if (isRateLimited) {
-      toast.error(`Please wait ${rateLimitTimer} seconds before trying again.`);
-      return;
-    }
 
     if (isSignUp) {
       const pwError = validatePassword(password);
@@ -238,12 +214,12 @@ export default function Login() {
             .insert({
               organization_id: orgData.id,
               user_id: data.user!.id,
-              role: "admin",
+              role: "user",
             });
 
           if (memError) throw memError;
 
-          toast.success("Account created! Welcome, admin.");
+          toast.success("Account created! Welcome.");
           navigate("/dashboard");
         } else {
           toast.success("Account created! Check your email to confirm, then sign in.");
@@ -255,23 +231,8 @@ export default function Login() {
           password,
         });
         if (error) {
-          const newAttempts = failedAttempts + 1;
-          setFailedAttempts(newAttempts);
-          if (newAttempts >= 5) {
-            setIsRateLimited(true);
-            setRateLimitTimer(60);
-            toast.error("Too many failed attempts. Please wait 60 seconds.");
-          } else if (newAttempts >= 3) {
-            setIsRateLimited(true);
-            setRateLimitTimer(30);
-            toast.error("Too many failed attempts. Please wait 30 seconds.");
-          } else {
-            throw error;
-          }
-          setLoading(false);
-          return;
+          throw error;
         }
-        setFailedAttempts(0);
         toast.success("Signed in successfully");
         navigate("/dashboard");
       }
@@ -396,7 +357,7 @@ export default function Login() {
               {isSignUp && (
                 <div className="mb-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                   <Shield className="w-4 h-4 text-emerald-500" />
-                  <span className="text-xs text-emerald-500 font-medium">New accounts are automatically assigned admin role</span>
+                  <span className="text-xs text-emerald-500 font-medium">New accounts are assigned user role</span>
                 </div>
               )}
 
@@ -472,7 +433,7 @@ export default function Login() {
                   ) : isSignUp ? (
                     <>
                       <UserPlus className="w-4 h-4 mr-2" />
-                      Create Admin Account
+                      Create Account
                     </>
                   ) : (
                     <>
@@ -489,7 +450,7 @@ export default function Login() {
                   onClick={() => setIsSignUp(!isSignUp)}
                   className="text-sm text-expo-blue hover:text-expo-blue/80 transition-colors"
                 >
-                  {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up as admin"}
+                  {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
                 </button>
               </div>
             </div>

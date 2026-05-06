@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Comment {
   id: string;
@@ -22,6 +23,7 @@ interface CommentsSectionProps {
 
 export function CommentsSection({ entityType, entityId }: CommentsSectionProps) {
   const { user, profile } = useAuth();
+  const { organizationId } = useOrganization();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
@@ -56,6 +58,10 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
 
   async function addComment() {
     if (!newComment.trim() || !entityId) return;
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
       const { error } = await supabase.from("comments").insert({
         entity_type: entityType,
@@ -63,6 +69,7 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
         text: newComment.trim(),
         author_name: authorName,
         user_id: user?.id || null,
+        organization_id: organizationId,
       });
 
       if (error) throw error;
