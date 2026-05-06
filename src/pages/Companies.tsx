@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRealtimeTable } from "@/hooks/useRealtime";
 
 interface Company {
   id: string;
@@ -39,6 +40,7 @@ export default function Companies() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [form, setForm] = useState({
@@ -46,6 +48,7 @@ export default function Companies() {
   });
 
   useEffect(() => { fetchCompanies(); }, []);
+  useRealtimeTable("companies", fetchCompanies);
 
   async function fetchCompanies() {
     try {
@@ -109,6 +112,49 @@ export default function Companies() {
     }
   }
 
+  async function bulkDelete() {
+    try {
+      const { error } = await supabase.from("companies").delete().in("id", selected);
+      if (error) throw error;
+      toast.success(`${selected.length} companies deleted`);
+      setSelected([]);
+      fetchCompanies();
+    } catch (error: any) {
+      toast.error("Failed to delete companies: " + error.message);
+    }
+  }
+
+  async function bulkUpdateStatus(status: string) {
+    try {
+      const { error } = await supabase.from("companies").update({ status }).in("id", selected);
+      if (error) throw error;
+      toast.success(`Status updated for ${selected.length} companies`);
+      setSelected([]);
+      fetchCompanies();
+    } catch (error: any) {
+      toast.error("Failed to update status: " + error.message);
+    }
+  }
+
+  function exportCompanies() {
+    const data = selected.length > 0 ? companies.filter(c => selected.includes(c.id)) : companies;
+    const csv = [
+      ["Name", "Industry", "Size", "Location", "Website", "Revenue", "Health", "Status", "Notes"].join(","),
+      ...data.map(c =>
+        [c.name, c.industry || "", c.size || "", c.location || "", c.website || "", c.revenue || "", c.health, c.status, c.notes || ""].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `companies-export-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${data.length} companies exported`);
+    setSelected([]);
+  }
+
   function editCompany(company: Company) {
     setEditingCompany(company);
     setForm({
@@ -151,7 +197,7 @@ export default function Companies() {
           <p className="text-sm text-white/50 mt-1">Manage your accounts and organizations</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5">
+          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={exportCompanies}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
           <Dialog open={dialogOpen} onOpenChange={(open) => {
@@ -227,6 +273,31 @@ export default function Companies() {
         </div>
       </div>
 
+      {/* Bulk Actions */}
+      {selected.length > 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#6452db]/10 border border-[#6452db]/20">
+          <span className="text-sm text-white">{selected.length} selected</span>
+          <div className="flex-1" />
+          <Select onValueChange={bulkUpdateStatus}>
+            <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white w-40 h-8 text-xs">
+              <SelectValue placeholder="Change status" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+              <SelectItem value="Lead">Lead</SelectItem>
+              <SelectItem value="Prospect">Prospect</SelectItem>
+              <SelectItem value="Customer">Customer</SelectItem>
+              <SelectItem value="At Risk">At Risk</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={bulkDelete}>
+            <Trash2 className="w-4 h-4 mr-1" />Delete
+          </Button>
+          <Button variant="ghost" size="sm" className="text-white/50 hover:text-white h-8" onClick={() => setSelected([])}>
+            Clear
+          </Button>
+        </div>
+      )}
+
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
@@ -241,8 +312,16 @@ export default function Companies() {
           <Card key={company.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
             <CardContent className="p-5">
               <div className="flex items-start justify-between mb-4">
-                <div className="w-10 h-10 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-[#6452db]" />
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    className="rounded border-white/20 bg-transparent"
+                    checked={selected.includes(company.id)}
+                    onChange={(e) => setSelected((prev) => e.target.checked ? [...prev, company.id] : prev.filter((id) => id !== company.id))}
+                  />
+                  <div className="w-10 h-10 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-[#6452db]" />
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className={`text-xs ${statusColors[company.status] || statusColors.Prospect}`}>{company.status}</Badge>

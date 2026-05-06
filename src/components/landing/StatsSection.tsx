@@ -22,7 +22,7 @@ export default function StatsSection() {
         >
           <div className="text-4xl lg:text-5xl font-bold text-white mb-2">
             <AnimatedCounter
-              target={stat.value}
+              end={stat.value}
               suffix={stat.suffix}
               duration={2.5}
             />

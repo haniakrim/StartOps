@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HeroDashboardPreview from "@/components/landing/HeroDashboardPreview";
+import LogoCloud from "@/components/landing/LogoCloud";
 import ModuleGrid from "@/components/landing/ModuleGrid";
 import StatsSection from "@/components/landing/StatsSection";
 import FeatureSection from "@/components/landing/FeatureSection";
@@ -197,6 +198,16 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Logo Cloud */}
+      <section className="py-8 border-y border-white/5">
+        <div className="max-w-6xl mx-auto px-6">
+          <p className="text-center text-xs text-white/20 uppercase tracking-widest mb-4">
+            Trusted by innovative teams
+          </p>
+          <LogoCloud />
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="py-16 border-y border-white/5">
         <div className="max-w-6xl mx-auto px-6">
@@ -232,7 +243,6 @@ export default function Index() {
           <FeatureSection
             title="AI-powered insights that actually matter"
             description="Stop guessing. Start knowing. Our AI analyzes your pipeline, identifies at-risk deals, forecasts revenue, and surfaces anomalies before they become problems."
-            badge="AI Intelligence"
           >
             <div className="bg-[#18191b] border border-white/10 rounded-xl p-5 space-y-3">
               {[
@@ -280,7 +290,6 @@ export default function Index() {
             title="Visual pipeline that moves as fast as you do"
             description="Drag-and-drop deals across stages. See pipeline value at a glance. Track probability, expected close dates, and lead sources — all in a beautiful Kanban view."
             reversed
-            badge="Sales"
           >
             <div className="bg-[#18191b] border border-white/10 rounded-xl p-5">
               <div className="flex gap-3 overflow-x-auto pb-2">
@@ -351,7 +360,6 @@ export default function Index() {
           <FeatureSection
             title="Finance that keeps up with your ambition"
             description="Invoices, expenses, vendor management, and cash flow forecasting — all with AI anomaly detection that catches issues before they cost you."
-            badge="Finance"
           >
             <div className="bg-[#18191b] border border-white/10 rounded-xl p-5 space-y-4">
               <div className="grid grid-cols-2 gap-3">
