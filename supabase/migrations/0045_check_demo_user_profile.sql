@@ -1,0 +1,1 @@
+SELECT * FROM public.profiles WHERE email = 'demo@example.com' LIMIT 1;

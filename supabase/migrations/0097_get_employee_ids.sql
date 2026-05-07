@@ -1,0 +1,1 @@
+SELECT id, first_name, last_name FROM public.employees WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542';

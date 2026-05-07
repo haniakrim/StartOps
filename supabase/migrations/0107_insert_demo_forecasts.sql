@@ -1,0 +1,5 @@
+-- Insert Forecasts
+INSERT INTO public.forecasts (organization_id, name, period, projected_revenue, weighted_revenue, confidence_low, confidence_high, factors) VALUES
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Q1 2025 Revenue Forecast', 'Q1 2025', 2100000, 1680000, 1450000, 2350000, '[{"factor": "Pipeline growth", "impact": "positive", "weight": 0.3}, {"factor": "Seasonal trends", "impact": "neutral", "weight": 0.2}, {"factor": "Economic conditions", "impact": "negative", "weight": 0.15}]'),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Q2 2025 Revenue Forecast', 'Q2 2025', 2450000, 1960000, 1750000, 2800000, '[{"factor": "New product launch", "impact": "positive", "weight": 0.35}, {"factor": "Market expansion", "impact": "positive", "weight": 0.25}, {"factor": "Competition", "impact": "negative", "weight": 0.2}]'),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Annual 2025 Forecast', '2025', 9800000, 7840000, 7200000, 11500000, '[{"factor": "Enterprise deals", "impact": "positive", "weight": 0.4}, {"factor": "Retention rate", "impact": "positive", "weight": 0.3}, {"factor": "Churn risk", "impact": "negative", "weight": 0.15}]');

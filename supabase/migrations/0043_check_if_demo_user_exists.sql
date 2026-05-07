@@ -1,0 +1,1 @@
+SELECT id, email FROM auth.users WHERE email = 'demo@example.com' LIMIT 1;

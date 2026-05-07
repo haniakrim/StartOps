@@ -1,0 +1,1 @@
+SELECT id, quote_number FROM public.quotes WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542' LIMIT 3;

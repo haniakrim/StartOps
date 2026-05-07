@@ -1,0 +1,16 @@
+SELECT 
+  (SELECT COUNT(*) FROM public.companies WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as companies,
+  (SELECT COUNT(*) FROM public.contacts WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as contacts,
+  (SELECT COUNT(*) FROM public.deals WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as deals,
+  (SELECT COUNT(*) FROM public.activities WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as activities,
+  (SELECT COUNT(*) FROM public.communications WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as communications,
+  (SELECT COUNT(*) FROM public.projects WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as projects,
+  (SELECT COUNT(*) FROM public.project_tasks WHERE project_id IN (SELECT id FROM public.projects WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542')) as project_tasks,
+  (SELECT COUNT(*) FROM public.products WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as products,
+  (SELECT COUNT(*) FROM public.quotes WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as quotes,
+  (SELECT COUNT(*) FROM public.goals WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as goals,
+  (SELECT COUNT(*) FROM public.key_results WHERE goal_id IN (SELECT id FROM public.goals WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542')) as key_results,
+  (SELECT COUNT(*) FROM public.email_templates WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as email_templates,
+  (SELECT COUNT(*) FROM public.pipelines WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as pipelines,
+  (SELECT COUNT(*) FROM public.comments WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542') as comments,
+  (SELECT COUNT(*) FROM public.deal_stage_history WHERE deal_id IN (SELECT id FROM public.deals WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542')) as deal_stage_history;

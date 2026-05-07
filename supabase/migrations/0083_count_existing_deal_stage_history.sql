@@ -1,0 +1,1 @@
+SELECT COUNT(*) as count FROM public.deal_stage_history WHERE deal_id IN (SELECT id FROM public.deals WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542');

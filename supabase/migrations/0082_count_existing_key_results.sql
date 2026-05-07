@@ -1,0 +1,1 @@
+SELECT COUNT(*) as count FROM public.key_results WHERE goal_id IN (SELECT id FROM public.goals WHERE organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542');

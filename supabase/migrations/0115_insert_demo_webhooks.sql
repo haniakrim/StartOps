@@ -1,0 +1,6 @@
+-- Insert Webhooks
+INSERT INTO public.webhooks (organization_id, user_id, name, url, events, secret, is_active, last_triggered_at, last_response_status) VALUES
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'Salesforce Sync', 'https://hooks.salesforce.com/startops/sync', '{"deal.created", "deal.updated", "contact.created"}', 'whsec_sf_abc123', true, '2025-01-30', 200),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'Slack Notifications', 'https://hooks.slack.com/services/T000/B000/XXXX', '{"deal.won", "invoice.paid"}', 'whsec_slack_def456', true, '2025-01-29', 200),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'Zapier Integration', 'https://hooks.zapier.com/hooks/catch/123/abc', '{"contact.created", "activity.completed"}', 'whsec_zapier_ghi789', true, '2025-01-25', 200),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'Custom Dashboard', 'https://dashboard.demo-org.com/webhook', '{"all"}', 'whsec_custom_jkl012', false, NULL, NULL);

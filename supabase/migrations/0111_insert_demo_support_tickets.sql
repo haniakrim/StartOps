@@ -1,0 +1,8 @@
+-- Insert Support Tickets
+INSERT INTO public.support_tickets (organization_id, user_id, subject, description, category, priority, status, sla_target_hours, assigned_to) VALUES
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'Cannot access dashboard after login', 'User reports being redirected to login page repeatedly after successful authentication.', 'technical', 'high', 'open', 4, NULL),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'API rate limit questions', 'Customer wants to know current API rate limits and how to increase them.', 'billing', 'medium', 'in_progress', 24, 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9'),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'Data export feature request', 'Request for bulk data export functionality in CSV and Excel formats.', 'feature_request', 'low', 'open', 48, NULL),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'Integration with Salesforce failing', 'Webhook integration with Salesforce returning 401 errors since yesterday.', 'technical', 'high', 'in_progress', 4, 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9'),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'Billing discrepancy on invoice INV-2025-002', 'Customer claims they were charged for 350 users instead of 300.', 'billing', 'medium', 'open', 24, NULL),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9', 'How to set up custom fields', 'New user needs guidance on creating custom fields for deals.', 'general', 'low', 'resolved', 24, 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9');

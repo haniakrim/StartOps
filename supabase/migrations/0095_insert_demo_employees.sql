@@ -1,0 +1,14 @@
+-- Insert Employees
+INSERT INTO public.employees (organization_id, first_name, last_name, email, title, department_id, team_id, hire_date, salary, utilization_target, is_active) VALUES
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Alex', 'Morgan', 'alex.morgan@demo-org.com', 'VP of Sales', 'a714014f-595b-479d-94c8-5f752ab239eb', 'f157faa9-13f1-44aa-8afb-6e173feb59a1', '2022-03-15', 185000, 85, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Jordan', 'Lee', 'jordan.lee@demo-org.com', 'Sales Director', 'a714014f-595b-479d-94c8-5f752ab239eb', 'f157faa9-13f1-44aa-8afb-6e173feb59a1', '2022-08-01', 145000, 90, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Casey', 'Rivera', 'casey.rivera@demo-org.com', 'Account Executive', 'a714014f-595b-479d-94c8-5f752ab239eb', '1fb19a25-36a4-4aa6-a5f1-7529148b29f1', '2023-01-10', 95000, 88, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Taylor', 'Kim', 'taylor.kim@demo-org.com', 'CTO', '3614690e-5c79-45e7-bdda-07a3d029cd7c', '1b7717d2-c40b-405d-9570-d73f60a79cc1', '2021-06-01', 220000, 80, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Morgan', 'Patel', 'morgan.patel@demo-org.com', 'Senior Engineer', '3614690e-5c79-45e7-bdda-07a3d029cd7c', '1b7717d2-c40b-405d-9570-d73f60a79cc1', '2022-11-15', 135000, 85, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Riley', 'Chen', 'riley.chen@demo-org.com', 'DevOps Engineer', '3614690e-5c79-45e7-bdda-07a3d029cd7c', 'cf53d41c-5475-4cf0-a514-6e47e0f217b5', '2023-04-20', 115000, 82, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Quinn', 'Johnson', 'quinn.johnson@demo-org.com', 'CMO', '89658698-32f7-453f-8194-43e03934a0da', '4c93fcbd-3fcf-4d9a-98b4-8c4bca91f8fa', '2022-01-15', 175000, 80, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Avery', 'Smith', 'avery.smith@demo-org.com', 'Marketing Manager', '89658698-32f7-453f-8194-43e03934a0da', '4c93fcbd-3fcf-4d9a-98b4-8c4bca91f8fa', '2023-03-01', 85000, 85, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Sam', 'Williams', 'sam.williams@demo-org.com', 'Head of Customer Success', '921a2111-254e-4aff-afdf-b09feb3e5b1d', 'aa375b0d-48e6-4b88-8feb-a74c2f79a14b', '2022-05-10', 155000, 80, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Jamie', 'Brown', 'jamie.brown@demo-org.com', 'Support Specialist', '921a2111-254e-4aff-afdf-b09feb3e5b1d', 'aa375b0d-48e6-4b88-8feb-a74c2f79a14b', '2023-07-15', 65000, 90, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Drew', 'Garcia', 'drew.garcia@demo-org.com', 'CFO', '014f82d2-ec75-4f22-bc9b-e93be7594944', NULL, '2021-09-01', 195000, 75, true),
+('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'Peyton', 'Martinez', 'peyton.martinez@demo-org.com', 'Operations Manager', '5ebe379a-0bc9-4974-b270-1c89bab16f1b', NULL, '2022-12-01', 78000, 85, true);
