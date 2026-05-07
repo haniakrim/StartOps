@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   BarChart3, TrendingUp, TrendingDown, Users, DollarSign, Activity, Loader2,
   Target, GitBranch, Calendar, Filter, ArrowUpRight, BrainCircuit
@@ -29,9 +29,11 @@ export default function Analytics() {
   const [sourceData, setSourceData] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState("month");
 
-  useEffect(() => { if (organizationId) fetchAnalytics(); }, [organizationId]);
-
-  async function fetchAnalytics() {
+  const fetchAnalytics = useCallback(async () => {
+    if (!organizationId) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
 
@@ -130,11 +132,29 @@ export default function Analytics() {
       })));
 
     } catch (error: any) {
+      console.error("[Analytics] fetch error:", error);
       toast.error("Failed to load analytics: " + error.message);
     } finally {
       setLoading(false);
     }
-  }
+  }, [organizationId]);
+
+  useEffect(() => {
+    if (organizationId) {
+      fetchAnalytics();
+    } else {
+      setLoading(false);
+    }
+  }, [organizationId, fetchAnalytics]);
+
+  // Polling refresh every 30s
+  useEffect(() => {
+    if (!organizationId) return;
+    const interval = setInterval(() => {
+      fetchAnalytics();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [organizationId, fetchAnalytics]);
 
   const statCards = [
     { label: "Total Revenue", value: `$${stats.totalRevenue.toLocaleString()}`, change: "+12.5%", up: true, icon: DollarSign },
@@ -145,8 +165,24 @@ export default function Analytics() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
         <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
+        <p className="text-sm text-muted-foreground">Loading analytics...</p>
+        <p className="text-xs text-muted-foreground/60">orgId: {organizationId ?? "null"}</p>
+      </div>
+    );
+  }
+
+  if (!organizationId) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 gap-4">
+        <BarChart3 className="w-12 h-12 text-muted-foreground/30" />
+        <h2 className="text-lg font-medium text-foreground">No Organization Found</h2>
+        <p className="text-sm text-muted-foreground text-center max-w-md">
+          You need to be a member of an organization to view analytics.
+          Please sign out and sign in again, or contact your administrator.
+        </p>
+        <Button onClick={() => fetchAnalytics()}>Retry</Button>
       </div>
     );
   }
@@ -159,6 +195,9 @@ export default function Analytics() {
           <p className="text-muted-foreground mt-1">Performance metrics and AI-powered insights from live data</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => { fetchAnalytics(); toast.info("Refreshing..."); }}>
+            <Loader2 className="w-4 h-4 mr-2" />Refresh
+          </Button>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger className="bg-card border-border text-foreground w-32">
               <SelectValue />
@@ -350,7 +389,7 @@ export default function Analytics() {
                     const nextStage = funnelData[i + 1];
                     const dropoff = nextStage ? Math.max(0, stage.value - nextStage.value) : 0;
                     return { name: stage.name, dropoff, retained: nextStage?.value || 0 };
-                  })}>
+                  })} >
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
