@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Product {
   id: string;
@@ -30,6 +31,7 @@ interface Product {
 }
 
 export default function Inventory() {
+  const { organizationId } = useOrganization();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -37,13 +39,18 @@ export default function Inventory() {
   const [newProduct, setNewProduct] = useState({ name: "", sku: "", category: "", unit_price: "", cost_price: "", quantity_on_hand: "", reorder_point: "" });
   const [statusFilter, setStatusFilter] = useState("all");
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => { fetchProducts(); }, [organizationId]);
   useRealtimeTable("products", fetchProducts);
 
   async function fetchProducts() {
+    if (!organizationId) {
+      setProducts([]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("products").select("*").eq("organization_id", organizationId).order("created_at", { ascending: false });
       if (error) throw error;
       setProducts(data || []);
     } catch (error: any) {
@@ -55,6 +62,10 @@ export default function Inventory() {
 
   async function createProduct(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization selected");
+      return;
+    }
     try {
       const { error } = await supabase.from("products").insert({
         name: newProduct.name,
@@ -64,6 +75,7 @@ export default function Inventory() {
         cost_price: parseFloat(newProduct.cost_price) || 0,
         quantity_on_hand: parseInt(newProduct.quantity_on_hand) || 0,
         reorder_point: parseInt(newProduct.reorder_point) || 0,
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Product added");
@@ -116,7 +128,6 @@ export default function Inventory() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
-          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
@@ -165,8 +176,9 @@ export default function Inventory() {
           </DialogContent>
         </Dialog>
       </div>
+    </div>
 
-      {/* Stats */}
+    {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-[#18191b] border-white/10">
           <CardContent className="p-5">

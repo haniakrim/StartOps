@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Document {
   id: string;
@@ -69,6 +70,7 @@ const fileColors: Record<string, string> = {
 };
 
 export default function Documents() {
+  const { organizationId } = useOrganization();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -84,15 +86,21 @@ export default function Documents() {
     tags: "",
   });
 
-  useEffect(() => { fetchDocuments(); }, []);
+  useEffect(() => { fetchDocuments(); }, [organizationId]);
   useRealtimeTable("documents", fetchDocuments);
 
   async function fetchDocuments() {
+    if (!organizationId) {
+      setDocuments([]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from("documents")
         .select("*")
+        .eq("organization_id", organizationId)
         .order("created_at", { ascending: false });
       if (error) throw error;
       setDocuments(data || []);
@@ -105,6 +113,10 @@ export default function Documents() {
 
   async function uploadDocument(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization selected");
+      return;
+    }
     try {
       setUploading(true);
       const { error } = await supabase.from("documents").insert({
@@ -115,6 +127,7 @@ export default function Documents() {
         tags: newDoc.tags ? newDoc.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
         type: "pdf",
         size: 0,
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Document added");
@@ -129,8 +142,9 @@ export default function Documents() {
   }
 
   async function deleteDocument(id: string) {
+    if (!organizationId) return;
     try {
-      const { error } = await supabase.from("documents").delete().eq("id", id);
+      const { error } = await supabase.from("documents").delete().eq("id", id).eq("organization_id", organizationId);
       if (error) throw error;
       toast.success("Document deleted");
       fetchDocuments();
@@ -176,7 +190,6 @@ export default function Documents() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
-          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
@@ -232,10 +245,11 @@ export default function Documents() {
               </Button>
             </form>
           </DialogContent>
-        </Dialog>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+         </Dialog>
+       </div>
+     </div>
+ 
+     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <Card className="bg-[#18191b] border-white/10">
           <CardContent className="p-5">
             <FileText className="w-5 h-5 text-[#6452db] mb-3" />
@@ -291,8 +305,9 @@ export default function Documents() {
           <span className="text-sm text-white">{selected.length} selected</span>
           <div className="flex-1" />
           <Button variant="ghost" size="sm" className="text-[#be6464] hover:text-[#be6464] hover:bg-[#be6464]/10 h-8" onClick={async () => {
+            if (!organizationId) return;
             try {
-              const { error } = await supabase.from("documents").delete().in("id", selected);
+              const { error } = await supabase.from("documents").delete().in("id", selected).eq("organization_id", organizationId);
               if (error) throw error;
               toast.success(`${selected.length} documents deleted`);
               setSelected([]);
