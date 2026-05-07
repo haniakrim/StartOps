@@ -6,6 +6,9 @@ const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("development"),
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -13,6 +16,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["react", "react-dom", "react/jsx-dev-runtime", "react/jsx-runtime"],
+    force: true,
   },
   server: {
     port: 5173,
