@@ -464,6 +464,41 @@ export default function Login() {
                     </>
                   )}
                 </Button>
+
+                {/* Demo Account Button */}
+                {!isSignUp && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={loading}
+                    onClick={async () => {
+                      setLoading(true);
+                      try {
+                        const { data, error } = await supabase.auth.signInWithPassword({
+                          email: "demo@example.com",
+                          password: "DemoPass123!",
+                        });
+                        if (error) throw error;
+                        if (data.user && !data.user.email_confirmed_at) {
+                          await supabase.auth.signOut();
+                          toast.error("Please verify your email before signing in.");
+                          setLoading(false);
+                          return;
+                        }
+                        toast.success("Signed in as Demo User");
+                        navigate("/dashboard");
+                      } catch (error: any) {
+                        toast.error(error.message || "Demo login failed");
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    className="w-full h-11 text-sm font-medium border-dashed border-expo-blue/50 text-expo-blue hover:bg-expo-blue/5 hover:text-expo-blue"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Try Demo Account
+                  </Button>
+                )}
               </form>
 
               <div className="mt-6 text-center">

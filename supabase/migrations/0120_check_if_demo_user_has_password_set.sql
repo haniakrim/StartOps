@@ -1,0 +1,1 @@
+SELECT id, email, encrypted_password IS NOT NULL as has_password, email_confirmed_at FROM auth.users WHERE email = 'demo@example.com' LIMIT 1;

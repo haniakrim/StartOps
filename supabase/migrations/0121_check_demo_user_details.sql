@@ -1,0 +1,1 @@
+SELECT id, email, created_at, updated_at FROM auth.users WHERE email = 'demo@example.com' LIMIT 1;
