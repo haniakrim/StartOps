@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw, DollarSign, Target, Users, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDashboardData } from "@/hooks/useDashboardData";
+import { useDashboardData, type DashboardTimeRange } from "@/hooks/useDashboardData";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { PipelineChart } from "@/components/dashboard/PipelineChart";
@@ -12,22 +12,16 @@ import { DealHealth } from "@/components/dashboard/DealHealth";
 import { AIForecast } from "@/components/dashboard/AIForecast";
 import { AnomalyDetection } from "@/components/dashboard/AnomalyDetection";
 import { GettingStarted } from "@/components/dashboard/GettingStarted";
-import {
-  DollarSign,
-  Target,
-  Users,
-  Building2,
-} from "lucide-react";
 
 export default function Dashboard() {
-  const [timeRange, setTimeRange] = useState("month");
-  const { stats, recentActivity, topDeals, loading } = useDashboardData();
+  const [timeRange, setTimeRange] = useState<DashboardTimeRange>("month");
+  const { stats, recentActivity, topDeals, revenueData, pipelineData, loading, refetch } = useDashboardData(timeRange);
 
   const statCards = [
     {
       title: "Total Revenue",
       value: `$${stats.totalRevenue.toLocaleString()}`,
-      change: "+12.5%",
+      change: `${timeRange}`,
       trend: "up" as const,
       icon: DollarSign,
       color: "#0066B1",
@@ -35,7 +29,7 @@ export default function Dashboard() {
     {
       title: "Active Deals",
       value: stats.activeDeals.toString(),
-      change: "+8.2%",
+      change: `${timeRange}`,
       trend: "up" as const,
       icon: Target,
       color: "#E63946",
@@ -43,7 +37,7 @@ export default function Dashboard() {
     {
       title: "Contacts",
       value: stats.totalContacts.toLocaleString(),
-      change: "+24.1%",
+      change: `${timeRange}`,
       trend: "up" as const,
       icon: Users,
       color: "#00BFFF",
@@ -51,7 +45,7 @@ export default function Dashboard() {
     {
       title: "Companies",
       value: stats.totalCompanies.toString(),
-      change: "-2.4%",
+      change: `${timeRange}`,
       trend: "down" as const,
       icon: Building2,
       color: "#0066B1",
@@ -68,64 +62,60 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in-up">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-h2 text-foreground tracking-tight">
-            Dashboard
-          </h1>
+          <h1 className="text-h2 text-foreground tracking-tight">Dashboard</h1>
           <p className="text-body-sm text-muted-foreground mt-1">
-            Welcome back. Here's what's happening today.
+            Live CRM performance for the selected time range.
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
-          {(["week", "month", "quarter", "year"] as const).map((range) => (
-            <Button
-              key={range}
-              variant={timeRange === range ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setTimeRange(range)}
-              className={
-                timeRange === range
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent rounded-md"
-              }
-            >
-              {range.charAt(0).toUpperCase() + range.slice(1)}
-            </Button>
-          ))}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+            {(["week", "month", "quarter", "year"] as const).map((range) => (
+              <Button
+                key={range}
+                variant={timeRange === range ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setTimeRange(range)}
+                className={
+                  timeRange === range
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent rounded-md"
+                }
+              >
+                {range.charAt(0).toUpperCase() + range.slice(1)}
+              </Button>
+            ))}
+          </div>
+          <Button variant="outline" size="sm" onClick={refetch}>
+            <RefreshCw className="w-4 h-4 mr-2" />Refresh
+          </Button>
         </div>
       </div>
 
-      {/* Getting Started */}
       <GettingStarted />
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat) => (
           <StatCard key={stat.title} {...stat} />
         ))}
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <RevenueChart />
-        <PipelineChart />
+        <RevenueChart data={revenueData} />
+        <PipelineChart data={pipelineData} />
       </div>
 
-      {/* AI Intelligence */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ExecutiveBriefing />
         <DealHealth />
       </div>
 
-      {/* AI Forecasting & Anomalies */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <AIForecast />
         <AnomalyDetection />
       </div>
 
-      {/* Bottom section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <TopDeals deals={topDeals} />
         <RecentActivity items={recentActivity} />
