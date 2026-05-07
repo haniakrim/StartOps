@@ -361,14 +361,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Campaigns />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/staff-directory"
                 element={
                   <ProtectedRoute>
                     <StaffDirectory />
-                  </ProtectedRoute>
-                }
-              />
                   </ProtectedRoute>
                 }
               />
