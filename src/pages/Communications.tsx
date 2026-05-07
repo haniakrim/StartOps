@@ -71,9 +71,9 @@ export default function Communications() {
       fetchEmailTemplates();
     }
   }, [organizationId]);
-  useRealtimeTable("communications", fetchCommunications);
-  useRealtimeTable("contacts", fetchContactsAndDeals);
-  useRealtimeTable("deals", fetchContactsAndDeals);
+  useRealtimeTable("communications", fetchCommunications, [organizationId], organizationId);
+  useRealtimeTable("contacts", fetchContactsAndDeals, [organizationId], organizationId);
+  useRealtimeTable("deals", fetchContactsAndDeals, [organizationId], organizationId);
 
   useEffect(() => {
     if (organizationId) {
@@ -98,7 +98,11 @@ export default function Communications() {
   }
 
   async function fetchCommunications() {
-    if (!organizationId) return;
+    if (!organizationId) {
+      setLoading(false);
+      setCommunications([]);
+      return;
+    }
     try {
       setLoading(true);
       const { data, error } = await supabase

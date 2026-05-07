@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export function useRealtimeTable(
@@ -7,9 +7,12 @@ export function useRealtimeTable(
   deps: any[] = [],
   organizationId?: string | null
 ) {
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
   useEffect(() => {
     const channel = supabase
-      .channel(`${table}-realtime`)
+      .channel(`${table}-realtime-${organizationId || "global"}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table },
@@ -22,7 +25,7 @@ export function useRealtimeTable(
               return;
             }
           }
-          onChange();
+          onChangeRef.current();
         }
       )
       .subscribe();
@@ -30,5 +33,5 @@ export function useRealtimeTable(
     return () => {
       channel.unsubscribe();
     };
-  }, deps);
+  }, [table, organizationId, ...deps]);
 }
