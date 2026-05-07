@@ -152,6 +152,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -160,6 +162,24 @@ export default function Login() {
     const timer = setTimeout(() => setFormVisible(true), 100);
     return () => clearTimeout(timer);
   }, [user, navigate]);
+
+  // Load failed attempts from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("login_lockout");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.lockoutUntil && parsed.lockoutUntil > Date.now()) {
+          setLockoutUntil(parsed.lockoutUntil);
+          setFailedAttempts(parsed.failedAttempts || 0);
+        } else {
+          localStorage.removeItem("login_lockout");
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   function validatePassword(pw: string): string | null {
     if (pw.length < 8) return "Password must be at least 8 characters";
@@ -170,8 +190,43 @@ export default function Login() {
     return null;
   }
 
+  function getLockoutSeconds(): number {
+    if (!lockoutUntil) return 0;
+    return Math.max(0, Math.ceil((lockoutUntil - Date.now()) / 1000));
+  }
+
+  function recordFailedAttempt() {
+    const newAttempts = failedAttempts + 1;
+    setFailedAttempts(newAttempts);
+    let lockoutTime: number | null = null;
+    if (newAttempts >= 5) {
+      lockoutTime = Date.now() + 300000; // 5 minutes
+      setLockoutUntil(lockoutTime);
+    } else if (newAttempts >= 3) {
+      lockoutTime = Date.now() + 30000; // 30 seconds
+      setLockoutUntil(lockoutTime);
+    }
+    if (lockoutTime) {
+      localStorage.setItem("login_lockout", JSON.stringify({ failedAttempts: newAttempts, lockoutUntil: lockoutTime }));
+    } else {
+      localStorage.setItem("login_lockout", JSON.stringify({ failedAttempts: newAttempts, lockoutUntil: null }));
+    }
+  }
+
+  function clearFailedAttempts() {
+    setFailedAttempts(0);
+    setLockoutUntil(null);
+    localStorage.removeItem("login_lockout");
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const lockoutSeconds = getLockoutSeconds();
+    if (lockoutSeconds > 0) {
+      toast.error(`Too many failed attempts. Please wait ${lockoutSeconds} seconds.`);
+      return;
+    }
 
     if (isSignUp) {
       const pwError = validatePassword(password);
@@ -197,6 +252,25 @@ export default function Login() {
         });
         if (error) throw error;
 
+        // Check if email confirmation is required
+        if (data.user && !data.user.email_confirmed_at && !data.session) {
+          toast.success("Account created! Check your email to confirm, then sign in.");
+          setIsSignUp(false);
+          clearFailedAttempts();
+          setLoading(false);
+          return;
+        }
+
+        // If session exists but email is not confirmed, still require verification
+        if (data.user && !data.user.email_confirmed_at) {
+          toast.success("Account created! Please verify your email before signing in.");
+          await supabase.auth.signOut();
+          setIsSignUp(false);
+          clearFailedAttempts();
+          setLoading(false);
+          return;
+        }
+
         if (data.session) {
           const { data: orgData, error: orgError } = await supabase
             .from("organizations")
@@ -220,19 +294,30 @@ export default function Login() {
           if (memError) throw memError;
 
           toast.success("Account created! Welcome.");
+          clearFailedAttempts();
           navigate("/dashboard");
         } else {
           toast.success("Account created! Check your email to confirm, then sign in.");
           setIsSignUp(false);
+          clearFailedAttempts();
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) {
+          recordFailedAttempt();
           throw error;
         }
+        // Check email verification on sign-in too
+        if (data.user && !data.user.email_confirmed_at) {
+          await supabase.auth.signOut();
+          toast.error("Please verify your email before signing in. Check your inbox for the confirmation link.");
+          setLoading(false);
+          return;
+        }
+        clearFailedAttempts();
         toast.success("Signed in successfully");
         navigate("/dashboard");
       }
@@ -423,9 +508,15 @@ export default function Login() {
                   </div>
                 </div>
 
+                {getLockoutSeconds() > 0 && (
+                  <div className="text-sm text-red-500">
+                    Too many failed attempts. Please wait {getLockoutSeconds()} seconds.
+                  </div>
+                )}
+
                 <Button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || getLockoutSeconds() > 0}
                   className="w-full h-11 text-sm font-medium transition-all"
                 >
                   {loading ? (

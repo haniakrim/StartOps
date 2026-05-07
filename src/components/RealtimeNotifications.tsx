@@ -24,9 +24,25 @@ export function RealtimeNotifications() {
   useEffect(() => {
     const saved = localStorage.getItem("realtime_notifications");
     if (saved) {
-      const parsed = JSON.parse(saved);
-      setNotifications(parsed);
-      setUnreadCount(parsed.filter((n: RealtimeNotification) => !n.read).length);
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          const valid = parsed.filter(
+            (n: any) =>
+              n &&
+              typeof n === "object" &&
+              typeof n.id === "string" &&
+              typeof n.title === "string" &&
+              typeof n.message === "string" &&
+              n.title.length < 200 &&
+              n.message.length < 1000
+          );
+          setNotifications(valid);
+          setUnreadCount(valid.filter((n: RealtimeNotification) => !n.read).length);
+        }
+      } catch {
+        localStorage.removeItem("realtime_notifications");
+      }
     }
 
     const channels = [
@@ -87,6 +103,8 @@ export function RealtimeNotifications() {
   }, [organizationId]);
 
   function addNotification(notification: Omit<RealtimeNotification, "id" | "created_at" | "read">) {
+    if (!notification.title || !notification.message) return;
+    if (notification.title.length > 200 || notification.message.length > 1000) return;
     const newNotification: RealtimeNotification = {
       ...notification,
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),

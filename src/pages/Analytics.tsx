@@ -10,11 +10,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
 const COLORS = ["hsl(var(--primary))", "#8dc572", "#ff8964", "#5683da", "#f0ad4e", "#be6464"];
 
 export default function Analytics() {
+  const { organizationId } = useOrganization();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalRevenue: 0, activeDeals: 0, totalContacts: 0, totalCompanies: 0,
@@ -27,13 +29,16 @@ export default function Analytics() {
   const [sourceData, setSourceData] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState("month");
 
-  useEffect(() => { fetchAnalytics(); }, []);
+  useEffect(() => { if (organizationId) fetchAnalytics(); }, [organizationId]);
 
   async function fetchAnalytics() {
     try {
       setLoading(true);
 
-      const { data: dealsData, error: dealsError } = await supabase.from("deals").select("value, stage, status, created_at, expected_close_date, source");
+      const { data: dealsData, error: dealsError } = await supabase
+        .from("deals")
+        .select("value, stage, status, created_at, expected_close_date, source")
+        .eq("organization_id", organizationId);
       if (dealsError) throw dealsError;
 
       const totalRevenue = dealsData?.reduce((sum, d) => sum + (d.value || 0), 0) || 0;
@@ -46,10 +51,17 @@ export default function Analytics() {
       const winRate = closedDeals > 0 ? ((wonDeals / closedDeals) * 100).toFixed(1) + "%" : "0%";
       const avgDealSize = totalDeals > 0 ? Math.round(totalRevenue / totalDeals) : 0;
 
-      const { count: contactsCount, error: contactsError } = await supabase.from("contacts").select("*", { count: "exact", head: true });
+      const { count: contactsCount, error: contactsError } = await supabase
+        .from("contacts")
+        .select("*", { count: "exact", head: true })
+        .eq("organization_id", organizationId);
       if (contactsError) throw contactsError;
 
-      const { data: contactsWithCompany } = await supabase.from("contacts").select("company").not("company", "is", null);
+      const { data: contactsWithCompany } = await supabase
+        .from("contacts")
+        .select("company")
+        .eq("organization_id", organizationId)
+        .not("company", "is", null);
       const distinctCompanies = new Set((contactsWithCompany || []).map((c: any) => c.company).filter(Boolean)).size;
 
       setStats({

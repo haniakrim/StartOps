@@ -105,8 +105,21 @@ export default function Security() {
       toast.error(pwError);
       return;
     }
+    if (!currentPassword) {
+      toast.error("Current password is required");
+      return;
+    }
     try {
       setChangingPassword(true);
+      // Verify current password first
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user?.email || "",
+        password: currentPassword,
+      });
+      if (verifyError) {
+        toast.error("Current password is incorrect");
+        return;
+      }
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
       toast.success("Password updated successfully");
@@ -182,6 +195,15 @@ export default function Security() {
                   <h3 className="text-base font-medium text-white">Change Password</h3>
                   <p className="text-sm text-white/50 mt-1">Update your account password</p>
                   <form onSubmit={changePassword} className="space-y-3 mt-4">
+                    <div className="space-y-2">
+                      <Label className="text-white/70 text-sm">Current Password</Label>
+                      <div className="relative">
+                        <Input type={showPassword ? "text" : "password"} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="bg-[#0b0d10] border-white/10 text-white pr-10" required />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white">
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
                     <div className="space-y-2">
                       <Label className="text-white/70 text-sm">New Password</Label>
                       <div className="relative">

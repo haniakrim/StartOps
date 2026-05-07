@@ -9,6 +9,8 @@ import {
   Bell,
   Key,
   Save,
+  AlertTriangle,
+  CheckCircle2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,6 +27,7 @@ import { toast } from "sonner";
 export default function Profile() {
   const { user, profile, loading: authLoading } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -42,6 +45,12 @@ export default function Profile() {
         phone: profile.phone || "",
         avatar_url: profile.avatar_url || "",
       });
+    }
+    // Check email verification status from auth user
+    if (user?.email_confirmed_at) {
+      setEmailVerified(true);
+    } else {
+      setEmailVerified(false);
     }
   }, [profile, user]);
 
@@ -111,12 +120,31 @@ export default function Profile() {
         <div>
           <h2 className="text-lg font-semibold text-white">{userName}</h2>
           <p className="text-sm text-white/50">{user?.email}</p>
-          <Badge
-            variant="secondary"
-            className="mt-2 bg-[#6452db]/20 text-[#6452db] text-xs capitalize"
-          >
-            {profile?.role || "User"}
-          </Badge>
+          <div className="flex items-center gap-2 mt-2">
+            <Badge
+              variant="secondary"
+              className="bg-[#6452db]/20 text-[#6452db] text-xs capitalize"
+            >
+              {profile?.role || "User"}
+            </Badge>
+            {emailVerified ? (
+              <Badge
+                variant="secondary"
+                className="bg-emerald-500/20 text-emerald-400 text-xs"
+              >
+                <CheckCircle2 className="w-3 h-3 mr-1" />
+                Email Verified
+              </Badge>
+            ) : (
+              <Badge
+                variant="secondary"
+                className="bg-orange-500/20 text-orange-400 text-xs"
+              >
+                <AlertTriangle className="w-3 h-3 mr-1" />
+                Email Unverified
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
 
@@ -187,6 +215,12 @@ export default function Profile() {
                   <p className="text-xs text-white/30">
                     Email cannot be changed. Contact support to update.
                   </p>
+                  {!emailVerified && (
+                    <p className="text-xs text-orange-400 mt-1 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      Your email is not verified. Some features may be restricted.
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label className="text-white/70">Phone</Label>

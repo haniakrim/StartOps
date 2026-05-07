@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Communication {
   id: string;
@@ -43,6 +44,7 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 export default function Communications() {
+  const { organizationId } = useOrganization();
   const [communications, setCommunications] = useState<Communication[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -65,17 +67,27 @@ export default function Communications() {
   const [sentimentFilter, setSentimentFilter] = useState("all");
 
   useEffect(() => {
-    fetchEmailTemplates();
-  }, []);
+    if (organizationId) {
+      fetchEmailTemplates();
+    }
+  }, [organizationId]);
   useRealtimeTable("communications", fetchCommunications);
   useRealtimeTable("contacts", fetchContactsAndDeals);
   useRealtimeTable("deals", fetchContactsAndDeals);
+
+  useEffect(() => {
+    if (organizationId) {
+      fetchCommunications();
+      fetchContactsAndDeals();
+    }
+  }, [organizationId]);
 
   async function fetchEmailTemplates() {
     try {
       const { data, error } = await supabase
         .from("email_templates")
         .select("*")
+        .eq("organization_id", organizationId)
         .order("created_at", { ascending: false });
       if (error) throw error;
       setEmailTemplates(data || []);
@@ -85,12 +97,8 @@ export default function Communications() {
     }
   }
 
-  useEffect(() => {
-    fetchCommunications();
-    fetchContactsAndDeals();
-  }, []);
-
   async function fetchCommunications() {
+    if (!organizationId) return;
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -100,6 +108,7 @@ export default function Communications() {
           contacts:contact_id (first_name, last_name, company),
           deals:deal_id (name)
         `)
+        .eq("organization_id", organizationId)
         .order("occurred_at", { ascending: false })
         .limit(100);
 
@@ -132,14 +141,27 @@ export default function Communications() {
   }
 
   async function fetchContactsAndDeals() {
-    const { data: c } = await supabase.from("contacts").select("id, first_name, last_name").order("first_name");
+    if (!organizationId) return;
+    const { data: c } = await supabase
+      .from("contacts")
+      .select("id, first_name, last_name")
+      .eq("organization_id", organizationId)
+      .order("first_name");
     setContacts(c || []);
-    const { data: d } = await supabase.from("deals").select("id, name").order("name");
+    const { data: d } = await supabase
+      .from("deals")
+      .select("id, name")
+      .eq("organization_id", organizationId)
+      .order("name");
     setDeals(d || []);
   }
 
   async function createCommunication(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("Please select an organization first");
+      return;
+    }
     try {
       // Simulate AI analysis
       const sentiment = analyzeSentiment(newComm.content || "");
@@ -154,6 +176,7 @@ export default function Communications() {
         sentiment,
         contact_id: newComm.contact_id || null,
         deal_id: newComm.deal_id || null,
+        organization_id: organizationId,
         occurred_at: new Date().toISOString(),
       });
 

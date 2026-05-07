@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Message {
   id: string;
@@ -15,6 +16,7 @@ interface Message {
 }
 
 export default function Assistant() {
+  const { organizationId } = useOrganization();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -34,6 +36,10 @@ export default function Assistant() {
   async function handleSend(e?: React.FormEvent) {
     e?.preventDefault();
     if (!input.trim() || loading) return;
+    if (!organizationId) {
+      toast.error("Please select an organization first");
+      return;
+    }
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -59,10 +65,13 @@ export default function Assistant() {
 
     // Pipeline summary
     if (q.includes("pipeline") || q.includes("deals") && q.includes("summary")) {
-      const { data: deals } = await supabase.from("deals").select("value, stage, status, probability, created_at, expected_close_date");
+      const { data: deals } = await supabase
+        .from("deals")
+        .select("value, stage, status, probability, created_at, expected_close_date")
+        .eq("organization_id", organizationId);
       const total = deals?.reduce((s, d) => s + (d.value || 0), 0) || 0;
       const active = deals?.filter((d) => d.status === "open" && !d.stage?.startsWith("closed")).length || 0;
-      const stalled = deals?.filter((d) => {
+      const stalled = (deals || []).filter((d: any) => {
         const days = Math.floor((Date.now() - new Date(d.created_at).getTime()) / 86400000);
         return d.status === "open" && days > 14;
       }).length || 0;
@@ -78,7 +87,10 @@ export default function Assistant() {
 
     // Revenue
     if (q.includes("revenue") || q.includes("forecast")) {
-      const { data: deals } = await supabase.from("deals").select("value, probability, stage, status");
+      const { data: deals } = await supabase
+        .from("deals")
+        .select("value, stage, probability, status")
+        .eq("organization_id", organizationId);
       const weighted = deals?.reduce((s, d) => s + (d.value || 0) * ((d.probability || 0) / 100), 0) || 0;
       const won = deals?.filter((d) => d.stage === "closed-won").reduce((s, d) => s + (d.value || 0), 0) || 0;
 
@@ -96,6 +108,7 @@ export default function Assistant() {
       const { data: deals } = await supabase
         .from("deals")
         .select("id, name, value, stage, probability, created_at, contacts:contact_id (first_name, last_name, company)")
+        .eq("organization_id", organizationId)
         .eq("status", "open")
         .order("created_at", { ascending: true });
 
@@ -124,8 +137,16 @@ export default function Assistant() {
 
     // Contacts
     if (q.includes("contacts") || q.includes("who") && q.includes("know")) {
-      const { count } = await supabase.from("contacts").select("*", { count: "exact", head: true });
-      const { data: recent } = await supabase.from("contacts").select("first_name, last_name, company, created_at").order("created_at", { ascending: false }).limit(5);
+      const { count } = await supabase
+        .from("contacts")
+        .select("*", { count: "exact", head: true })
+        .eq("organization_id", organizationId);
+      const { data: recent } = await supabase
+        .from("contacts")
+        .select("first_name, last_name, company, created_at")
+        .eq("organization_id", organizationId)
+        .order("created_at", { ascending: false })
+        .limit(5);
 
       return {
         id: Date.now().toString(),
@@ -137,7 +158,13 @@ export default function Assistant() {
 
     // Activities / tasks
     if (q.includes("tasks") || q.includes("activities") || q.includes("todo")) {
-      const { data: pending } = await supabase.from("activities").select("subject, type, due_date, priority").eq("status", "pending").order("due_date", { ascending: true }).limit(5);
+      const { data: pending } = await supabase
+        .from("activities")
+        .select("subject, type, due_date, priority")
+        .eq("organization_id", organizationId)
+        .eq("status", "pending")
+        .order("due_date", { ascending: true })
+        .limit(5);
 
       if (!pending || pending.length === 0) {
         return {
@@ -158,7 +185,10 @@ export default function Assistant() {
 
     // Health / anomalies
     if (q.includes("health") || q.includes("anomal") || q.includes("wrong") || q.includes("risk")) {
-      const { data: deals } = await supabase.from("deals").select("value, stage, probability, status");
+      const { data: deals } = await supabase
+        .from("deals")
+        .select("value, stage, probability, status")
+        .eq("organization_id", organizationId);
       const lowProb = deals?.filter((d) => d.status === "open" && (d.probability || 0) < 30).length || 0;
       const atRisk = deals?.filter((d) => d.status === "open" && d.stage === "negotiation" && (d.probability || 0) < 50).length || 0;
 

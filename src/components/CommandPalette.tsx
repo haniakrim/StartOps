@@ -68,15 +68,26 @@ export function CommandPalette() {
       const raw = localStorage.getItem("startops_recent");
       if (!raw) return [];
       const parsed = JSON.parse(raw);
-      return parsed.slice(0, 5).map((item: any, i: number) => ({
-        id: `recent-${i}`,
-        type: "recent" as const,
-        title: item.title,
-        subtitle: item.subtitle,
-        icon: navItems.find((n) => n.path === item.path)?.icon || ArrowRight,
-        iconColor: navItems.find((n) => n.path === item.path)?.color || "#6452db",
-        action: () => navigate(item.path),
-      }));
+      if (!Array.isArray(parsed)) return [];
+      return parsed
+        .filter((item: any) =>
+          item &&
+          typeof item === "object" &&
+          typeof item.title === "string" &&
+          typeof item.path === "string" &&
+          item.title.length < 200 &&
+          item.path.length < 500
+        )
+        .slice(0, 5)
+        .map((item: any, i: number) => ({
+          id: `recent-${i}`,
+          type: "recent" as const,
+          title: item.title,
+          subtitle: item.subtitle && typeof item.subtitle === "string" ? item.subtitle : "Recent",
+          icon: navItems.find((n) => n.path === item.path)?.icon || ArrowRight,
+          iconColor: navItems.find((n) => n.path === item.path)?.color || "#6452db",
+          action: () => navigate(item.path),
+        }));
     } catch {
       return [];
     }
@@ -203,9 +214,15 @@ export function CommandPalette() {
 
   function addRecent(title: string, path: string) {
     try {
+      if (typeof title !== "string" || typeof path !== "string") return;
+      if (title.length > 200 || path.length > 500) return;
       const raw = localStorage.getItem("startops_recent") || "[]";
       const parsed = JSON.parse(raw);
-      const filtered = parsed.filter((r: any) => r.path !== path);
+      if (!Array.isArray(parsed)) {
+        localStorage.setItem("startops_recent", JSON.stringify([{ title, path, time: Date.now() }]));
+        return;
+      }
+      const filtered = parsed.filter((r: any) => r?.path !== path);
       const updated = [{ title, path, time: Date.now() }, ...filtered].slice(0, 10);
       localStorage.setItem("startops_recent", JSON.stringify(updated));
     } catch {

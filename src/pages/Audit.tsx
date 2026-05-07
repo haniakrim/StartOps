@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface AuditLog {
   id: string;
@@ -29,10 +30,11 @@ const severityColors: Record<string, string> = {
 };
 
 export default function Audit() {
+  const { organizationId } = useOrganization();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchLogs(); }, []);
+  useEffect(() => { if (organizationId) fetchLogs(); }, [organizationId]);
 
   async function fetchLogs() {
     try {
@@ -40,6 +42,7 @@ export default function Audit() {
       const { data, error } = await supabase
         .from("audit_logs")
         .select("*")
+        .eq("organization_id", organizationId)
         .order("created_at", { ascending: false })
         .limit(50);
 

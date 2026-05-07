@@ -57,8 +57,21 @@ serve(async (req) => {
       })
     }
 
+    // Parse request body for options
+    let body: any = {}
+    try {
+      body = await req.json()
+    } catch {
+      body = {}
+    }
+
+    // Require confirmation for destructive operations
+    const confirmCleanup = body?.confirm === true
+    const dryRun = body?.dryRun === true
+
+    // Generate random demo password instead of hardcoding
+    const demoPassword = crypto.randomUUID().replace(/-/g, '').slice(0, 16)
     const demoEmail = 'demo@example.com'
-    const demoPassword = 'demodemo123'
 
     // 1. Create or get demo auth user
     console.log("[seed-demo] Checking for demo user")
@@ -82,7 +95,7 @@ serve(async (req) => {
       console.log("[seed-demo] Created demo user:", demoUserId)
     }
 
-    // Ensure profile exists
+    // Ensure profile exists with user role (not admin)
     const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
       .select('id')
@@ -95,9 +108,12 @@ serve(async (req) => {
         first_name: 'Demo',
         last_name: 'User',
         email: demoEmail,
-        role: 'admin'
+        role: 'user'
       })
       console.log("[seed-demo] Created demo profile")
+    } else {
+      // Ensure role is user, not admin
+      await supabaseAdmin.from('profiles').update({ role: 'user' }).eq('id', demoUserId)
     }
 
     // 2. Create or get demo organization
@@ -151,6 +167,39 @@ serve(async (req) => {
       'contacts', 'companies', 'pipelines', 'products', 'quotes', 'goals',
       'email_templates', 'organization_members'
     ]
+
+    if (dryRun) {
+      const wouldDelete: Record<string, number> = {}
+      for (const table of tablesWithOrgId) {
+        const { count, error } = await supabaseAdmin
+          .from(table)
+          .select('*', { count: 'exact', head: true })
+          .neq('organization_id', demoOrgId)
+        if (!error) wouldDelete[table] = count || 0
+      }
+      return new Response(JSON.stringify({
+        dryRun: true,
+        wouldDelete,
+        demoUserId,
+        demoOrgId,
+        demoPassword
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
+      })
+    }
+
+    if (!confirmCleanup) {
+      return new Response(JSON.stringify({
+        error: 'Destructive cleanup requires confirm: true in request body. Use dryRun: true to preview what would be deleted.',
+        demoUserId,
+        demoOrgId,
+        demoPassword
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      })
+    }
 
     for (const table of tablesWithOrgId) {
       const { error } = await supabaseAdmin
@@ -414,7 +463,8 @@ serve(async (req) => {
       success: true,
       message: 'Demo data seeded successfully',
       demoUserId,
-      demoOrgId
+      demoOrgId,
+      demoPassword
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200
