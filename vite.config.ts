@@ -1,14 +1,11 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig({
   plugins: [react()],
-  define: {
-    "process.env.NODE_ENV": JSON.stringify("development"),
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -16,7 +13,11 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["react", "react-dom", "react/jsx-dev-runtime", "react/jsx-runtime"],
-    force: true,
+    esbuildOptions: {
+      define: {
+        "process.env.NODE_ENV": '"development"',
+      },
+    },
   },
   server: {
     port: 5173,

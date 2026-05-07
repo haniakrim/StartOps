@@ -6,8 +6,6 @@ const ALLOWED_ORIGINS = [
   "https://startops.io",
   "https://www.startops.io",
   "https://app.startops.io",
-  "http://localhost:5173",
-  "http://localhost:3000",
 ];
 
 function getCorsHeaders(req: Request): Record<string, string> {

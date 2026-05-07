@@ -3,8 +3,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
 const ALLOWED_ORIGINS = [
   'https://dtrwtbmxvscrfkzdpsqt.supabase.co',
-  'http://localhost:5173',
-  'http://localhost:3000',
 ]
 
 function getCorsHeaders(req: Request) {
@@ -54,15 +52,17 @@ serve(async (req) => {
       })
     }
 
-    // Check admin role
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from('profiles')
+    // Check admin role via organization_members (not user-modifiable profiles)
+    const { data: member, error: memberError } = await supabaseAdmin
+      .from('organization_members')
       .select('role')
-      .eq('id', user.id)
-      .single()
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .limit(1)
+      .maybeSingle()
 
-    if (profileError || !profile || profile.role !== 'admin') {
-      console.error("[seed-demo] User is not admin:", profileError?.message || profile?.role)
+    if (memberError || !member) {
+      console.error("[seed-demo] User is not an org admin:", memberError?.message || 'no admin membership found')
       return new Response(JSON.stringify({ error: 'Forbidden: admin access required' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 403
