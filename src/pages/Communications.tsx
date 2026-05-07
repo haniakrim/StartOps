@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Mail, Phone, MessageSquare, BrainCircuit, TrendingUp, TrendingDown,
-  Minus, Search, Filter, Plus, Loader2, Send, Clock, User, Building2, Download, Trash2
+  Minus, Search, Filter, Plus, Loader2, Clock, User, Building2, Download, Trash2
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useRealtimeTable } from "@/hooks/useRealtime";
 import { useOrganization } from "@/hooks/useOrganization";
 
 interface Communication {
@@ -26,6 +25,8 @@ interface Communication {
   sentiment: string | null;
   extracted_data: any;
   occurred_at: string;
+  contact_id: string | null;
+  deal_id: string | null;
   contacts: { first_name: string; last_name: string; company: string | null } | null;
   deals: { name: string } | null;
 }
@@ -66,38 +67,7 @@ export default function Communications() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [sentimentFilter, setSentimentFilter] = useState("all");
 
-  useEffect(() => {
-    if (organizationId) {
-      fetchEmailTemplates();
-    }
-  }, [organizationId]);
-  useRealtimeTable("communications", fetchCommunications, [organizationId], organizationId);
-  useRealtimeTable("contacts", fetchContactsAndDeals, [organizationId], organizationId);
-  useRealtimeTable("deals", fetchContactsAndDeals, [organizationId], organizationId);
-
-  useEffect(() => {
-    if (organizationId) {
-      fetchCommunications();
-      fetchContactsAndDeals();
-    }
-  }, [organizationId]);
-
-  async function fetchEmailTemplates() {
-    try {
-      const { data, error } = await supabase
-        .from("email_templates")
-        .select("*")
-        .eq("organization_id", organizationId)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      setEmailTemplates(data || []);
-    } catch (error: any) {
-      // Silently fail - templates are optional
-      setEmailTemplates([]);
-    }
-  }
-
-  async function fetchCommunications() {
+  const fetchCommunications = useCallback(async () => {
     if (!organizationId) {
       setLoading(false);
       setCommunications([]);
@@ -107,22 +77,31 @@ export default function Communications() {
       setLoading(true);
       const { data, error } = await supabase
         .from("communications")
-        .select(`
-          id, type, direction, subject, content, summary, sentiment, extracted_data, occurred_at,
-          contacts:contact_id (first_name, last_name, company),
-          deals:deal_id (name)
-        `)
+        .select("*")
         .eq("organization_id", organizationId)
         .order("occurred_at", { ascending: false })
         .limit(100);
 
       if (error) throw error;
 
-      const mapped = (data || []).map((d: any) => ({
-        ...d,
-        contacts: d.contacts?.[0] ?? null,
-        deals: d.deals?.[0] ?? null,
-      }));
+      // Fetch contacts and deals for lookup
+      const [{ data: contactsData }, { data: dealsData }] = await Promise.all([
+        supabase.from("contacts").select("id, first_name, last_name, company").eq("organization_id", organizationId),
+        supabase.from("deals").select("id, name").eq("organization_id", organizationId),
+      ]);
+
+      const contactsMap = new Map((contactsData || []).map((c: any) => [c.id, c]));
+      const dealsMap = new Map((dealsData || []).map((d: any) => [d.id, d]));
+
+      const mapped: Communication[] = (data || []).map((d: any) => {
+        const contact = d.contact_id ? contactsMap.get(d.contact_id) : null;
+        const deal = d.deal_id ? dealsMap.get(d.deal_id) : null;
+        return {
+          ...d,
+          contacts: contact ? { first_name: contact.first_name, last_name: contact.last_name, company: contact.company } : null,
+          deals: deal ? { name: deal.name } : null,
+        };
+      });
 
       setCommunications(mapped);
 
@@ -138,27 +117,58 @@ export default function Communications() {
         neutral: sentiments.neutral || 0,
       });
     } catch (error: any) {
+      console.error("[Communications] fetch error:", error);
       toast.error("Failed to load communications: " + error.message);
     } finally {
       setLoading(false);
     }
-  }
+  }, [organizationId]);
 
-  async function fetchContactsAndDeals() {
+  const fetchContactsAndDeals = useCallback(async () => {
     if (!organizationId) return;
-    const { data: c } = await supabase
-      .from("contacts")
-      .select("id, first_name, last_name")
-      .eq("organization_id", organizationId)
-      .order("first_name");
+    const [{ data: c }, { data: d }] = await Promise.all([
+      supabase.from("contacts").select("id, first_name, last_name").eq("organization_id", organizationId).order("first_name"),
+      supabase.from("deals").select("id, name").eq("organization_id", organizationId).order("name"),
+    ]);
     setContacts(c || []);
-    const { data: d } = await supabase
-      .from("deals")
-      .select("id, name")
-      .eq("organization_id", organizationId)
-      .order("name");
     setDeals(d || []);
-  }
+  }, [organizationId]);
+
+  const fetchEmailTemplates = useCallback(async () => {
+    if (!organizationId) return;
+    try {
+      const { data, error } = await supabase
+        .from("email_templates")
+        .select("*")
+        .eq("organization_id", organizationId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setEmailTemplates(data || []);
+    } catch {
+      setEmailTemplates([]);
+    }
+  }, [organizationId]);
+
+  // Initial data load
+  useEffect(() => {
+    if (organizationId) {
+      fetchCommunications();
+      fetchContactsAndDeals();
+      fetchEmailTemplates();
+    } else {
+      setLoading(false);
+      setCommunications([]);
+    }
+  }, [organizationId, fetchCommunications, fetchContactsAndDeals, fetchEmailTemplates]);
+
+  // Polling refresh every 30s
+  useEffect(() => {
+    if (!organizationId) return;
+    const interval = setInterval(() => {
+      fetchCommunications();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [organizationId, fetchCommunications]);
 
   async function createCommunication(e: React.FormEvent) {
     e.preventDefault();
@@ -167,7 +177,6 @@ export default function Communications() {
       return;
     }
     try {
-      // Simulate AI analysis
       const sentiment = analyzeSentiment(newComm.content || "");
       const summary = generateSummary(newComm.content || "", newComm.type);
 
@@ -230,8 +239,24 @@ export default function Communications() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
         <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
+        <p className="text-sm text-muted-foreground">Loading communications...</p>
+        <p className="text-xs text-muted-foreground/60">orgId: {organizationId ?? "null"}</p>
+      </div>
+    );
+  }
+
+  if (!organizationId) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 gap-4">
+        <Mail className="w-12 h-12 text-muted-foreground/30" />
+        <h2 className="text-lg font-medium text-foreground">No Organization Found</h2>
+        <p className="text-sm text-muted-foreground text-center max-w-md">
+          You need to be a member of an organization to view communications.
+          Please sign out and sign in again, or contact your administrator.
+        </p>
+        <Button onClick={() => fetchCommunications()}>Retry</Button>
       </div>
     );
   }
@@ -244,7 +269,10 @@ export default function Communications() {
           <p className="text-sm text-muted-foreground mt-1">AI-powered conversation tracking and sentiment analysis</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent" onClick={() => {
+          <Button variant="outline" size="sm" onClick={() => { fetchCommunications(); toast.info("Refreshing..."); }}>
+            <Loader2 className="w-4 h-4 mr-2" />Refresh
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => {
             const exportData = communications.map(c => ({
               "Type": c.type,
               "Direction": c.direction,
@@ -264,9 +292,7 @@ export default function Communications() {
           </Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />Log Communication
-              </Button>
+              <Button size="sm"><Plus className="w-4 h-4 mr-2" />Log Communication</Button>
             </DialogTrigger>
             <DialogContent className="bg-card border-border text-card-foreground max-w-lg">
               <DialogHeader><DialogTitle>Log Communication</DialogTitle></DialogHeader>
@@ -303,35 +329,22 @@ export default function Communications() {
                       onValueChange={async (v) => {
                         const template = emailTemplates.find((t) => t.id === v);
                         if (template) {
-                          // Update usage count in DB
-                          await supabase
-                            .from("email_templates")
-                            .update({ usage_count: (template.usage_count || 0) + 1 })
-                            .eq("id", template.id);
-                          setNewComm((p) => ({
-                            ...p,
-                            subject: template.subject,
-                            content: template.body,
-                          }));
+                          await supabase.from("email_templates").update({ usage_count: (template.usage_count || 0) + 1 }).eq("id", template.id);
+                          setNewComm((p) => ({ ...p, subject: template.subject, content: template.body }));
                           toast.success(`Applied template: ${template.name}`);
                           fetchEmailTemplates();
                         }
                       }}
                     >
-                      <SelectTrigger className="bg-muted border-border">
-                        <SelectValue placeholder="Select a template" />
-                      </SelectTrigger>
+                      <SelectTrigger className="bg-muted border-border"><SelectValue placeholder="Select a template" /></SelectTrigger>
                       <SelectContent className="bg-card border-border">
                         {emailTemplates.map((t) => (
-                          <SelectItem key={t.id} value={t.id}>
-                            {t.name}
-                          </SelectItem>
+                          <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                 )}
-
                 <div className="space-y-2">
                   <Label>Subject</Label>
                   <Input value={newComm.subject} onChange={(e) => setNewComm(p => ({ ...p, subject: e.target.value }))} className="bg-muted border-border" placeholder="Re: Proposal follow-up" />

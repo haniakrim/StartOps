@@ -6,6 +6,7 @@ export function useOrganization() {
   const { user } = useAuth();
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchOrg() {
@@ -15,15 +16,27 @@ export function useOrganization() {
         return;
       }
       try {
-        const { data, error } = await supabase
+        setError(null);
+        // Use limit(1) instead of maybeSingle to avoid "multiple rows" warning being treated as error
+        const { data, error: queryError } = await supabase
           .from("organization_members")
           .select("organization_id")
           .eq("user_id", user.id)
-          .maybeSingle();
+          .limit(1);
 
-        if (error) throw error;
-        setOrganizationId(data?.organization_id || null);
-      } catch {
+        if (queryError) {
+          console.error("[useOrganization] query error:", queryError);
+          setError(queryError.message);
+          setOrganizationId(null);
+          return;
+        }
+
+        const orgId = data?.[0]?.organization_id || null;
+        console.log("[useOrganization] found orgId:", orgId);
+        setOrganizationId(orgId);
+      } catch (err: any) {
+        console.error("[useOrganization] catch error:", err);
+        setError(err.message);
         setOrganizationId(null);
       } finally {
         setLoading(false);
@@ -33,5 +46,5 @@ export function useOrganization() {
     fetchOrg();
   }, [user]);
 
-  return { organizationId, loading };
+  return { organizationId, loading, error };
 }
