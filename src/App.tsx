@@ -42,6 +42,7 @@ import EmailTemplates from "./pages/EmailTemplates";
 import Documents from "./pages/Documents";
 import Subscriptions from "./pages/Subscriptions";
 import Campaigns from "./pages/Campaigns";
+import StaffDirectory from "./pages/StaffDirectory";
 
 const queryClient = new QueryClient();
 
@@ -360,6 +361,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Campaigns />
+              <Route
+                path="/staff-directory"
+                element={
+                  <ProtectedRoute>
+                    <StaffDirectory />
+                  </ProtectedRoute>
+                }
+              />
                   </ProtectedRoute>
                 }
               />
