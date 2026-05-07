@@ -1,10 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 import { secureCookieStorage } from "@/lib/secure-cookie-storage";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const SUPABASE_URL = "https://dtrwtbmxvscrfkzdpsqt.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0cnd0Ym14dnNjcmZremRwc3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMDY5NTgsImV4cCI6MjA5MzU4Mjk1OH0.VfQiPNBOVQBCd8AGQEgmBMNrU6RgSNHhAtjx80qborE";
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: secureCookieStorage,
     autoRefreshToken: true,
