@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface DealDetailProps {
   dealId: string | null;
@@ -21,6 +22,7 @@ interface DealDetailProps {
 }
 
 export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps) {
+  const { organizationId } = useOrganization();
   const [deal, setDeal] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -33,21 +35,23 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
   useEffect(() => { if (dealId && open) fetchDeal(); }, [dealId, open]);
 
   async function fetchDeal() {
+    if (!organizationId) return;
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from("deals")
         .select(`*, contacts:contact_id (first_name, last_name, company, email, phone)`)
         .eq("id", dealId)
+        .eq("organization_id", organizationId)
         .maybeSingle();
       if (error) throw error;
       setDeal(data ? { ...data, contacts: data.contacts?.[0] ?? null } : null);
 
       const [{ data: pipeline }, { data: history }, { data: comms }, { data: acts }] = await Promise.all([
-        supabase.from("pipelines").select("stages").limit(1).single(),
+        supabase.from("pipelines").select("stages").eq("organization_id", organizationId).limit(1).single(),
         supabase.from("deal_stage_history").select("*").eq("deal_id", dealId).order("occurred_at", { ascending: false }),
-        supabase.from("communications").select("*").eq("deal_id", dealId).order("occurred_at", { ascending: false }).limit(10),
-        supabase.from("activities").select("*").eq("deal_id", dealId).order("created_at", { ascending: false }).limit(10),
+        supabase.from("communications").select("*").eq("deal_id", dealId).eq("organization_id", organizationId).order("occurred_at", { ascending: false }).limit(10),
+        supabase.from("activities").select("*").eq("deal_id", dealId).eq("organization_id", organizationId).order("created_at", { ascending: false }).limit(10),
       ]);
 
       setStages(pipeline?.stages || []);
@@ -62,11 +66,12 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
   }
 
   async function saveChanges() {
+    if (!organizationId) return;
     try {
       const { error } = await supabase.from("deals").update({
         name: deal.name, value: deal.value, probability: deal.probability,
         stage: deal.stage, expected_close_date: deal.expected_close_date,
-      }).eq("id", dealId);
+      }).eq("id", dealId).eq("organization_id", organizationId);
       if (error) throw error;
       toast.success("Deal updated");
       setEditing(false);
@@ -77,8 +82,9 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
   }
 
   async function deleteDeal() {
+    if (!organizationId) return;
     try {
-      const { error } = await supabase.from("deals").delete().eq("id", dealId);
+      const { error } = await supabase.from("deals").delete().eq("id", dealId).eq("organization_id", organizationId);
       if (error) throw error;
       toast.success("Deal deleted");
       onClose();

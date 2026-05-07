@@ -1,12 +1,24 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const ALLOWED_ORIGINS = [
+  'https://dtrwtbmxvscrfkzdpsqt.supabase.co',
+  'http://localhost:5173',
+  'http://localhost:3000',
+]
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('Origin') || ''
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  }
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req)
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -182,7 +194,6 @@ serve(async (req) => {
         wouldDelete,
         demoUserId,
         demoOrgId,
-        demoPassword
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200
@@ -194,7 +205,6 @@ serve(async (req) => {
         error: 'Destructive cleanup requires confirm: true in request body. Use dryRun: true to preview what would be deleted.',
         demoUserId,
         demoOrgId,
-        demoPassword
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400
@@ -299,9 +309,9 @@ serve(async (req) => {
       { organization_id: demoOrgId, contact_id: contactIds[0], deal_id: dealIds[0], type: 'call', subject: 'Discovery call with John', description: 'Discussed expansion needs and timeline', due_date: '2025-01-15T10:00:00Z', status: 'completed', priority: 'high' },
       { organization_id: demoOrgId, contact_id: contactIds[2], deal_id: dealIds[1], type: 'meeting', subject: 'Demo for Globex team', description: 'Product demo for manufacturing suite', due_date: '2025-01-20T14:00:00Z', status: 'completed', priority: 'high' },
       { organization_id: demoOrgId, contact_id: contactIds[4], type: 'email', subject: 'Follow-up on automation', description: 'Sent pricing and feature list', due_date: '2025-01-22T09:00:00Z', status: 'completed', priority: 'medium' },
-      { organization_id: demoOrgId, contact_id: contactIds[6], type: 'call', subject: 'Contract negotiation', description: 'Final terms discussion', due_date: '2025-01-08T11:00:00Z', status: 'completed', priority: 'high' },
-      { organization_id: demoOrgId, contact_id: contactIds[8], type: 'meeting', subject: 'Security review', description: 'Compliance and security assessment', due_date: '2025-01-25T13:00:00Z', status: 'pending', priority: 'high' },
-      { organization_id: demoOrgId, contact_id: contactIds[10], type: 'task', subject: 'Prepare proposal for Wayne', description: 'Custom proposal for multi-division', due_date: '2025-02-05T17:00:00Z', status: 'pending', priority: 'medium' },
+      { organization_id: demoOrgId, contact_id: contactIds[6], deal_id: dealIds[3], type: 'call', subject: 'Contract negotiation', description: 'Final terms discussion', due_date: '2025-01-08T11:00:00Z', status: 'completed', priority: 'high' },
+      { organization_id: demoOrgId, contact_id: contactIds[8], deal_id: dealIds[4], type: 'meeting', subject: 'Security review', description: 'Compliance and security assessment', due_date: '2025-01-25T13:00:00Z', status: 'pending', priority: 'high' },
+      { organization_id: demoOrgId, contact_id: contactIds[10], deal_id: dealIds[5], type: 'task', subject: 'Prepare proposal for Wayne', description: 'Custom proposal for multi-division', due_date: '2025-02-05T17:00:00Z', status: 'pending', priority: 'medium' },
       { organization_id: demoOrgId, contact_id: contactIds[1], type: 'email', subject: 'Technical documentation', description: 'Sent API docs and integration guide', due_date: '2025-01-18T10:00:00Z', status: 'completed', priority: 'low' },
       { organization_id: demoOrgId, contact_id: contactIds[3], type: 'call', subject: 'Check-in call', description: 'Quarterly business review', due_date: '2025-02-10T15:00:00Z', status: 'pending', priority: 'medium' },
       { organization_id: demoOrgId, contact_id: contactIds[5], type: 'meeting', subject: 'Requirements gathering', description: 'Detailed requirements for Initech', due_date: '2025-01-28T11:00:00Z', status: 'pending', priority: 'high' },
@@ -464,7 +474,6 @@ serve(async (req) => {
       message: 'Demo data seeded successfully',
       demoUserId,
       demoOrgId,
-      demoPassword
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200

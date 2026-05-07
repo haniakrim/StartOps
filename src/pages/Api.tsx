@@ -21,41 +21,6 @@ interface WebhookItem {
   created_at: string;
 }
 
-function isValidWebhookUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-      return false;
-    }
-    const hostname = parsed.hostname.toLowerCase();
-    if (hostname === "localhost" || hostname.endsWith(".localhost")) {
-      return false;
-    }
-    // Reject private IP ranges
-    const privateRanges = [
-      /^127\./,
-      /^10\./,
-      /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
-      /^192\.168\./,
-      /^169\.254\./,
-      /^0\./,
-      /^::1$/,
-      /^fc00:/i,
-      /^fe80:/i,
-    ];
-    if (privateRanges.some((regex) => regex.test(hostname))) {
-      return false;
-    }
-    // Reject metadata endpoints
-    if (hostname === "169.254.169.254" || hostname.endsWith(".internal") || hostname.endsWith(".local")) {
-      return false;
-    }
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export default function Api() {
   const { organizationId } = useOrganization();
   const [webhooks, setWebhooks] = useState<WebhookItem[]>([]);
@@ -72,14 +37,14 @@ export default function Api() {
       setLoading(true);
       const { data: whData, error: whError } = await supabase
         .from("webhooks")
-        .select("*")
+        .select("id,name,url,events,is_active,last_triggered_at,created_at")
         .order("created_at", { ascending: false });
       if (whError) throw whError;
       setWebhooks(whData || []);
 
       const { data: keyData, error: keyError } = await supabase
         .from("api_keys")
-        .select("*")
+        .select("id,name,permissions,rate_limit,last_used_at,expires_at,is_active")
         .order("created_at", { ascending: false });
       if (keyError) throw keyError;
       setApiKeys(keyData || []);
@@ -97,18 +62,37 @@ export default function Api() {
         toast.error("No organization found. Please sign out and sign in again.");
         return;
       }
-      if (!isValidWebhookUrl(newWebhook.url)) {
-        toast.error("Invalid webhook URL. URLs must use http/https, and cannot point to localhost, private IP addresses, or internal metadata endpoints.");
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        toast.error("Not authenticated");
         return;
       }
-      const { error } = await supabase.from("webhooks").insert({
-        name: newWebhook.name,
-        url: newWebhook.url,
-        events: [newWebhook.events],
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        organization_id: organizationId,
-      });
-      if (error) throw error;
+
+      const response = await fetch(
+        "https://dtrwtbmxvscrfkzdpsqt.supabase.co/functions/v1/manage-webhook",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            name: newWebhook.name,
+            url: newWebhook.url,
+            events: [newWebhook.events],
+            organization_id: organizationId,
+          }),
+        }
+      );
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast.error(result.error || "Failed to create webhook");
+        return;
+      }
+
       toast.success("Webhook created");
       setDialogOpen(false);
       setNewWebhook({ name: "", url: "", events: "contact.created" });

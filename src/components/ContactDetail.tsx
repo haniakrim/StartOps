@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface ContactDetailProps {
   contactId: string | null;
@@ -19,6 +20,7 @@ interface ContactDetailProps {
 }
 
 export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDetailProps) {
+  const { organizationId } = useOrganization();
   const [contact, setContact] = useState<any>(null);
   const [deals, setDeals] = useState<any[]>([]);
   const [communications, setCommunications] = useState<any[]>([]);
@@ -33,16 +35,22 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
   useEffect(() => { if (contactId && open) fetchContact(); }, [contactId, open]);
 
   async function fetchContact() {
+    if (!organizationId) return;
     try {
       setLoading(true);
-      const { data, error } = await supabase.from("contacts").select("*").eq("id", contactId).maybeSingle();
+      const { data, error } = await supabase
+        .from("contacts")
+        .select("*")
+        .eq("id", contactId)
+        .eq("organization_id", organizationId)
+        .maybeSingle();
       if (error) throw error;
       setContact(data);
 
       const [{ data: dealsData }, { data: commsData }, { data: actsData }] = await Promise.all([
-        supabase.from("deals").select("*").eq("contact_id", contactId).order("created_at", { ascending: false }),
-        supabase.from("communications").select("*").eq("contact_id", contactId).order("occurred_at", { ascending: false }).limit(10),
-        supabase.from("activities").select("*").eq("contact_id", contactId).order("created_at", { ascending: false }).limit(10),
+        supabase.from("deals").select("*").eq("contact_id", contactId).eq("organization_id", organizationId).order("created_at", { ascending: false }),
+        supabase.from("communications").select("*").eq("contact_id", contactId).eq("organization_id", organizationId).order("occurred_at", { ascending: false }).limit(10),
+        supabase.from("activities").select("*").eq("contact_id", contactId).eq("organization_id", organizationId).order("created_at", { ascending: false }).limit(10),
       ]);
 
       setDeals(dealsData || []);
@@ -56,11 +64,12 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
   }
 
   async function saveChanges() {
+    if (!organizationId) return;
     try {
       const { error } = await supabase.from("contacts").update({
         first_name: contact.first_name, last_name: contact.last_name, email: contact.email,
         phone: contact.phone, company: contact.company, title: contact.title, status: contact.status,
-      }).eq("id", contactId);
+      }).eq("id", contactId).eq("organization_id", organizationId);
       if (error) throw error;
       toast.success("Contact updated");
       setEditing(false);
@@ -71,8 +80,9 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
   }
 
   async function deleteContact() {
+    if (!organizationId) return;
     try {
-      const { error } = await supabase.from("contacts").delete().eq("id", contactId);
+      const { error } = await supabase.from("contacts").delete().eq("id", contactId).eq("organization_id", organizationId);
       if (error) throw error;
       toast.success("Contact deleted");
       onClose();
@@ -84,6 +94,10 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
 
   async function createActivity(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found.");
+      return;
+    }
     try {
       const { error } = await supabase.from("activities").insert({
         type: newActivity.type,
@@ -92,6 +106,7 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
         due_date: newActivity.due_date || null,
         priority: newActivity.priority,
         contact_id: contactId,
+        organization_id: organizationId,
         status: "pending",
       });
       if (error) throw error;
@@ -106,6 +121,10 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
 
   async function createDeal(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found.");
+      return;
+    }
     try {
       const { error } = await supabase.from("deals").insert({
         name: newDeal.name,
@@ -114,6 +133,7 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
         stage: newDeal.stage,
         expected_close_date: newDeal.expected_close_date || null,
         contact_id: contactId,
+        organization_id: organizationId,
         status: "open",
       });
       if (error) throw error;
@@ -127,12 +147,17 @@ export function ContactDetail({ contactId, open, onClose, onUpdate }: ContactDet
   }
 
   async function logCommunication(type: string) {
+    if (!organizationId) {
+      toast.error("No organization found.");
+      return;
+    }
     try {
       const { error } = await supabase.from("communications").insert({
         type,
         direction: "outbound",
         subject: `${type} with ${contact?.first_name} ${contact?.last_name}`,
         contact_id: contactId,
+        organization_id: organizationId,
         occurred_at: new Date().toISOString(),
       });
       if (error) throw error;
