@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { loginRateLimiter, signupRateLimiter } from "@/lib/rate-limiter";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,42 +14,15 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [rateLimitMs, setRateLimitMs] = useState(0);
-
-  useEffect(() => {
-    if (rateLimitMs <= 0) return;
-    const interval = setInterval(() => {
-      const check = loginRateLimiter.check();
-      setRateLimitMs(check.remainingMs);
-      if (check.allowed) {
-        clearInterval(interval);
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [rateLimitMs]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const rateCheck = loginRateLimiter.check();
-    if (!rateCheck.allowed) {
-      setRateLimitMs(rateCheck.remainingMs);
-      toast({
-        title: "Too many attempts",
-        description: `Please wait ${Math.ceil(rateCheck.remainingMs / 1000)}s before trying again.`,
-        variant: "destructive",
-      });
-      return;
-    }
 
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        const rateResult = loginRateLimiter.recordFailure();
-        setRateLimitMs(rateResult.remainingMs);
-
         // Generic error message to prevent account enumeration
         toast({
           title: "Authentication failed",
@@ -58,11 +30,9 @@ const Login = () => {
           variant: "destructive",
         });
       } else {
-        loginRateLimiter.recordSuccess();
         navigate("/");
       }
     } catch {
-      loginRateLimiter.recordFailure();
       toast({
         title: "Authentication failed",
         description: "Invalid credentials. Please check your email and password.",
@@ -76,36 +46,23 @@ const Login = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const rateCheck = signupRateLimiter.check();
-    if (!rateCheck.allowed) {
-      toast({
-        title: "Too many attempts",
-        description: `Please wait ${Math.ceil(rateCheck.remainingMs / 1000)}s before trying again.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
     try {
       const { error } = await supabase.auth.signUp({ email, password });
 
       if (error) {
-        signupRateLimiter.recordFailure();
         toast({
           title: "Sign up failed",
           description: error.message,
           variant: "destructive",
         });
       } else {
-        signupRateLimiter.recordSuccess();
         toast({
           title: "Account created",
           description: "Please check your email to verify your account.",
         });
       }
     } catch {
-      signupRateLimiter.recordFailure();
       toast({
         title: "Sign up failed",
         description: "An unexpected error occurred.",
@@ -115,8 +72,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
-  const isRateLimited = rateLimitMs > 0;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -142,7 +97,6 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    disabled={isRateLimited}
                   />
                 </div>
                 <div className="space-y-2">
@@ -153,15 +107,9 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    disabled={isRateLimited}
                   />
                 </div>
-                {isRateLimited && (
-                  <p className="text-sm text-destructive">
-                    Too many failed attempts. Please wait {Math.ceil(rateLimitMs / 1000)}s.
-                  </p>
-                )}
-                <Button type="submit" className="w-full" disabled={loading || isRateLimited}>
+                <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
