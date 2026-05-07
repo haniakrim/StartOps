@@ -85,12 +85,14 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
 
   async function deleteComment(id: string) {
     if (!organizationId) return;
+    if (!user?.id) return;
     try {
       const { error } = await supabase
         .from("comments")
         .delete()
         .eq("id", id)
-        .eq("organization_id", organizationId);
+        .eq("organization_id", organizationId)
+        .eq("user_id", user.id);
       if (error) throw error;
       toast.success("Comment deleted");
       fetchComments();
@@ -133,12 +135,14 @@ export function CommentsSection({ entityType, entityId }: CommentsSectionProps) 
                     {new Date(comment.created_at).toLocaleString()}
                   </span>
                 </div>
-                <button
-                  onClick={() => deleteComment(comment.id)}
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity p-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                {comment.user_id === user?.id && (
+                  <button
+                    onClick={() => deleteComment(comment.id)}
+                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity p-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                 {comment.text}

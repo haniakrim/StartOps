@@ -58,6 +58,16 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
+/** Sanitize a string for use as a CSS custom property name segment. */
+function sanitizeCssName(value: string): string {
+  return value.replace(/[^a-zA-Z0-9_-]/g, "");
+}
+
+/** Sanitize a string for use in a CSS attribute selector value. */
+function sanitizeCssSelectorValue(value: string): string {
+  return value.replace(/["'\[\]<>{}\\]/g, "");
+}
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.color || config.theme
@@ -67,19 +77,24 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
+  const safeId = sanitizeCssSelectorValue(id);
+
   const css = Object.entries(THEMES)
     .map(([theme, prefix]) => {
       const rules = colorConfig
         .map(([key, itemConfig]) => {
+          const safeKey = sanitizeCssName(key);
+          if (!safeKey) return "";
+
           // Sanitize all color values before CSS injection
           const color = itemConfig.color ? sanitizeColor(itemConfig.color) : "";
           const themeColor = itemConfig.theme?.[theme as keyof typeof THEMES]
             ? sanitizeColor(itemConfig.theme[theme as keyof typeof THEMES])
             : "";
 
-          const colorRule = color ? `  --color-${key}: ${color};` : "";
+          const colorRule = color ? `  --color-${safeKey}: ${color};` : "";
           const themeColorRule = themeColor
-            ? `  --color-${key}: ${themeColor};`
+            ? `  --color-${safeKey}: ${themeColor};`
             : "";
 
           return colorRule || themeColorRule;
@@ -88,8 +103,8 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
         .join("\n");
 
       return prefix
-        ? `${prefix} [data-chart=${id}] {\n${rules}\n}`
-        : `[data-chart=${id}] {\n${rules}\n}`;
+        ? `${prefix} [data-chart=${safeId}] {\n${rules}\n}`
+        : `[data-chart=${safeId}] {\n${rules}\n}`;
     })
     .join("\n");
 

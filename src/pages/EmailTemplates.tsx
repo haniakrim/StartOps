@@ -24,6 +24,7 @@ import { EmailTemplateForm } from "@/components/email-templates/EmailTemplateFor
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface EmailTemplate {
   id: string;
@@ -45,6 +46,7 @@ const categoryColors: Record<string, string> = {
 };
 
 export default function EmailTemplates() {
+  const { organizationId } = useOrganization();
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -56,11 +58,13 @@ export default function EmailTemplates() {
   useRealtimeTable("email_templates", fetchTemplates);
 
   async function fetchTemplates() {
+    if (!organizationId) return;
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from("email_templates")
         .select("*")
+        .eq("organization_id", organizationId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -71,6 +75,7 @@ export default function EmailTemplates() {
         const { data: seeded } = await supabase
           .from("email_templates")
           .select("*")
+          .eq("organization_id", organizationId)
           .order("created_at", { ascending: false });
         setTemplates(seeded || []);
       } else {
@@ -84,24 +89,28 @@ export default function EmailTemplates() {
   }
 
   async function seedDefaults() {
+    if (!organizationId) return;
     const defaults = [
       {
         name: "Initial Outreach",
         category: "Sales",
         subject: "Following up on your interest",
         body: "Hi {{first_name}},\n\nI hope this email finds you well. I wanted to follow up on your recent interest in our solutions.\n\nWould you be available for a quick call next week?\n\nBest regards,\nYour Name",
+        organization_id: organizationId,
       },
       {
         name: "Demo Follow-up",
         category: "Sales",
         subject: "Thanks for attending the demo",
         body: "Hi {{first_name}},\n\nThank you for taking the time to attend our demo today. It was great learning more about {{company}}'s needs.\n\nAs discussed, I've attached the proposal for your review.\n\nLet me know if you have any questions!\n\nBest,\nYour Name",
+        organization_id: organizationId,
       },
       {
         name: "Welcome Email",
         category: "Onboarding",
         subject: "Welcome to the team!",
         body: "Hi {{first_name}},\n\nWelcome aboard! We're excited to have {{company}} as a partner.\n\nYour account manager will reach out shortly to kick off the onboarding process.\n\nCheers,\nThe Team",
+        organization_id: organizationId,
       },
     ];
 
@@ -111,8 +120,12 @@ export default function EmailTemplates() {
   }
 
   async function createTemplate(data: { name: string; category: string; subject: string; body: string }) {
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
-      const { error } = await supabase.from("email_templates").insert(data);
+      const { error } = await supabase.from("email_templates").insert({ ...data, organization_id: organizationId });
       if (error) throw error;
       toast.success("Template created");
       setDialogOpen(false);
@@ -148,12 +161,17 @@ export default function EmailTemplates() {
   }
 
   async function duplicateTemplate(template: EmailTemplate) {
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
       const { error } = await supabase.from("email_templates").insert({
         name: `${template.name} (Copy)`,
         category: template.category,
         subject: template.subject,
         body: template.body,
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Template duplicated");

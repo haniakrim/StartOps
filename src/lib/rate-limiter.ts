@@ -10,6 +10,13 @@ const MAX_ATTEMPTS = 5;
 const BASE_COOLDOWN_MS = 3000; // 3 seconds
 const MAX_COOLDOWN_MS = 60000; // 1 minute max
 
+/**
+ * Client-side rate limiter for auth actions.
+ *
+ * IMPORTANT: This is a UX enhancement only. It uses localStorage and can be
+ * bypassed by a determined attacker. The primary rate limiting is performed
+ * server-side by Supabase Auth, which cannot be bypassed from the client.
+ */
 export class AuthRateLimiter {
   private key: string;
 
@@ -19,7 +26,7 @@ export class AuthRateLimiter {
 
   private getState(): RateLimitState {
     try {
-      const stored = sessionStorage.getItem(this.key);
+      const stored = localStorage.getItem(this.key);
       if (stored) {
         return JSON.parse(stored);
       }
@@ -31,7 +38,7 @@ export class AuthRateLimiter {
 
   private setState(state: RateLimitState): void {
     try {
-      sessionStorage.setItem(this.key, JSON.stringify(state));
+      localStorage.setItem(this.key, JSON.stringify(state));
     } catch {
       // Ignore storage errors
     }
@@ -93,7 +100,7 @@ export class AuthRateLimiter {
    */
   reset(): void {
     try {
-      sessionStorage.removeItem(this.key);
+      localStorage.removeItem(this.key);
     } catch {
       // Ignore
     }
