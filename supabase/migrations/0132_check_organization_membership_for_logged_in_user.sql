@@ -1,0 +1,1 @@
+SELECT * FROM organization_members WHERE user_id = 'c39578b8-2563-4670-9eec-c8b750832f8f'

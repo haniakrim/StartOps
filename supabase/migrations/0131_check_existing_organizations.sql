@@ -1,0 +1,1 @@
+SELECT * FROM organizations LIMIT 5
