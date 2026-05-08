@@ -1,0 +1,1 @@
+UPDATE public.webhooks SET user_id = 'c39578b8-2563-4670-9eec-c8b750832f8f' WHERE user_id = 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9';

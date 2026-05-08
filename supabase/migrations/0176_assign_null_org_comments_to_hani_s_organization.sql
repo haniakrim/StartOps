@@ -1,0 +1,1 @@
+UPDATE public.comments SET organization_id = '9321e605-1b36-4b31-a8ef-4bf5c58b5542' WHERE organization_id IS NULL;

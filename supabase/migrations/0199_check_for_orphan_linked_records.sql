@@ -1,0 +1,5 @@
+SELECT 'project_tasks orphan' as check_type, COUNT(*) as count FROM public.project_tasks pt WHERE NOT EXISTS (SELECT 1 FROM public.projects p WHERE p.id = pt.project_id)
+UNION ALL SELECT 'key_results orphan' as check_type, COUNT(*) FROM public.key_results kr WHERE NOT EXISTS (SELECT 1 FROM public.goals g WHERE g.id = kr.goal_id)
+UNION ALL SELECT 'quote_items orphan' as check_type, COUNT(*) FROM public.quote_items qi WHERE NOT EXISTS (SELECT 1 FROM public.quotes q WHERE q.id = qi.quote_id)
+UNION ALL SELECT 'employee_skills orphan' as check_type, COUNT(*) FROM public.employee_skills es WHERE NOT EXISTS (SELECT 1 FROM public.employees e WHERE e.id = es.employee_id)
+UNION ALL SELECT 'deal_stage_history orphan' as check_type, COUNT(*) FROM public.deal_stage_history dsh WHERE NOT EXISTS (SELECT 1 FROM public.deals d WHERE d.id = dsh.deal_id);

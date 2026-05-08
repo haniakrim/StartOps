@@ -1,0 +1,1 @@
+SELECT COUNT(*) as total FROM public.profiles WHERE id = 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9';
