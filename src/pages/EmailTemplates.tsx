@@ -32,8 +32,8 @@ export default function EmailTemplates() {
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
 
-  useEffect(() => { fetchTemplates(); }, []);
-  useRealtimeTable("email_templates", fetchTemplates);
+  useEffect(() => { fetchTemplates(); }, [organizationId]);
+  useRealtimeTable("email_templates", fetchTemplates, [], organizationId);
 
   async function fetchTemplates() {
     if (!organizationId) return;

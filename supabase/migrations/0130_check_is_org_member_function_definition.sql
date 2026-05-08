@@ -1,0 +1,1 @@
+SELECT * FROM pg_proc WHERE proname = 'is_org_member'
