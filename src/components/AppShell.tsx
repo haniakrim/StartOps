@@ -36,6 +36,7 @@ import {
   ChevronDown,
   ChevronRight,
   FolderOpen,
+  Sun,
   type LucideIcon,
 } from "lucide-react";
 import HeroLogo from "@/components/landing/HeroLogo";
@@ -47,6 +48,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import CommandPalette from "@/components/CommandPalette";
 import RealtimeNotifications from "@/components/RealtimeNotifications";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface NavItem {
   path: string;
