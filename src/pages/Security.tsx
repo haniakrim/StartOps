@@ -36,9 +36,20 @@ const Security = () => {
 
     setLoading(true);
     try {
-      // Re-authenticate with current password
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Session expired",
+          description: "Please log in again to change your password.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Re-authenticate with current password to ensure user is who they say they are
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: (await supabase.auth.getUser()).data.user?.email || "",
+        email: user.email || "",
         password: currentPassword,
       });
 
@@ -70,10 +81,10 @@ const Security = () => {
         setNewPassword("");
         setConfirmPassword("");
       }
-    } catch {
+    } catch (error: any) {
       toast({
         title: "Password change failed",
-        description: "An unexpected error occurred.",
+        description: error.message || "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -83,8 +94,8 @@ const Security = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Security</h1>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl font-bold tracking-tight">Security</h1>
         <p className="text-muted-foreground">Manage your account security settings</p>
       </div>
 
@@ -127,7 +138,7 @@ const Security = () => {
                 minLength={8}
               />
             </div>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="w-full sm:w-auto">
               {loading ? "Updating..." : "Update Password"}
             </Button>
           </form>
