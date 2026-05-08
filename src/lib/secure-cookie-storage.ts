@@ -13,7 +13,7 @@ interface StorageItem {
 
 const COOKIE_OPTIONS = {
   secure: typeof window !== "undefined" && window.location.protocol === "https:",
-  sameSite: "Strict" as const,
+  sameSite: "Lax" as const,
   path: "/",
   maxAge: 60 * 60 * 24 * 7, // 7 days
 };

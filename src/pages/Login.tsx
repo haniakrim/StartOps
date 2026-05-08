@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Building2, ArrowRight, Zap, Shield, Users, BarChart3 } from "lucide-react";
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -18,24 +20,66 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      console.log("[Login] signInWithPassword result:", {
+        error: error?.message ?? null,
+        hasUser: !!data.user,
+        hasSession: !!data.session,
+      });
 
       if (error) {
         toast({
           title: "Authentication failed",
-          description: "Invalid credentials. Please check your email and password.",
+          description: error.message,
           variant: "destructive",
         });
-      } else {
-        window.location.href = "/dashboard";
+        return;
       }
-    } catch {
+
+      if (!data.session) {
+        toast({
+          title: "Authentication failed",
+          description: "No session returned. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Manually persist the session to ensure storage adapter writes it
+      const setResult = await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+      console.log("[Login] setSession result:", {
+        error: setResult.error?.message ?? null,
+        hasSession: !!setResult.data.session,
+      });
+
+      // Wait for storage to flush
+      await sleep(400);
+
+      // Verify session was persisted
+      const { data: check } = await supabase.auth.getSession();
+      console.log("[Login] getSession check:", { hasSession: !!check.session });
+
+      if (!check.session) {
+        console.warn("[Login] Session not persisted — forcing navigation anyway");
+      }
+
+      // Full page reload so AuthContext picks up the session on /dashboard
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      console.error("[Login] Unexpected error:", err);
       toast({
         title: "Authentication failed",
-        description: "Invalid credentials. Please check your email and password.",
+        description: err?.message || "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -45,10 +89,13 @@ const Login = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
+
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
       if (error) {
         toast({
@@ -56,16 +103,26 @@ const Login = () => {
           description: error.message,
           variant: "destructive",
         });
+        return;
+      }
+
+      if (data.session) {
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+        await sleep(400);
+        window.location.href = "/dashboard";
       } else {
         toast({
           title: "Account created",
           description: "Please check your email to verify your account.",
         });
       }
-    } catch {
+    } catch (err: any) {
       toast({
         title: "Sign up failed",
-        description: "An unexpected error occurred.",
+        description: err?.message || "An unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -78,7 +135,7 @@ const Login = () => {
       {/* Left side - Hero */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#0A1628] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0066B1]/20 via-transparent to-[#00BFFF]/10" />
-        
+
         <div className="relative z-10 flex flex-col justify-between p-12">
           <div>
             <div className="flex items-center gap-3 mb-8">
