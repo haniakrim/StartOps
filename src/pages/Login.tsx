@@ -30,16 +30,19 @@ const Login = () => {
         password,
       });
 
-      // If user doesn't exist with these credentials, auto-signup the demo user
+      // If user doesn't exist, auto-create via signUp then immediately sign in
       if (error?.message?.toLowerCase().includes("invalid login credentials")) {
-        const signup = await supabase.auth.signUp({
-          email,
-          password,
-        });
+        const signup = await supabase.auth.signUp({ email, password });
 
-        if (signup.data?.session) {
-          data = signup.data;
-          error = null;
+        // Try signing in again — user now exists
+        if (!signup.error) {
+          const secondTry = await supabase.auth.signInWithPassword({ email, password });
+          if (secondTry.data?.session) {
+            data = secondTry.data;
+            error = null;
+          } else {
+            error = secondTry.error || signup.error;
+          }
         } else {
           error = signup.error;
         }
