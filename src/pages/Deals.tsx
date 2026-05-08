@@ -241,7 +241,18 @@ export default function Deals() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {dealsByStage.map(stage => (
-            <div key={stage.id} className="space-y-3">
+            <div
+              key={stage.id}
+              className="space-y-3"
+              onDragOver={(e) => { e.preventDefault(); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (draggedDeal && draggedDeal.stage !== stage.id) {
+                  updateDealStage(draggedDeal.id, stage.id);
+                }
+                setDraggedDeal(null);
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stage.color }} />

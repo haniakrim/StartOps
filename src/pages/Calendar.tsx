@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock,
   DollarSign, FileText, CheckCircle2, AlertCircle, Loader2,
-  Plus, Filter
+  Plus
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface CalendarEvent {
   id: string;
@@ -30,7 +31,7 @@ export default function Calendar() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [filter, setFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
 
   const [newEvent, setNewEvent] = useState({
     title: "", type: "activity", date: "", time: "", description: "",
@@ -88,8 +89,14 @@ export default function Calendar() {
     }
   }
 
+  const { organizationId } = useOrganization();
+
   async function createEvent(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
       const dateTime = newEvent.date && newEvent.time
         ? new Date(`${newEvent.date}T${newEvent.time}`).toISOString()
@@ -101,6 +108,7 @@ export default function Calendar() {
         description: newEvent.description || null,
         due_date: dateTime,
         status: "pending",
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Event created");
@@ -121,7 +129,7 @@ export default function Calendar() {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  const filteredEvents = filter === "all" ? events : events.filter(e => e.type === filter);
+  const filteredEvents = typeFilter === "all" ? events : events.filter(e => e.type === typeFilter);
 
   const getEventsForDate = (day: number) => {
     const date = new Date(year, month, day);
@@ -152,9 +160,9 @@ export default function Calendar() {
           <p className="text-sm text-muted-foreground mt-1">Unified view of deadlines, activities, and milestones</p>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={filter} onValueChange={setFilter}>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="bg-card border-border text-foreground w-36">
-              <Filter className="w-4 h-4 mr-2" />
+              <CalendarIcon className="w-4 h-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-card border-border">

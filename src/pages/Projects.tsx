@@ -59,6 +59,7 @@ export default function Projects() {
   const [projectTasks, setProjectTasks] = useState<ProjectTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [newProject, setNewProject] = useState({ name: "", description: "", budget: "", priority: "medium", start_date: "", end_date: "" });
@@ -310,7 +311,7 @@ export default function Projects() {
                   <h2 className="text-lg font-semibold text-foreground">{projects.find(p => p.id === selectedProjectId)?.name}</h2>
                   <p className="text-sm text-muted-foreground">{selectedProjectTasks.length} tasks</p>
                 </div>
-                <Button size="sm" onClick={() => { setNewTask({ name: "", description: "", status: "todo", priority: "medium", due_date: "" }); }}>
+                <Button size="sm" onClick={() => { setNewTask({ name: "", description: "", status: "todo", priority: "medium", due_date: "" }); setTaskDialogOpen(true); }}>
                   <Plus className="w-4 h-4 mr-2" />Add Task
                 </Button>
               </div>
@@ -354,9 +355,8 @@ export default function Projects() {
         </TabsContent>
       </Tabs>
 
-      {/* Quick task creation dialog (shown after button click) */}
       {selectedProjectId && (
-        <Dialog open={!!newTask.name} onOpenChange={(open) => { if (!open) setNewTask({ name: "", description: "", status: "todo", priority: "medium", due_date: "" }); }}>
+        <Dialog open={taskDialogOpen} onOpenChange={(open) => { setTaskDialogOpen(open); if (!open) setNewTask({ name: "", description: "", status: "todo", priority: "medium", due_date: "" }); }}>
           <DialogContent>
             <DialogHeader><DialogTitle>Add Task</DialogTitle></DialogHeader>
             <form onSubmit={createTask} className="space-y-4 pt-4">

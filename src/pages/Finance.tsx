@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, FileText, CreditCard, AlertTriangle,
   Plus, Search, Filter, Loader2, Download, CheckCircle, Clock, XCircle,

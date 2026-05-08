@@ -269,7 +269,7 @@ export default function Communications() {
           <p className="text-sm text-muted-foreground mt-1">AI-powered conversation tracking and sentiment analysis</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => { fetchCommunications(); toast.info("Refreshing..."); }}>
+          <Button variant="outline" size="sm" onClick={() => { toast.info("Refreshing..."); fetchCommunications(); }}>
             <Loader2 className="w-4 h-4 mr-2" />Refresh
           </Button>
           <Button variant="outline" size="sm" onClick={() => {

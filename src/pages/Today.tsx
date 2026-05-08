@@ -48,8 +48,6 @@ export default function Today() {
         supabase.from("contacts")
           .select("id,first_name,last_name,company,created_at")
           .eq("organization_id", organizationId)
-          .gte("created_at", startOfDay)
-          .lte("created_at", endOfDay)
           .order("created_at", { ascending: false })
           .limit(5),
       ]);

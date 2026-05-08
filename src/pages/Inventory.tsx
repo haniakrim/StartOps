@@ -52,6 +52,14 @@ export default function Inventory() {
                   <div className="space-y-2"><Label>SKU</Label><Input value={newProduct.sku} onChange={e => setNewProduct(p => ({ ...p, sku: e.target.value }))} /></div>
                   <div className="space-y-2"><Label>Category</Label><Input value={newProduct.category} onChange={e => setNewProduct(p => ({ ...p, category: e.target.value }))} /></div>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label>Unit Price ($)</Label><Input type="number" min={0} step="0.01" value={newProduct.unit_price} onChange={e => setNewProduct(p => ({ ...p, unit_price: e.target.value }))} /></div>
+                  <div className="space-y-2"><Label>Cost Price ($)</Label><Input type="number" min={0} step="0.01" value={newProduct.cost_price} onChange={e => setNewProduct(p => ({ ...p, cost_price: e.target.value }))} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label>Quantity On Hand</Label><Input type="number" min={0} step="1" value={newProduct.quantity_on_hand} onChange={e => setNewProduct(p => ({ ...p, quantity_on_hand: e.target.value }))} /></div>
+                  <div className="space-y-2"><Label>Reorder Point</Label><Input type="number" min={0} step="1" value={newProduct.reorder_point} onChange={e => setNewProduct(p => ({ ...p, reorder_point: e.target.value }))} /></div>
+                </div>
                 <Button type="submit" className="w-full">Add Product</Button>
               </form>
             </DialogContent>

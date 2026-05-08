@@ -156,6 +156,13 @@ export default function Analytics() {
     return () => clearInterval(interval);
   }, [organizationId, fetchAnalytics]);
 
+  // Re-fetch when timeRange changes
+  useEffect(() => {
+    if (organizationId) {
+      fetchAnalytics();
+    }
+  }, [timeRange, organizationId]);
+
   const statCards = [
     { label: "Total Revenue", value: `$${stats.totalRevenue.toLocaleString()}`, change: "+12.5%", up: true, icon: DollarSign },
     { label: "Active Deals", value: stats.activeDeals.toString(), change: "+8.2%", up: true, icon: Target },

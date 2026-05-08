@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import {
-  BrainCircuit, TrendingUp, TrendingDown, Plus, Loader2,
-  Calendar, DollarSign, Target, AlertTriangle, Save, Trash2,
-  ChevronRight, BarChart3, Sparkles
+  BrainCircuit, TrendingUp, Plus, Loader2,
+  DollarSign, Target, Trash2,
+  BarChart3, Sparkles
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, ReferenceLine } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useRealtimeTable } from "@/hooks/useRealtime";
 
@@ -95,6 +94,10 @@ export default function Forecasts() {
 
   async function createForecast(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
       const { error } = await supabase.from("forecasts").insert({
         name: newForecast.name,
@@ -104,6 +107,7 @@ export default function Forecasts() {
         confidence_low: parseFloat(newForecast.confidence_low) || 0,
         confidence_high: parseFloat(newForecast.confidence_high) || 0,
         factors: [],
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Forecast created");

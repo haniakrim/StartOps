@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Calendar, Filter, GitBranch, DollarSign, Activity, Mail } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Calendar, Filter, GitBranch, DollarSign, Activity, Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -19,9 +19,14 @@ import { CommunicationsReport } from "@/components/reports/CommunicationsReport"
 export default function Reports() {
   const [dateRange, setDateRange] = useState("Last 30 days");
   const [activeTab, setActiveTab] = useState("pipeline");
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const range: DateRange =
     dateRanges.find((r) => r.label === dateRange) || dateRanges[1];
+
+  const refresh = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -48,8 +53,8 @@ export default function Reports() {
               ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" onClick={() => setActiveTab(activeTab)}>
-            <Filter className="w-4 h-4 mr-2" />
+          <Button variant="outline" size="sm" onClick={refresh}>
+            <Loader2 key={refreshKey} className="w-4 h-4 mr-2" />
             Refresh
           </Button>
         </div>
