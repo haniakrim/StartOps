@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Zap, Shield, Users, BarChart3 } from "lucide-react";
 import HeroLogo from "@/components/landing/HeroLogo";
+import LoginHeroIllustration from "@/components/landing/LoginHeroIllustration";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -119,24 +120,28 @@ const Login = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-hp-slate relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-hp-blue/20 via-transparent to-hp-blue-light/10" />
 
-        <div className="relative z-10 flex flex-col justify-between p-12">
-          <div>
-            <div className="flex items-center gap-3 mb-8">
+        <div className="relative z-10 flex flex-col p-12 h-full">
+          <div className="shrink-0">
+            <div className="flex items-center gap-3 mb-6">
               <HeroLogo className="w-10 h-10" />
               <span className="text-xl font-bold text-white">StartOps</span>
             </div>
 
-            <h1 className="text-4xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-3xl font-bold text-white leading-tight mb-4">
               The all-in-one{" "}
               <span className="text-hp-blue-light">operating system</span>{" "}
               for startups
             </h1>
-            <p className="text-lg text-white/50 max-w-md">
+            <p className="text-base text-white/50 max-w-md">
               CRM, finance, projects, inventory, and analytics — unified in one powerful platform.
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="flex-1 min-h-0 my-4">
+            <LoginHeroIllustration className="w-full h-full" />
+          </div>
+
+          <div className="shrink-0 space-y-3 mb-6">
             {[
               { icon: Zap, text: "AI-powered insights" },
               { icon: Shield, text: "Enterprise-grade security" },
@@ -145,12 +150,12 @@ const Login = () => {
             ].map((feature, i) => (
               <div key={i} className="flex items-center gap-3 text-white/60">
                 <feature.icon className="w-5 h-5 text-hp-blue-light" />
-                <span>{feature.text}</span>
+                <span className="text-sm">{feature.text}</span>
               </div>
             ))}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="shrink-0 flex items-center gap-4">
             <div className="flex -space-x-2">
               {[1, 2, 3, 4].map((i) => (
                 <div
