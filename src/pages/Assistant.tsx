@@ -313,6 +313,11 @@ export default function Assistant() {
               key={s}
               onClick={() => {
                 setInput(s);
+                // Auto-submit after state update
+                setTimeout(() => {
+                  const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+                  handleSend(fakeEvent);
+                }, 50);
               }}
               className="px-3 py-1.5 rounded-full bg-card border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
             >

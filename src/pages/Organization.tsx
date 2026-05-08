@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface TeamMember {
   id: string;
@@ -33,39 +35,59 @@ interface Department {
 }
 
 const statusColors: Record<string, string> = {
-  Active: "bg-emerald-500/15 text-emerald-600",
-  Away: "bg-yellow-500/15 text-yellow-600",
+  Active: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  Away: "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400",
   Inactive: "bg-muted text-muted-foreground",
 };
 
 export default function Organization() {
+  const { organizationId } = useOrganization();
+  const { user } = useAuth();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedDepts, setExpandedDepts] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("member");
+  const [inviteDept, setInviteDept] = useState("");
+  const [addDeptOpen, setAddDeptOpen] = useState(false);
+  const [newDeptName, setNewDeptName] = useState("");
 
-  useEffect(() => { fetchOrganizationData(); }, []);
+  useEffect(() => { fetchOrganizationData(); }, [organizationId]);
 
   async function fetchOrganizationData() {
+    if (!organizationId) {
+      setLoading(false);
+      setDepartments([]);
+      setMembers([]);
+      return;
+    }
     try {
       setLoading(true);
 
-      const { data: deptsData, error: deptsError } = await supabase.from("departments").select("*").order("name");
+      const { data: deptsData, error: deptsError } = await supabase
+        .from("departments")
+        .select("*")
+        .eq("organization_id", organizationId)
+        .order("name");
       if (deptsError) throw deptsError;
 
-      const { data: teamsData, error: teamsError } = await supabase.from("teams").select("*");
+      const { data: teamsData, error: teamsError } = await supabase
+        .from("teams")
+        .select("*")
+        .eq("organization_id", organizationId);
       if (teamsError) throw teamsError;
 
-      const deptsWithTeams = (deptsData || []).map((d) => ({
+      const deptsWithTeams = (deptsData || []).map((d: any) => ({
         id: d.id,
         name: d.name,
         head: d.manager_id ? "Assigned" : "Unassigned",
-        members: (teamsData || []).filter((t) => t.department_id === d.id).reduce((sum, t) => sum + 0, 0),
+        members: 0,
         teams: (teamsData || [])
-          .filter((t) => t.department_id === d.id)
-          .map((t) => ({ id: t.id, name: t.name, members: 0 })),
+          .filter((t: any) => t.department_id === d.id)
+          .map((t: any) => ({ id: t.id, name: t.name, members: 0 })),
       }));
 
       setDepartments(deptsWithTeams);
@@ -74,6 +96,7 @@ export default function Organization() {
       const { data: membersData, error: membersError } = await supabase
         .from("organization_members")
         .select("*")
+        .eq("organization_id", organizationId)
         .order("joined_at", { ascending: false });
 
       if (membersError) throw membersError;
@@ -97,7 +120,7 @@ export default function Organization() {
           name: `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || "Unknown",
           email: profile.email || "No email",
           role: m.role || "Member",
-          department: deptsData?.find((d) => d.id === m.department_id)?.name || "Unassigned",
+          department: deptsData?.find((d: any) => d.id === m.department_id)?.name || "Unassigned",
           status: "Active",
           lastActive: "Recently",
         };
@@ -108,6 +131,71 @@ export default function Organization() {
       toast.error("Failed to load organization data: " + error.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleInvite() {
+    if (!organizationId || !inviteEmail.trim()) {
+      toast.error("Please enter an email address");
+      return;
+    }
+    try {
+      // Check if user with this email already exists in auth
+      const { data: existingUsers } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .eq("email", inviteEmail.trim())
+        .single();
+
+      if (existingUsers) {
+        // Add existing user to org
+        const { error } = await supabase.from("organization_members").insert({
+          organization_id: organizationId,
+          user_id: existingUsers.id,
+          role: inviteRole,
+          department_id: inviteDept || null,
+        });
+        if (error) throw error;
+        toast.success(`${inviteEmail} added to organization`);
+      } else {
+        toast.info(`Invitation would be sent to ${inviteEmail} (demo - needs email service setup)`);
+      }
+
+      setDialogOpen(false);
+      setInviteEmail("");
+      setInviteRole("member");
+      setInviteDept("");
+      fetchOrganizationData();
+    } catch (error: any) {
+      toast.error("Failed to invite: " + error.message);
+    }
+  }
+
+  async function addDepartment() {
+    if (!organizationId || !newDeptName.trim()) return;
+    try {
+      const { error } = await supabase.from("departments").insert({
+        name: newDeptName.trim(),
+        organization_id: organizationId,
+      });
+      if (error) throw error;
+      toast.success("Department created");
+      setAddDeptOpen(false);
+      setNewDeptName("");
+      fetchOrganizationData();
+    } catch (error: any) {
+      toast.error("Failed to create department: " + error.message);
+    }
+  }
+
+  async function removeMember(memberId: string) {
+    try {
+      const { error } = await supabase.from("organization_members").delete().eq("id", memberId);
+      if (error) throw error;
+      toast.success("Member removed");
+      fetchOrganizationData();
+    } catch (error: any) {
+      toast.error("Failed to remove member: " + error.message);
     }
   }
 
@@ -122,10 +210,10 @@ export default function Organization() {
   );
 
   const roles = [
-    { name: "Admin", description: "Full system access and configuration", users: members.filter((m) => m.role === "Admin").length, permissions: 28, color: "#ff8964" },
-    { name: "Manager", description: "Team management and reporting access", users: members.filter((m) => m.role === "Manager").length, permissions: 18, color: "#5683da" },
-    { name: "User", description: "Standard CRM operations", users: members.filter((m) => m.role === "User" || m.role === "member").length, permissions: 12, color: "#6452db" },
-    { name: "Viewer", description: "Read-only access to assigned data", users: members.filter((m) => m.role === "Viewer").length, permissions: 6, color: "#8dc572" },
+    { name: "Admin", description: "Full system access and configuration", users: members.filter((m) => m.role.toLowerCase() === "admin").length, permissions: 28, color: "hsl(var(--hp-orange))" },
+    { name: "Manager", description: "Team management and reporting access", users: members.filter((m) => m.role.toLowerCase() === "manager").length, permissions: 18, color: "hsl(var(--hp-blue-light))" },
+    { name: "Member", description: "Standard CRM operations", users: members.filter((m) => m.role.toLowerCase() === "member" || m.role.toLowerCase() === "user").length, permissions: 12, color: "hsl(var(--primary))" },
+    { name: "Viewer", description: "Read-only access to assigned data", users: members.filter((m) => m.role.toLowerCase() === "viewer").length, permissions: 6, color: "hsl(var(--hp-green))" },
   ];
 
   if (loading) {
@@ -154,30 +242,35 @@ export default function Organization() {
             <div className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label>Email Address</Label>
-                <Input type="email" placeholder="colleague@company.com" />
+                <Input
+                  type="email"
+                  placeholder="colleague@company.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Role</Label>
-                <Select>
+                <Select value={inviteRole} onValueChange={setInviteRole}>
                   <SelectTrigger><SelectValue placeholder="Select role" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Admin</SelectItem>
                     <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="member">Member</SelectItem>
                     <SelectItem value="viewer">Viewer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label>Department</Label>
-                <Select>
+                <Select value={inviteDept} onValueChange={setInviteDept}>
                   <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
                   <SelectContent>
                     {departments.map((d) => (<SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>))}
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full">Send Invitation</Button>
+              <Button className="w-full" onClick={handleInvite}>Send Invitation</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -191,6 +284,23 @@ export default function Organization() {
         </TabsList>
 
         <TabsContent value="structure" className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <Dialog open={addDeptOpen} onOpenChange={setAddDeptOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm"><Plus className="w-4 h-4 mr-2" />Add Department</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader><DialogTitle>Add Department</DialogTitle></DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label>Department Name</Label>
+                    <Input value={newDeptName} onChange={(e) => setNewDeptName(e.target.value)} placeholder="Engineering" />
+                  </div>
+                  <Button className="w-full" onClick={addDepartment}>Create Department</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           <div className="space-y-3">
             {departments.map((dept) => (
               <Card key={dept.id}>
@@ -212,7 +322,6 @@ export default function Organization() {
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground"><MoreHorizontal className="w-3 h-3" /></Button>
                         </div>
                       ))}
-                      <Button variant="ghost" size="sm" className="text-muted-foreground"><Plus className="w-4 h-4 mr-2" />Add Team</Button>
                     </div>
                   )}
                 </CardContent>
@@ -244,7 +353,6 @@ export default function Organization() {
                     <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</th>
                     <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">Department</th>
                     <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Active</th>
                     <th className="w-10"></th>
                   </tr>
                 </thead>
@@ -260,12 +368,17 @@ export default function Organization() {
                       <td className="py-3 px-4"><Badge variant="secondary" className="text-xs text-primary">{member.role}</Badge></td>
                       <td className="py-3 px-4 text-sm text-muted-foreground">{member.department}</td>
                       <td className="py-3 px-4"><Badge variant="secondary" className={`text-xs ${statusColors[member.status]}`}>{member.status}</Badge></td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">{member.lastActive}</td>
-                      <td className="py-3 px-4"><Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground"><MoreHorizontal className="w-4 h-4" /></Button></td>
+                      <td className="py-3 px-4">
+                        {member.email !== (user?.email || "") && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeMember(member.id)}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                   {filteredMembers.length === 0 && (
-                    <tr><td colSpan={6} className="py-12 text-center text-sm text-muted-foreground/50">{search ? "No members match your search" : "No members yet."}</td></tr>
+                    <tr><td colSpan={5} className="py-12 text-center text-sm text-muted-foreground/50">{search ? "No members match your search" : "No members yet."}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -281,10 +394,6 @@ export default function Organization() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${role.color}20` }}>
                       <Shield className="w-5 h-5" style={{ color: role.color }} />
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
                     </div>
                   </div>
                   <h3 className="text-base font-semibold text-foreground mb-1">{role.name}</h3>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
@@ -24,39 +24,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<any>(null);
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const isFetchingRef = useRef(false);
+
+  const fetchUserData = useCallback(async (userId: string) => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
+    try {
+      const [{ data: profileData, error: profileError }, { data: membershipData, error: membershipError }] =
+        await Promise.all([
+          supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+          supabase
+            .from("organization_members")
+            .select("organization_id")
+            .eq("user_id", userId)
+            .limit(1),
+        ]);
+
+      if (profileError) {
+        console.log("[AuthContext] profile error:", profileError);
+      }
+      if (membershipError) {
+        console.log("[AuthContext] membership error:", membershipError);
+      }
+
+      setProfile(profileData || null);
+      setOrganizationId(membershipData?.[0]?.organization_id ?? null);
+    } catch (err: any) {
+      console.error("[AuthContext] Failed to fetch user data:", err);
+      setProfile(null);
+      setOrganizationId(null);
+    } finally {
+      setLoading(false);
+      isFetchingRef.current = false;
+    }
+  }, []);
 
   useEffect(() => {
     let mounted = true;
-
-    async function fetchUserData(userId: string) {
-      try {
-        const [{ data: profileData, error: profileError }, { data: membershipData, error: membershipError }] =
-          await Promise.all([
-            supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
-            supabase
-              .from("organization_members")
-              .select("organization_id")
-              .eq("user_id", userId)
-              .maybeSingle(),
-          ]);
-
-        if (profileError) throw profileError;
-        if (membershipError) throw membershipError;
-
-        if (mounted) {
-          setProfile(profileData);
-          setOrganizationId(membershipData?.organization_id ?? null);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user data:", err);
-        if (mounted) {
-          setProfile(null);
-          setOrganizationId(null);
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
@@ -79,9 +84,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
 
-      if (currentUser) {
+      if (currentUser && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
         fetchUserData(currentUser.id);
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         setProfile(null);
         setOrganizationId(null);
         setLoading(false);
@@ -92,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchUserData]);
 
   const signOut = async () => {
     await supabase.auth.signOut();

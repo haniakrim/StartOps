@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Trash2 } from "lucide-react";
+import { Upload, Plus, Trash2, Pencil, SearchX } from "lucide-react";
 import { validateCsvData } from "@/lib/csv-validation";
 
 interface Contact {
@@ -40,7 +40,9 @@ const Contacts = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
-  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [search, setSearch] = useState("");
   const [newContact, setNewContact] = useState({
     first_name: "",
     last_name: "",
@@ -51,7 +53,12 @@ const Contacts = () => {
   });
 
   const fetchContacts = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organizationId) {
+      setContacts([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     const { data } = await supabase
       .from("contacts")
       .select("*")
@@ -68,51 +75,32 @@ const Contacts = () => {
   const handleCSVImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setImporting(true);
     try {
       const text = await file.text();
       const lines = text.split("\n").filter((line) => line.trim());
       if (lines.length < 2) {
-        toast({
-          title: "Invalid CSV",
-          description: "CSV file must have a header row and at least one data row.",
-          variant: "destructive",
-        });
+        toast({ title: "Invalid CSV", description: "Must have header + data row.", variant: "destructive" });
         return;
       }
-
       const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/\s+/g, "_"));
       const rows = lines
         .slice(1)
         .map((line) => {
           const values = line.split(",").map((v) => v.trim());
           const row: Record<string, string> = {};
-          headers.forEach((header, i) => {
-            row[header] = values[i] || "";
-          });
+          headers.forEach((header, i) => { row[header] = values[i] || ""; });
           return row;
         })
         .filter((row) => Object.values(row).some((v) => v));
 
-      // Validate all rows before inserting
       const { validContacts, skippedRows } = validateCsvData(rows);
 
       if (skippedRows.length > 0) {
-        toast({
-          title: "Import warnings",
-          description: `${skippedRows.length} row(s) skipped due to validation errors. Check data format.`,
-          variant: "destructive",
-        });
+        toast({ title: "Import warnings", description: `${skippedRows.length} row(s) skipped.`, variant: "destructive" });
       }
-
       if (validContacts.length === 0) {
-        toast({
-          title: "No valid contacts",
-          description: "No valid contacts found in the CSV file.",
-          variant: "destructive",
-        });
-        setImporting(false);
+        toast({ title: "No valid contacts", variant: "destructive" });
         return;
       }
 
@@ -122,74 +110,82 @@ const Contacts = () => {
       }));
 
       const { error } = await supabase.from("contacts").insert(contactsToInsert);
-
-      if (error) {
-        toast({
-          title: "Import failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Import successful",
-          description: `${validContacts.length} contact(s) imported.${skippedRows.length > 0 ? ` ${skippedRows.length} row(s) skipped.` : ""}`,
-        });
-        fetchContacts();
-      }
+      if (error) throw error;
+      toast({ title: "Import successful", description: `${validContacts.length} contact(s) imported.` });
+      fetchContacts();
     } catch {
-      toast({
-        title: "Import failed",
-        description: "Failed to parse CSV file. Please check the file format.",
-        variant: "destructive",
-      });
+      toast({ title: "Import failed", description: "Failed to parse CSV file.", variant: "destructive" });
     } finally {
       setImporting(false);
       e.target.value = "";
     }
   };
 
-  const handleAddContact = async () => {
-    const { error } = await supabase.from("contacts").insert({
+  const handleSave = async () => {
+    if (!organizationId) {
+      toast({ title: "Error", description: "No organization found.", variant: "destructive" });
+      return;
+    }
+
+    const payload = {
       ...newContact,
       organization_id: organizationId,
-    });
+    };
 
-    if (error) {
-      toast({
-        title: "Error adding contact",
-        description: error.message,
-        variant: "destructive",
-      });
+    if (editingContact) {
+      const { error } = await supabase.from("contacts").update(payload).eq("id", editingContact.id);
+      if (error) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Contact updated" });
+        setShowDialog(false);
+        setEditingContact(null);
+        setNewContact({ first_name: "", last_name: "", email: "", phone: "", company: "", title: "" });
+        fetchContacts();
+      }
     } else {
-      toast({ title: "Contact added" });
-      setShowAddDialog(false);
-      setNewContact({
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone: "",
-        company: "",
-        title: "",
-      });
-      fetchContacts();
+      const { error } = await supabase.from("contacts").insert(payload);
+      if (error) {
+        toast({ title: "Error adding contact", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Contact added" });
+        setShowDialog(false);
+        setNewContact({ first_name: "", last_name: "", email: "", phone: "", company: "", title: "" });
+        fetchContacts();
+      }
     }
+  };
+
+  const openEdit = (contact: Contact) => {
+    setEditingContact(contact);
+    setNewContact({
+      first_name: contact.first_name || "",
+      last_name: contact.last_name || "",
+      email: contact.email || "",
+      phone: contact.phone || "",
+      company: contact.company || "",
+      title: contact.title || "",
+    });
+    setShowDialog(true);
   };
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("contacts").delete().eq("id", id);
     if (error) {
-      toast({
-        title: "Error deleting contact",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "Error deleting contact", description: error.message, variant: "destructive" });
     } else {
       fetchContacts();
     }
   };
 
+  const filtered = contacts.filter(c =>
+    `${c.first_name} ${c.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
+    (c.email?.toLowerCase() || "").includes(search.toLowerCase()) ||
+    (c.company?.toLowerCase() || "").includes(search.toLowerCase())
+  );
+
   if (loading) {
-    return <div className="p-8">Loading contacts...</div>;
+    return <div className="p-8 text-muted-foreground">Loading contacts...</div>;
   }
 
   return (
@@ -215,7 +211,13 @@ const Contacts = () => {
               </span>
             </Button>
           </label>
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+          <Dialog open={showDialog} onOpenChange={(open) => {
+            setShowDialog(open);
+            if (!open) {
+              setEditingContact(null);
+              setNewContact({ first_name: "", last_name: "", email: "", phone: "", company: "", title: "" });
+            }
+          }}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -224,76 +226,39 @@ const Contacts = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Contact</DialogTitle>
+                <DialogTitle>{editingContact ? "Edit Contact" : "Add Contact"}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">First Name</label>
-                    <Input
-                      value={newContact.first_name}
-                      onChange={(e) =>
-                        setNewContact({ ...newContact, first_name: e.target.value })
-                      }
-                      maxLength={100}
-                    />
+                    <Input value={newContact.first_name} onChange={(e) => setNewContact({ ...newContact, first_name: e.target.value })} maxLength={100} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Last Name</label>
-                    <Input
-                      value={newContact.last_name}
-                      onChange={(e) =>
-                        setNewContact({ ...newContact, last_name: e.target.value })
-                      }
-                      maxLength={100}
-                    />
+                    <Input value={newContact.last_name} onChange={(e) => setNewContact({ ...newContact, last_name: e.target.value })} maxLength={100} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Email</label>
-                  <Input
-                    type="email"
-                    value={newContact.email}
-                    onChange={(e) =>
-                      setNewContact({ ...newContact, email: e.target.value })
-                    }
-                    maxLength={254}
-                  />
+                  <Input type="email" value={newContact.email} onChange={(e) => setNewContact({ ...newContact, email: e.target.value })} maxLength={254} />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Phone</label>
-                  <Input
-                    value={newContact.phone}
-                    onChange={(e) =>
-                      setNewContact({ ...newContact, phone: e.target.value })
-                    }
-                    maxLength={50}
-                  />
+                  <Input value={newContact.phone} onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })} maxLength={50} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Company</label>
-                    <Input
-                      value={newContact.company}
-                      onChange={(e) =>
-                        setNewContact({ ...newContact, company: e.target.value })
-                      }
-                      maxLength={200}
-                    />
+                    <Input value={newContact.company} onChange={(e) => setNewContact({ ...newContact, company: e.target.value })} maxLength={200} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Title</label>
-                    <Input
-                      value={newContact.title}
-                      onChange={(e) =>
-                        setNewContact({ ...newContact, title: e.target.value })
-                      }
-                      maxLength={200}
-                    />
+                    <Input value={newContact.title} onChange={(e) => setNewContact({ ...newContact, title: e.target.value })} maxLength={200} />
                   </div>
                 </div>
-                <Button onClick={handleAddContact} className="w-full">
-                  Add Contact
+                <Button onClick={handleSave} className="w-full">
+                  {editingContact ? "Update Contact" : "Add Contact"}
                 </Button>
               </div>
             </DialogContent>
@@ -301,15 +266,27 @@ const Contacts = () => {
         </div>
       </div>
 
+      <div className="relative max-w-md mb-4">
+        <SearchX className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search contacts..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
       <Card>
         <CardHeader>
-          <CardTitle>All Contacts ({contacts.length})</CardTitle>
+          <CardTitle>All Contacts ({filtered.length})</CardTitle>
         </CardHeader>
         <CardContent>
           {contacts.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
               No contacts yet. Add your first contact or import from CSV.
             </p>
+          ) : filtered.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No contacts match your search.</p>
           ) : (
             <Table>
               <TableHeader>
@@ -319,11 +296,11 @@ const Contacts = () => {
                   <TableHead>Phone</TableHead>
                   <TableHead>Company</TableHead>
                   <TableHead>Title</TableHead>
-                  <TableHead className="w-[50px]" />
+                  <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {contacts.map((contact) => (
+                {filtered.map((contact) => (
                   <TableRow key={contact.id}>
                     <TableCell>
                       {contact.first_name} {contact.last_name}
@@ -333,13 +310,14 @@ const Contacts = () => {
                     <TableCell>{contact.company}</TableCell>
                     <TableCell>{contact.title}</TableCell>
                     <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(contact.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(contact)}>
+                          <Pencil className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(contact.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

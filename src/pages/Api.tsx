@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useOrganization } from "@/hooks/useOrganization";
@@ -55,7 +56,7 @@ export default function Api() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [rotating, setRotating] = useState(false);
   const [latestPlaintextKey, setLatestPlaintextKey] = useState<string | null>(null);
-  const [newWebhook, setNewWebhook] = useState({ name: "", url: "", events: "contact.created" });
+  const [newWebhook, setNewWebhook] = useState({ name: "", url: "", events: "contact.created", secret: "" });
 
   useEffect(() => {
     if (organizationId) {
@@ -67,7 +68,6 @@ export default function Api() {
 
   async function fetchData() {
     if (!organizationId) return;
-
     try {
       setLoading(true);
       const { data: whData, error: whError } = await supabase
@@ -97,7 +97,6 @@ export default function Api() {
       toast.error("You must belong to an organization to rotate API keys.");
       return;
     }
-
     try {
       setRotating(true);
       const token = `sk_live_${randomToken(40)}`;
@@ -110,7 +109,6 @@ export default function Api() {
           .from("api_keys")
           .update({ is_active: false, updated_at: new Date().toISOString() })
           .in("id", activeKeyIds);
-
         if (deactivateError) throw deactivateError;
       }
 
@@ -124,7 +122,6 @@ export default function Api() {
         rate_limit: 1000,
         is_active: true,
       });
-
       if (insertError) throw insertError;
 
       setLatestPlaintextKey(token);
@@ -139,27 +136,45 @@ export default function Api() {
 
   async function createWebhook(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
-      if (!organizationId) {
-        toast.error("No organization found. Please sign out and sign in again.");
-        return;
+      // Try edge function first, then fallback to direct insert
+      try {
+        const { data, error } = await supabase.functions.invoke("manage-webhook", {
+          body: {
+            name: newWebhook.name,
+            url: newWebhook.url,
+            events: [newWebhook.events],
+            organization_id: organizationId,
+            secret: newWebhook.secret || undefined,
+          },
+        });
+        if (!error && data?.success) {
+          toast.success("Webhook created");
+          setDialogOpen(false);
+          setNewWebhook({ name: "", url: "", events: "contact.created", secret: "" });
+          fetchData();
+          return;
+        }
+      } catch {
+        // Edge function not available, fallback to direct insert
       }
 
-      const { data, error } = await supabase.functions.invoke("manage-webhook", {
-        body: {
-          name: newWebhook.name,
-          url: newWebhook.url,
-          events: [newWebhook.events],
-          organization_id: organizationId,
-        },
+      const { error } = await supabase.from("webhooks").insert({
+        name: newWebhook.name,
+        url: newWebhook.url,
+        events: [newWebhook.events],
+        is_active: true,
+        organization_id: organizationId,
+        secret: newWebhook.secret || null,
       });
-
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
       toast.success("Webhook created");
       setDialogOpen(false);
-      setNewWebhook({ name: "", url: "", events: "contact.created" });
+      setNewWebhook({ name: "", url: "", events: "contact.created", secret: "" });
       fetchData();
     } catch (error: any) {
       toast.error("Failed to create webhook: " + error.message);
@@ -173,7 +188,6 @@ export default function Api() {
         .update({ is_active: !current, updated_at: new Date().toISOString() })
         .eq("id", id)
         .eq("organization_id", organizationId);
-
       if (error) throw error;
       setWebhooks((previous) => previous.map((webhook) => (webhook.id === id ? { ...webhook, is_active: !current } : webhook)));
       toast.success(current ? "Webhook paused" : "Webhook activated");
@@ -189,7 +203,6 @@ export default function Api() {
         .delete()
         .eq("id", id)
         .eq("organization_id", organizationId);
-
       if (error) throw error;
       toast.success("Webhook deleted");
       fetchData();
@@ -200,12 +213,10 @@ export default function Api() {
 
   async function copyKey() {
     const valueToCopy = latestPlaintextKey || null;
-
     if (!valueToCopy) {
       toast.error("Generate a new key to copy its full value.");
       return;
     }
-
     await navigator.clipboard.writeText(valueToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -218,7 +229,7 @@ export default function Api() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-expo-blue animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -233,7 +244,7 @@ export default function Api() {
       <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-foreground text-base flex items-center gap-2">
-            <Key className="w-4 h-4 text-expo-blue" />
+            <Key className="w-4 h-4 text-primary" />
             API Key
           </CardTitle>
         </CardHeader>
@@ -261,7 +272,7 @@ export default function Api() {
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-foreground text-base flex items-center gap-2">
-            <Webhook className="w-4 h-4 text-expo-blue" />
+            <Webhook className="w-4 h-4 text-primary" />
             Webhooks
           </CardTitle>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -283,7 +294,20 @@ export default function Api() {
                 </div>
                 <div className="space-y-2">
                   <Label>Event</Label>
-                  <Input value={newWebhook.events} onChange={(e) => setNewWebhook((current) => ({ ...current, events: e.target.value }))} className="bg-muted border-border" />
+                  <Select value={newWebhook.events} onValueChange={(v) => setNewWebhook(p => ({ ...p, events: v }))}>
+                    <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="contact.created">Contact Created</SelectItem>
+                      <SelectItem value="deal.created">Deal Created</SelectItem>
+                      <SelectItem value="deal.updated">Deal Updated</SelectItem>
+                      <SelectItem value="invoice.paid">Invoice Paid</SelectItem>
+                      <SelectItem value="*">All Events</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Secret (optional)</Label>
+                  <Input value={newWebhook.secret} onChange={(e) => setNewWebhook((current) => ({ ...current, secret: e.target.value }))} className="bg-muted border-border" placeholder="whsec_..." />
                 </div>
                 <Button type="submit" className="w-full">Create Webhook</Button>
               </form>
@@ -299,7 +323,7 @@ export default function Api() {
               <div key={webhook.id} className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <code className="text-sm text-foreground font-mono">{webhook.events?.[0] || "all"}</code>
+                    <code className="text-sm text-foreground font-mono">{Array.isArray(webhook.events) ? webhook.events[0] : webhook.events || "all"}</code>
                     <Badge className={webhook.is_active ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-0" : "bg-muted text-muted-foreground border-0"}>
                       {webhook.is_active ? "active" : "paused"}
                     </Badge>

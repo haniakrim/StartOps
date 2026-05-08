@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Employee {
   id: string;
@@ -48,8 +49,9 @@ export default function Employees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [employeeSkills, setEmployeeSkills] = useState<Record<string, EmployeeSkill[]>>({});
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const { organizationId } = useOrganization();
+    const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newEmployee, setNewEmployee] = useState({ first_name: "", last_name: "", email: "", title: "", department_id: "" });
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
@@ -60,11 +62,17 @@ export default function Employees() {
   useRealtimeTable("employee_skills", fetchData);
 
   async function fetchData() {
+    if (!organizationId) {
+      setLoading(false);
+      setEmployees([]);
+      return;
+    }
     try {
       setLoading(true);
       const { data: empData, error: empError } = await supabase
         .from("employees")
         .select(`*, departments:department_id (name), teams:team_id (name)`)
+        .eq("organization_id", organizationId)
         .order("created_at", { ascending: false });
       if (empError) throw empError;
       setEmployees((empData || []).map((d: any) => ({ ...d, departments: d.departments?.[0] ?? null, teams: d.teams?.[0] ?? null })));
@@ -91,6 +99,10 @@ export default function Employees() {
 
   async function createEmployee(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
       const { error } = await supabase.from("employees").insert({
         first_name: newEmployee.first_name,
@@ -98,6 +110,7 @@ export default function Employees() {
         email: newEmployee.email,
         title: newEmployee.title,
         department_id: newEmployee.department_id || null,
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Employee added");

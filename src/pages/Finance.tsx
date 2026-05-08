@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
 
 interface Invoice {
@@ -52,17 +53,18 @@ interface Vendor {
 
 const statusColors: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
-  sent: "bg-blue-500/15 text-blue-600",
-  paid: "bg-emerald-500/15 text-emerald-600",
-  overdue: "bg-red-500/15 text-red-600",
-  pending: "bg-yellow-500/15 text-yellow-600",
-  approved: "bg-emerald-500/15 text-emerald-600",
-  rejected: "bg-red-500/15 text-red-600",
+  sent: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  paid: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  overdue: "bg-red-500/15 text-red-600 dark:text-red-400",
+  pending: "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400",
+  approved: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  rejected: "bg-red-500/15 text-red-600 dark:text-red-400",
 };
 
 const COLORS = ["hsl(var(--primary))", "#ff8964", "#5683da", "#8dc572", "#f0ad4e", "#be6464"];
 
 export default function Finance() {
+  const { organizationId } = useOrganization();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,77 +79,66 @@ export default function Finance() {
   const [vendorDialogOpen, setVendorDialogOpen] = useState(false);
   const [newVendor, setNewVendor] = useState({ name: "", email: "", phone: "", website: "", address: "", category: "", payment_terms: "" });
 
-  useEffect(() => {
-    fetchFinanceData();
-    fetchContacts();
-    fetchVendors();
-    detectAnomalies();
-  }, []);
-  useRealtimeTable("invoices", fetchFinanceData);
-  useRealtimeTable("expenses", fetchFinanceData);
-  useRealtimeTable("vendors", fetchVendors);
-
-  async function fetchFinanceData() {
+  // Fetch all finance data
+  const fetchFinanceData = async () => {
+    if (!organizationId) { setLoading(false); return; }
     try {
       setLoading(true);
+
+      // Invoices
       const { data: invData, error: invError } = await supabase
         .from("invoices")
         .select(`*, contacts:contact_id (first_name, last_name, company)`)
+        .eq("organization_id", organizationId)
         .order("created_at", { ascending: false });
       if (invError) throw invError;
       setInvoices((invData || []).map((d: any) => ({ ...d, contacts: d.contacts?.[0] ?? null })));
 
+      // Expenses
       const { data: expData, error: expError } = await supabase
         .from("expenses")
         .select("*")
+        .eq("organization_id", organizationId)
         .order("created_at", { ascending: false });
       if (expError) throw expError;
       setExpenses(expData || []);
+
+      // Fetch contacts for select
+      const { data: contactsData } = await supabase
+        .from("contacts")
+        .select("id, first_name, last_name")
+        .eq("organization_id", organizationId)
+        .order("first_name");
+      setContacts(contactsData || []);
     } catch (error: any) {
       toast.error("Failed to load finance data: " + error.message);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  async function fetchContacts() {
-    const { data } = await supabase.from("contacts").select("id, first_name, last_name").order("first_name");
-    setContacts(data || []);
-  }
-
-  async function fetchVendors() {
+  const fetchVendors = async () => {
+    if (!organizationId) return;
     try {
-      const { data, error } = await supabase.from("vendors").select("*").order("name");
-      if (error) throw error;
+      const { data } = await supabase.from("vendors").select("*").eq("organization_id", organizationId).order("name");
       setVendors(data || []);
     } catch (error: any) {
       toast.error("Failed to load vendors: " + error.message);
     }
-  }
+  };
 
-  async function createVendor(e: React.FormEvent) {
-    e.preventDefault();
-    try {
-      const { error } = await supabase.from("vendors").insert({
-        name: newVendor.name,
-        email: newVendor.email || null,
-        phone: newVendor.phone || null,
-        website: newVendor.website || null,
-        address: newVendor.address || null,
-        category: newVendor.category || null,
-        payment_terms: newVendor.payment_terms || null,
-      });
-      if (error) throw error;
-      toast.success("Vendor added");
-      setVendorDialogOpen(false);
-      setNewVendor({ name: "", email: "", phone: "", website: "", address: "", category: "", payment_terms: "" });
-      fetchVendors();
-    } catch (error: any) {
-      toast.error("Failed to add vendor: " + error.message);
-    }
-  }
+  useEffect(() => {
+    fetchFinanceData();
+    fetchVendors();
+    detectAnomalies();
+  }, [organizationId]);
+
+  useRealtimeTable("invoices", fetchFinanceData);
+  useRealtimeTable("expenses", fetchFinanceData);
+  useRealtimeTable("vendors", fetchVendors);
 
   async function detectAnomalies() {
+    // Static demo anomalies - could be replaced with real data analysis
     const detected = [
       { type: "duplicate", severity: "high", description: "Potential duplicate invoice #INV-2045 detected", amount: 12500 },
       { type: "spike", severity: "medium", description: "Marketing spend 340% above monthly average", amount: 8400 },
@@ -158,13 +149,19 @@ export default function Finance() {
 
   async function createInvoice(e: React.FormEvent) {
     e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
     try {
       const { error } = await supabase.from("invoices").insert({
         invoice_number: newInvoice.invoice_number,
         amount: parseFloat(newInvoice.amount) || 0,
+        currency: "USD",
         contact_id: newInvoice.contact_id || null,
         due_date: newInvoice.due_date || null,
         status: newInvoice.status,
+        organization_id: organizationId,
       });
       if (error) throw error;
       toast.success("Invoice created");
@@ -173,6 +170,33 @@ export default function Finance() {
       fetchFinanceData();
     } catch (error: any) {
       toast.error("Failed to create invoice: " + error.message);
+    }
+  }
+
+  async function createVendor(e: React.FormEvent) {
+    e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
+    try {
+      const { error } = await supabase.from("vendors").insert({
+        name: newVendor.name,
+        email: newVendor.email || null,
+        phone: newVendor.phone || null,
+        website: newVendor.website || null,
+        address: newVendor.address || null,
+        category: newVendor.category || null,
+        payment_terms: newVendor.payment_terms || null,
+        organization_id: organizationId,
+      });
+      if (error) throw error;
+      toast.success("Vendor added");
+      setVendorDialogOpen(false);
+      setNewVendor({ name: "", email: "", phone: "", website: "", address: "", category: "", payment_terms: "" });
+      fetchVendors();
+    } catch (error: any) {
+      toast.error("Failed to add vendor: " + error.message);
     }
   }
 
@@ -208,49 +232,12 @@ export default function Finance() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="space-y-1">
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">Finance</h1>
-          <p className="text-sm text-muted-foreground mt-1">AI-powered financial operations and cash flow</p>
+          <p className="text-sm text-muted-foreground">Financial operations and cash flow</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm">
-              <Plus className="w-4 h-4 mr-2" />New Invoice
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Create Invoice</DialogTitle></DialogHeader>
-            <form onSubmit={createInvoice} className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label>Invoice Number</Label>
-                <Input required value={newInvoice.invoice_number} onChange={(e) => setNewInvoice(p => ({ ...p, invoice_number: e.target.value }))} placeholder="INV-001" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Amount ($)</Label>
-                  <Input type="number" required value={newInvoice.amount} onChange={(e) => setNewInvoice(p => ({ ...p, amount: e.target.value }))} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Due Date</Label>
-                  <Input type="date" value={newInvoice.due_date} onChange={(e) => setNewInvoice(p => ({ ...p, due_date: e.target.value }))} />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Contact</Label>
-                <Select value={newInvoice.contact_id} onValueChange={(v) => setNewInvoice(p => ({ ...p, contact_id: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select contact" /></SelectTrigger>
-                  <SelectContent>
-                    {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" className="w-full">Create Invoice</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-5">
@@ -294,13 +281,12 @@ export default function Finance() {
         </Card>
       </div>
 
-      {/* AI Anomaly Detection */}
       {anomalies.length > 0 && (
         <Card className="border-red-500/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
-              AI Anomaly Detection
+              Anomaly Detection
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -330,6 +316,44 @@ export default function Finance() {
         </TabsList>
 
         <TabsContent value="invoices" className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm">
+                  <Plus className="w-4 h-4 mr-2" />New Invoice
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader><DialogTitle>Create Invoice</DialogTitle></DialogHeader>
+                <form onSubmit={createInvoice} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label>Invoice Number</Label>
+                    <Input required value={newInvoice.invoice_number} onChange={(e) => setNewInvoice(p => ({ ...p, invoice_number: e.target.value }))} placeholder="INV-001" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Amount ($)</Label>
+                      <Input type="number" required value={newInvoice.amount} onChange={(e) => setNewInvoice(p => ({ ...p, amount: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Due Date</Label>
+                      <Input type="date" value={newInvoice.due_date} onChange={(e) => setNewInvoice(p => ({ ...p, due_date: e.target.value }))} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Contact</Label>
+                    <Select value={newInvoice.contact_id} onValueChange={(v) => setNewInvoice(p => ({ ...p, contact_id: v }))}>
+                      <SelectTrigger><SelectValue placeholder="Select contact" /></SelectTrigger>
+                      <SelectContent>
+                        {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button type="submit" className="w-full">Create Invoice</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
           <Card>
             <CardContent className="p-0">
               <table className="w-full">
@@ -344,7 +368,7 @@ export default function Finance() {
                 </thead>
                 <tbody>
                   {invoices.length === 0 && (
-                    <tr><td colSpan={5} className="py-12 text-center text-sm text-muted-foreground/50">No invoices yet. Create your first invoice!</td></tr>
+                    <tr><td colSpan={5} className="py-12 text-center text-sm text-muted-foreground/50">No invoices yet</td></tr>
                   )}
                   {invoices.map(inv => (
                     <tr key={inv.id} className="border-b border-border/50 hover:bg-muted/30">
@@ -393,14 +417,6 @@ export default function Finance() {
 
         <TabsContent value="vendors" className="mt-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search vendors..."
-                className="w-64 bg-muted border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
-              />
-            </div>
             <Dialog open={vendorDialogOpen} onOpenChange={setVendorDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm">
@@ -506,10 +522,10 @@ export default function Finance() {
                       <linearGradient id="colorInflow" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#8dc572" stopOpacity={0.3} /><stop offset="95%" stopColor="#8dc572" stopOpacity={0} /></linearGradient>
                       <linearGradient id="colorOutflow" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#be6464" stopOpacity={0.3} /><stop offset="95%" stopColor="#be6464" stopOpacity={0} /></linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
-                    <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
+                    <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--card-foreground))" }} />
                     <Area type="monotone" dataKey="inflow" stroke="#8dc572" strokeWidth={2} fillOpacity={1} fill="url(#colorInflow)" />
                     <Area type="monotone" dataKey="outflow" stroke="#be6464" strokeWidth={2} fillOpacity={1} fill="url(#colorOutflow)" />
                   </AreaChart>
@@ -526,7 +542,7 @@ export default function Finance() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: "#1f2126", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#fff" }} />
+                    <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--card-foreground))" }} />
                   </RechartsPieChart>
                 </ResponsiveContainer>
                 <div className="space-y-1 mt-2">

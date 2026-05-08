@@ -198,6 +198,14 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+/* HP color utility classes */
+.text-hp-green { color: hsl(var(--hp-green)); }
+.text-hp-red { color: hsl(var(--hp-red)); }
+.text-hp-orange { color: hsl(var(--hp-orange)); }
+.text-hp-blue-light { color: hsl(var(--hp-blue-light)); }
+.text-expo-blue { color: hsl(var(--primary)); }
+.bg-expo-blue { background-color: hsl(var(--primary)); }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,

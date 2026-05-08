@@ -1,0 +1,1 @@
+SELECT id, first_name, last_name, email, role FROM profiles ORDER BY created_at DESC LIMIT 5;

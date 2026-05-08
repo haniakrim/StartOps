@@ -21,34 +21,30 @@ export default function Dashboard() {
     {
       title: "Total Revenue",
       value: `$${stats.totalRevenue.toLocaleString()}`,
-      change: `${timeRange}`,
+      change: "All time",
       trend: "up" as const,
       icon: DollarSign,
-      color: "#0066B1",
     },
     {
       title: "Active Deals",
       value: stats.activeDeals.toString(),
-      change: `${timeRange}`,
+      change: "Open pipeline",
       trend: "up" as const,
       icon: Target,
-      color: "#E63946",
     },
     {
       title: "Contacts",
       value: stats.totalContacts.toLocaleString(),
-      change: `${timeRange}`,
+      change: "Total",
       trend: "up" as const,
       icon: Users,
-      color: "#00BFFF",
     },
     {
       title: "Companies",
       value: stats.totalCompanies.toString(),
-      change: `${timeRange}`,
+      change: "Connected",
       trend: "down" as const,
       icon: Building2,
-      color: "#0066B1",
     },
   ];
 
@@ -61,7 +57,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
+    <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-h2 text-foreground tracking-tight">Dashboard</h1>

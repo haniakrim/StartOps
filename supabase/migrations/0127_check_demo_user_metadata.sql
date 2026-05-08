@@ -1,0 +1,1 @@
+SELECT id, email, raw_user_meta_data FROM auth.users WHERE email = 'demo@example.com' LIMIT 1;
