@@ -43,6 +43,7 @@ import Documents from "./pages/Documents";
 import Subscriptions from "./pages/Subscriptions";
 import Campaigns from "./pages/Campaigns";
 import StaffDirectory from "./pages/StaffDirectory";
+import AIApiSettings from "./pages/AIApiSettings";
 
 const queryClient = new QueryClient();
 
@@ -193,6 +194,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Api />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai-api-settings"
+                element={
+                  <ProtectedRoute>
+                    <AIApiSettings />
                   </ProtectedRoute>
                 }
               />
