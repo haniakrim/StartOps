@@ -17,35 +17,35 @@ export default function Index() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-hp-slate text-white overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-hp-slate/80 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <HeroLogo className="w-8 h-8" />
-          <span className="font-semibold text-white">StartOps</span>
+          <span className="font-semibold text-foreground">StartOps</span>
         </div>
           <div className="hidden md:flex items-center gap-8">
             {["Features", "Modules", "Pricing", "Docs"].map((item) => (
               <span
                 key={item}
-                className="text-sm text-white/50 hover:text-white transition-colors cursor-default"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-default"
               >
                 {item}
               </span>
             ))}
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle className="text-white/50 hover:text-white hover:bg-white/5" />
+            <ThemeToggle />
             <button
               onClick={() => navigate("/login")}
-              className="px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
             >
               Sign In
             </button>
             <button
               onClick={() => navigate("/login")}
-              className="px-4 py-2 text-sm bg-hp-blue text-white hover:bg-hp-blue-dark rounded-lg transition-colors"
+              className="px-4 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors"
             >
               Get Started
             </button>
@@ -59,25 +59,25 @@ export default function Index() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
               <FadeIn>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-hp-blue/10 border border-hp-blue/20 text-sm text-hp-blue-light mb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary mb-6">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-hp-blue-light opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-hp-blue-light"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
                   Now with AI-powered insights
                 </div>
               </FadeIn>
 
               <FadeIn delay={0.1}>
-                <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight mb-6">
+                <h1 className="text-4xl lg:text-6xl font-bold text-foreground leading-tight mb-6">
                   The all-in-one{" "}
-                  <span className="text-hp-blue-light">operating system</span>{" "}
+                  <span className="text-primary">operating system</span>{" "}
                   for startups
                 </h1>
               </FadeIn>
 
               <FadeIn delay={0.2}>
-                <p className="text-lg text-white/50 leading-relaxed mb-8 max-w-lg">
+                <p className="text-lg text-muted-foreground leading-relaxed mb-8 max-w-lg">
                   CRM, finance, projects, inventory, and analytics — unified in one
                   powerful platform. Built for founders who move fast.
                 </p>
@@ -87,13 +87,13 @@ export default function Index() {
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <button
                     onClick={() => navigate("/login")}
-                    className="flex items-center gap-2 px-8 h-12 text-base bg-hp-blue text-white hover:bg-hp-blue-dark rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-8 h-12 text-base bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors"
                   >
                     Start Free Trial
                     <ArrowRight className="w-4 h-4" />
                   </button>
                   <button
-                    className="flex items-center gap-2 px-8 h-12 text-base border border-white/10 text-white hover:bg-white/5 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-8 h-12 text-base border border-border text-foreground hover:bg-accent rounded-lg transition-colors"
                   >
                     <Play className="w-4 h-4" />
                     Watch Demo
@@ -107,15 +107,15 @@ export default function Index() {
                     {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
-                        className="w-8 h-8 rounded-full bg-hp-surface border-2 border-hp-slate flex items-center justify-center"
+                        className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center"
                       >
-                        <span className="text-xs text-white/60">{i}</span>
+                        <span className="text-xs text-muted-foreground">{i}</span>
                       </div>
                     ))}
                   </div>
-                  <p className="text-sm text-white/40">
+                  <p className="text-sm text-muted-foreground">
                     Trusted by{" "}
-                    <span className="text-white/60 font-medium">2,000+ startups</span>
+                    <span className="text-foreground font-medium">2,000+ startups</span>
                   </p>
                 </div>
               </FadeIn>
@@ -129,9 +129,9 @@ export default function Index() {
       </section>
 
       {/* Logo Cloud */}
-      <section className="py-12 border-y border-white/5">
+      <section className="py-12 border-y border-border">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-sm text-white/30 mb-8">
+          <p className="text-center text-sm text-muted-foreground mb-8">
             Trusted by innovative teams worldwide
           </p>
           <LogoCloud />
@@ -150,13 +150,13 @@ export default function Index() {
         <div className="max-w-6xl mx-auto px-6 space-y-24">
           <div className="text-center mb-16">
             <FadeIn>
-              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
                 Everything you need to{" "}
-                <span className="text-hp-red">operate at scale</span>
+                <span className="text-destructive">operate at scale</span>
               </h2>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <p className="text-lg text-white/50 max-w-2xl mx-auto">
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 From first customer to enterprise — StartOps grows with you.
               </p>
             </FadeIn>
@@ -178,9 +178,9 @@ export default function Index() {
                   key={stat.label}
                   className="p-4 rounded-xl bg-card border border-border"
                 >
-                  <p className="text-xs text-white/40 mb-1">{stat.label}</p>
-                  <p className="text-lg font-semibold text-white">{stat.value}</p>
-                  <p className="text-xs text-hp-green">{stat.change}</p>
+                  <p className="text-xs text-muted-foreground mb-1">{stat.label}</p>
+                  <p className="text-lg font-semibold text-foreground">{stat.value}</p>
+                  <p className="text-xs text-green-500">{stat.change}</p>
                 </div>
               ))}
             </div>
@@ -194,16 +194,16 @@ export default function Index() {
           >
             <div className="space-y-3">
               {[
-                { label: "Monthly Revenue", value: "$124,500", bar: 75, color: "#0071E3" },
-                { label: "Burn Rate", value: "$48,200", bar: 45, color: "#FF2D55" },
-                { label: "Runway", value: "18 months", bar: 60, color: "#2997FF" },
+                { label: "Monthly Revenue", value: "$124,500", bar: 75, color: "hsl(var(--primary))" },
+                { label: "Burn Rate", value: "$48,200", bar: 45, color: "hsl(var(--destructive))" },
+                { label: "Runway", value: "18 months", bar: 60, color: "hsl(var(--primary))" },
               ].map((item) => (
                 <div key={item.label} className="p-4 rounded-xl bg-card border border-border">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-white/60">{item.label}</span>
-                    <span className="text-sm font-medium text-white">{item.value}</span>
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className="text-sm font-medium text-foreground">{item.value}</span>
                   </div>
-                  <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-1000"
                       style={{ width: `${item.bar}%`, backgroundColor: item.color }}
@@ -217,17 +217,17 @@ export default function Index() {
       </section>
 
       {/* Modules Grid */}
-      <section className="py-20 border-y border-white/5">
+      <section className="py-20 border-y border-border">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <FadeIn>
-              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
                 30+ integrated{" "}
-                <span className="text-hp-blue-light">modules</span>
+                <span className="text-primary">modules</span>
               </h2>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <p className="text-lg text-white/50 max-w-2xl mx-auto">
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Every tool you need, connected and unified. No more switching
                 between apps.
               </p>

@@ -30,12 +30,12 @@ export default function FeatureSection({
         className="flex-1"
       >
         {badge && (
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-4 text-xs text-white/50">
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border mb-4 text-xs text-muted-foreground">
             {badge}
           </span>
         )}
-        <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">{title}</h3>
-        <p className="text-base text-white/50 leading-relaxed">{description}</p>
+        <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">{title}</h3>
+        <p className="text-base text-muted-foreground leading-relaxed">{description}</p>
       </motion.div>
 
       <motion.div
