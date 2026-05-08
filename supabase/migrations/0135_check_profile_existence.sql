@@ -1,0 +1,1 @@
+SELECT id, first_name, last_name FROM profiles WHERE id = 'c39578b8-2563-4670-9eec-c8b750832f8f'

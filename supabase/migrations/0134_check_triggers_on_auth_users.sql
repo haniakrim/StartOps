@@ -1,0 +1,1 @@
+SELECT tgname, tgrelid::regclass FROM pg_trigger WHERE tgrelid = 'auth.users'::regclass

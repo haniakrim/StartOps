@@ -1,0 +1,1 @@
+INSERT INTO organization_members (organization_id, user_id, role) VALUES ('9321e605-1b36-4b31-a8ef-4bf5c58b5542', 'c39578b8-2563-4670-9eec-c8b750832f8f', 'admin')
