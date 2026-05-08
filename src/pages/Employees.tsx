@@ -217,7 +217,7 @@ export default function Employees() {
 
       <Tabs defaultValue="directory" className="w-full">
         <TabsList className="bg-[#18191b] border border-white/10">
-          <TabsTrigger value="directory" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Users className="w-4 h-4 mr-2" />Directory</TabsTrigger>
+          <TabsTrigger value="directory" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Users className="w-4 h-4 mr-2" />Directory</TabsTrigger>
           <TabsTrigger value="skills" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Award className="w-4 h-4 mr-2" />Skill Graph</TabsTrigger>
         </TabsList>
 

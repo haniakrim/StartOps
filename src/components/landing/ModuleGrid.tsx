@@ -107,8 +107,8 @@ export default function ModuleGrid() {
                 className="w-1 h-6 rounded-full"
                 style={{ backgroundColor: categoryColors[category] }}
               />
-              <h3 className="text-xl font-semibold text-white">{category}</h3>
-              <div className="flex-1 h-px bg-white/5" />
+              <h3 className="text-xl font-semibold text-foreground">{category}</h3>
+              <div className="flex-1 h-px bg-border" />
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -137,8 +137,8 @@ export default function ModuleGrid() {
                     >
                       <module.icon className="w-5 h-5" style={{ color: module.color }} />
                     </div>
-                    <h4 className="text-sm font-semibold text-white mb-1">{module.name}</h4>
-                    <p className="text-xs text-white/40 leading-relaxed">{module.description}</p>
+                    <h4 className="text-sm font-semibold text-foreground mb-1">{module.name}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{module.description}</p>
                   </div>
                 </motion.div>
               ))}

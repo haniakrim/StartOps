@@ -181,13 +181,13 @@ export function TimeTracker({ projects, tasks, onEntryCreated }: TimeTrackerProp
               {state === "running" && (
                 <>
                   <Button onClick={pause} variant="outline" className="border-border text-foreground hover:bg-accent flex-1"><Pause className="w-4 h-4 mr-2" /> Pause</Button>
-                  <Button onClick={stopAndSave} disabled={saving} className="bg-emerald-500 text-white hover:bg-emerald-500/90 flex-1"><Square className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Stop & Log"}</Button>
+                  <Button onClick={stopAndSave} disabled={saving} className="bg-emerald-500 text-primary-foreground hover:bg-emerald-500/90 flex-1"><Square className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Stop & Log"}</Button>
                 </>
               )}
               {state === "paused" && (
                 <>
                   <Button onClick={start} className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1"><Play className="w-4 h-4 mr-2" /> Resume</Button>
-                  <Button onClick={stopAndSave} disabled={saving} className="bg-emerald-500 text-white hover:bg-emerald-500/90 flex-1"><Square className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Stop & Log"}</Button>
+                  <Button onClick={stopAndSave} disabled={saving} className="bg-emerald-500 text-primary-foreground hover:bg-emerald-500/90 flex-1"><Square className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Stop & Log"}</Button>
                   <Button onClick={reset} variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive"><RotateCcw className="w-4 h-4" /></Button>
                 </>
               )}

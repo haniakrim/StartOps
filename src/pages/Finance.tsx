@@ -324,8 +324,8 @@ export default function Finance() {
 
       <Tabs defaultValue="invoices" className="w-full">
         <TabsList className="bg-[#18191b] border border-white/10">
-          <TabsTrigger value="invoices" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><FileText className="w-4 h-4 mr-2" />Invoices</TabsTrigger>
-          <TabsTrigger value="expenses" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><CreditCard className="w-4 h-4 mr-2" />Expenses</TabsTrigger>
+          <TabsTrigger value="invoices" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><FileText className="w-4 h-4 mr-2" />Invoices</TabsTrigger>
+          <TabsTrigger value="expenses" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><CreditCard className="w-4 h-4 mr-2" />Expenses</TabsTrigger>
           <TabsTrigger value="vendors" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Truck className="w-4 h-4 mr-2" />Vendors</TabsTrigger>
           <TabsTrigger value="cashflow" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><BarChart3 className="w-4 h-4 mr-2" />Cash Flow</TabsTrigger>
         </TabsList>

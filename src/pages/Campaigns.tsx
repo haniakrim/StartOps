@@ -246,10 +246,10 @@ export default function Campaigns() {
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="bg-card border border-border">
-          <TabsTrigger value="all" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground">All ({filtered.length})</TabsTrigger>
-          <TabsTrigger value="draft" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground">Drafts</TabsTrigger>
-          <TabsTrigger value="scheduled" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground">Scheduled</TabsTrigger>
-          <TabsTrigger value="sent" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground">Sent</TabsTrigger>
+          <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">All ({filtered.length})</TabsTrigger>
+          <TabsTrigger value="draft" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Drafts</TabsTrigger>
+          <TabsTrigger value="scheduled" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Scheduled</TabsTrigger>
+          <TabsTrigger value="sent" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Sent</TabsTrigger>
         </TabsList>
 
         {(["all", "draft", "scheduled", "sent"] as const).map(tab => {

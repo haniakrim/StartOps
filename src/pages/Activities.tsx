@@ -200,8 +200,8 @@ export default function Activities() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Activities</h1>
-          <p className="text-sm text-white/50 mt-1">Track tasks, calls, meetings, and more</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Activities</h1>
+          <p className="text-sm text-muted-foreground mt-1">Track tasks, calls, meetings, and more</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -213,10 +213,10 @@ export default function Activities() {
             <DialogHeader><DialogTitle>Add Activity</DialogTitle></DialogHeader>
             <form onSubmit={createActivity} className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label className="text-white/70">Type</Label>
+                <Label className="text-muted-foreground">Type</Label>
                 <Select value={newActivity.type} onValueChange={(v) => setNewActivity(p => ({ ...p, type: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectTrigger className="bg-input border-border text-foreground"><SelectValue /></SelectTrigger>
+                  <SelectContent className="bg-popover border-border text-foreground">
                     <SelectItem value="task">Task</SelectItem>
                     <SelectItem value="call">Call</SelectItem>
                     <SelectItem value="email">Email</SelectItem>
@@ -226,23 +226,23 @@ export default function Activities() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Subject</Label>
-                <Input required value={newActivity.subject} onChange={(e) => setNewActivity(p => ({ ...p, subject: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label className="text-muted-foreground">Subject</Label>
+                <Input required value={newActivity.subject} onChange={(e) => setNewActivity(p => ({ ...p, subject: e.target.value }))} className="bg-input border-border text-foreground" />
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Description</Label>
-                <Input value={newActivity.description} onChange={(e) => setNewActivity(p => ({ ...p, description: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label className="text-muted-foreground">Description</Label>
+                <Input value={newActivity.description} onChange={(e) => setNewActivity(p => ({ ...p, description: e.target.value }))} className="bg-input border-border text-foreground" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Due Date</Label>
-                  <Input type="date" value={newActivity.due_date} onChange={(e) => setNewActivity(p => ({ ...p, due_date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label className="text-muted-foreground">Due Date</Label>
+                  <Input type="date" value={newActivity.due_date} onChange={(e) => setNewActivity(p => ({ ...p, due_date: e.target.value }))} className="bg-input border-border text-foreground" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Priority</Label>
+                  <Label className="text-muted-foreground">Priority</Label>
                   <Select value={newActivity.priority} onValueChange={(v) => setNewActivity(p => ({ ...p, priority: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectTrigger className="bg-input border-border text-foreground"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-popover border-border text-foreground">
                       <SelectItem value="low">Low</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="high">High</SelectItem>
@@ -252,24 +252,24 @@ export default function Activities() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Contact</Label>
+                <Label className="text-muted-foreground">Contact</Label>
                 <Select value={newActivity.contact_id} onValueChange={(v) => setNewActivity(p => ({ ...p, contact_id: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select contact" /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectTrigger className="bg-input border-border text-foreground"><SelectValue placeholder="Select contact" /></SelectTrigger>
+                  <SelectContent className="bg-popover border-border text-foreground">
                     {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Deal</Label>
+                <Label className="text-muted-foreground">Deal</Label>
                 <Select value={newActivity.deal_id} onValueChange={(v) => setNewActivity(p => ({ ...p, deal_id: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select deal" /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectTrigger className="bg-input border-border text-foreground"><SelectValue placeholder="Select deal" /></SelectTrigger>
+                  <SelectContent className="bg-popover border-border text-foreground">
                     {deals.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Activity</Button>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Activity</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -277,29 +277,29 @@ export default function Activities() {
 
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-          <Input placeholder="Search activities..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 bg-[#18191b] border-white/10 text-white placeholder:text-white/30" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input placeholder="Search activities..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 bg-input border-border text-foreground placeholder:text-muted-foreground" />
         </div>
       </div>
 
       {selected.length > 0 && (
-        <div className="flex items-center gap-2 p-3 bg-[#6452db]/10 border border-[#6452db]/20 rounded-lg">
-          <span className="text-sm text-white">{selected.length} selected</span>
-          <Button variant="ghost" size="sm" onClick={() => setSelected([])} className="text-white/70 hover:text-white">Clear</Button>
+        <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+          <span className="text-sm text-foreground">{selected.length} selected</span>
+          <Button variant="ghost" size="sm" onClick={() => setSelected([])} className="text-muted-foreground hover:text-foreground">Clear</Button>
           <div className="flex-1" />
-          <Button variant="ghost" size="sm" onClick={bulkComplete} className="text-[#8dc572] hover:text-[#8dc572]">Complete</Button>
-          <Button variant="ghost" size="sm" onClick={bulkDelete} className="text-[#be6464] hover:text-[#be6464]">Delete</Button>
+          <Button variant="ghost" size="sm" onClick={bulkComplete} className="text-hp-green hover:text-hp-green">Complete</Button>
+          <Button variant="ghost" size="sm" onClick={bulkDelete} className="text-hp-red hover:text-hp-red">Delete</Button>
         </div>
       )}
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map(activity => (
-            <Card key={activity.id} className={`bg-[#18191b] border-white/10 hover:border-white/20 transition-colors ${activity.status === "completed" ? "opacity-60" : ""}`}>
+            <Card key={activity.id} className={`bg-card border-border hover:border-border/80 transition-colors ${activity.status === "completed" ? "opacity-60" : ""}`}>
               <CardContent className="p-4">
                 <div className="flex items-start gap-4">
                   <div className="mt-1">
@@ -308,22 +308,22 @@ export default function Activities() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <h3 className={`text-sm font-medium ${activity.status === "completed" ? "text-white/50 line-through" : "text-white"}`}>{activity.subject}</h3>
+                        <h3 className={`text-sm font-medium ${activity.status === "completed" ? "text-muted-foreground line-through" : "text-foreground"}`}>{activity.subject}</h3>
                         <Badge variant="secondary" className={`text-xs ${priorityColors[activity.priority] || priorityColors.medium}`}>{activity.priority}</Badge>
                       </div>
                       <div className="flex items-center gap-2">
                         {activity.status !== "completed" && (
-                          <Button variant="ghost" size="sm" onClick={() => completeActivity(activity.id)} className="text-[#8dc572] hover:text-[#8dc572]">
+                          <Button variant="ghost" size="sm" onClick={() => completeActivity(activity.id)} className="text-hp-green hover:text-hp-green">
                             <CheckCircle2 className="w-4 h-4" />
                           </Button>
                         )}
-                        <Button variant="ghost" size="sm" onClick={() => deleteActivity(activity.id)} className="text-[#be6464] hover:text-[#be6464]">
+                        <Button variant="ghost" size="sm" onClick={() => deleteActivity(activity.id)} className="text-hp-red hover:text-hp-red">
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                    {activity.description && <p className="text-sm text-white/50 mt-1">{activity.description}</p>}
-                    <div className="flex items-center gap-4 mt-2 text-xs text-white/40">
+                    {activity.description && <p className="text-sm text-muted-foreground mt-1">{activity.description}</p>}
+                    <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                       {activity.due_date && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(activity.due_date).toLocaleDateString()}</span>}
                       {activity.contacts && <span>{activity.contacts.first_name} {activity.contacts.last_name}</span>}
                       {activity.deals && <span>{activity.deals.name}</span>}
@@ -334,7 +334,7 @@ export default function Activities() {
             </Card>
           ))}
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-sm text-white/40">No activities found. Add your first activity!</div>
+            <div className="text-center py-12 text-sm text-muted-foreground">No activities found. Add your first activity!</div>
           )}
         </div>
       )}

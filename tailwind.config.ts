@@ -62,19 +62,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // HP Design System Colors
+        // HP Design System Colors — use CSS variables for light/dark
         hp: {
-          blue: "#0071E3",
-          "blue-light": "#2997FF",
-          "blue-dark": "#005BB5",
-          slate: "#14181F",
-          surface: "#1A1F28",
-          "surface-raised": "#232833",
-          "text-primary": "#F5F5F7",
-          "text-secondary": "#8A929D",
-          green: "#34C759",
-          orange: "#FF9500",
-          red: "#FF2D55",
+          blue: "hsl(var(--hp-blue))",
+          "blue-light": "hsl(var(--hp-blue-light))",
+          "blue-dark": "hsl(var(--hp-blue-dark))",
+          slate: "hsl(var(--hp-slate))",
+          surface: "hsl(var(--hp-surface))",
+          "surface-raised": "hsl(var(--hp-surface-raised))",
+          "text-primary": "hsl(var(--hp-text-primary))",
+          "text-secondary": "hsl(var(--hp-text-secondary))",
+          green: "hsl(var(--hp-green))",
+          orange: "hsl(var(--hp-orange))",
+          red: "hsl(var(--hp-red))",
         },
         // Legacy aliases for backwards compatibility
         startops: {

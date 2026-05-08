@@ -230,8 +230,8 @@ export default function Assistant() {
             className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             {msg.role === "assistant" && (
-              <div className="w-8 h-8 rounded-expo-lg bg-expo-blue flex items-center justify-center flex-shrink-0">
-                <Bot className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-expo-lg bg-primary flex items-center justify-center flex-shrink-0">
+                <Bot className="w-4 h-4 text-primary-foreground" />
               </div>
             )}
             <div className={`max-w-[80%] ${msg.role === "user" ? "order-first" : ""}`}>
@@ -254,11 +254,11 @@ export default function Assistant() {
                     <span
                       className={`text-xs font-medium ${
                         msg.role === "user"
-                          ? "text-white/70"
+                          ? "text-primary-foreground/70"
                           : msg.type === "warning"
-                            ? "text-expo-pink"
+                            ? "text-hp-red"
                             : msg.type === "insight"
-                              ? "text-expo-green"
+                              ? "text-hp-green"
                               : "text-muted-foreground"
                       }`}
                     >
@@ -267,7 +267,7 @@ export default function Assistant() {
                   </div>
                   <div
                     className={`text-sm whitespace-pre-wrap ${
-                      msg.role === "user" ? "text-white" : "text-foreground"
+                      msg.role === "user" ? "text-primary-foreground" : "text-foreground"
                     }`}
                   >
                     {msg.content.split(/(\*\*.*?\*\*)/).map((part, i) => {
@@ -293,8 +293,8 @@ export default function Assistant() {
         ))}
         {loading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-expo-lg bg-expo-blue flex items-center justify-center flex-shrink-0">
-              <Bot className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-expo-lg bg-primary flex items-center justify-center flex-shrink-0">
+              <Bot className="w-4 h-4 text-primary-foreground" />
             </div>
             <Card className="bg-card border-border">
               <CardContent className="p-4">
@@ -335,7 +335,7 @@ export default function Assistant() {
             type="submit"
             size="sm"
             disabled={loading || !input.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-expo-blue text-white hover:bg-expo-blue/90 h-8 w-8 p-0"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 p-0"
           >
             <Send className="w-4 h-4" />
           </Button>

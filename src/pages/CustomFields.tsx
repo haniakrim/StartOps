@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import {
   Settings, Plus, Trash2, GripVertical, Type, Hash, ToggleLeft,
-  List, Calendar, CheckSquare, Loader2, Save
+  List, Calendar, CheckSquare, Loader2
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -148,7 +148,7 @@ export default function CustomFields() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -157,43 +157,43 @@ export default function CustomFields() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Custom Fields</h1>
-          <p className="text-sm text-white/50 mt-1">Configure custom data fields for your records</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Custom Fields</h1>
+          <p className="text-sm text-muted-foreground mt-1">Configure custom data fields for your records</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-2" />Add Field
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white">
+          <DialogContent className="bg-card border-border text-foreground">
             <DialogHeader><DialogTitle>Add Custom Field</DialogTitle></DialogHeader>
             <form onSubmit={createField} className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label className="text-white/70">Applies To</Label>
+                <Label className="text-muted-foreground">Applies To</Label>
                 <Select value={form.entity_type} onValueChange={(v) => setForm(p => ({ ...p, entity_type: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                  <SelectTrigger className="bg-input border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectContent className="bg-popover border-border text-foreground">
                     {entityTypes.map(e => <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Field Label</Label>
-                <Input required value={form.label} onChange={(e) => setForm(p => ({ ...p, label: e.target.value, name: e.target.value.toLowerCase().replace(/\s+/g, "_") }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., Customer Lifetime Value" />
+                <Label className="text-muted-foreground">Field Label</Label>
+                <Input required value={form.label} onChange={(e) => setForm(p => ({ ...p, label: e.target.value, name: e.target.value.toLowerCase().replace(/\s+/g, "_") }))} className="bg-input border-border text-foreground" placeholder="e.g., Customer Lifetime Value" />
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Field Type</Label>
+                <Label className="text-muted-foreground">Field Type</Label>
                 <Select value={form.field_type} onValueChange={(v) => setForm(p => ({ ...p, field_type: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                  <SelectTrigger className="bg-input border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectContent className="bg-popover border-border text-foreground">
                     <SelectItem value="text">Text</SelectItem>
                     <SelectItem value="number">Number</SelectItem>
                     <SelectItem value="boolean">Yes/No</SelectItem>
@@ -205,19 +205,19 @@ export default function CustomFields() {
               </div>
               {(form.field_type === "select" || form.field_type === "multiselect") && (
                 <div className="space-y-2">
-                  <Label className="text-white/70">Options (comma-separated)</Label>
-                  <Input value={form.options} onChange={(e) => setForm(p => ({ ...p, options: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Option 1, Option 2, Option 3" />
+                  <Label className="text-muted-foreground">Options (comma-separated)</Label>
+                  <Input value={form.options} onChange={(e) => setForm(p => ({ ...p, options: e.target.value }))} className="bg-input border-border text-foreground" placeholder="Option 1, Option 2, Option 3" />
                 </div>
               )}
               <div className="space-y-2">
-                <Label className="text-white/70">Default Value (optional)</Label>
-                <Input value={form.default_value} onChange={(e) => setForm(p => ({ ...p, default_value: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label className="text-muted-foreground">Default Value (optional)</Label>
+                <Input value={form.default_value} onChange={(e) => setForm(p => ({ ...p, default_value: e.target.value }))} className="bg-input border-border text-foreground" />
               </div>
               <div className="flex items-center gap-2">
                 <Switch checked={form.is_required} onCheckedChange={(v) => setForm(p => ({ ...p, is_required: v }))} />
-                <Label className="text-white/70">Required field</Label>
+                <Label className="text-muted-foreground">Required field</Label>
               </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Field</Button>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Create Field</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -230,8 +230,8 @@ export default function CustomFields() {
             onClick={() => setSelectedEntity(entity.id)}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               selectedEntity === entity.id
-                ? "bg-[#6452db] text-white"
-                : "bg-[#18191b] text-white/50 hover:text-white border border-white/10"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card text-muted-foreground hover:text-foreground border border-border"
             }`}
           >
             {entity.label}
@@ -239,37 +239,37 @@ export default function CustomFields() {
         ))}
       </div>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card className="bg-card border-border">
         <CardContent className="p-0">
           {filteredFields.length === 0 ? (
             <div className="text-center py-12">
-              <Settings className="w-12 h-12 text-white/20 mx-auto mb-4" />
-              <p className="text-sm text-white/40">No custom fields for {entityTypes.find(e => e.id === selectedEntity)?.label}</p>
-              <p className="text-xs text-white/30 mt-1">Add your first custom field above</p>
+              <Settings className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+              <p className="text-sm text-muted-foreground">No custom fields for {entityTypes.find(e => e.id === selectedEntity)?.label}</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Add your first custom field above</p>
             </div>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-border">
               {filteredFields.map((field) => {
                 const Icon = fieldTypeIcons[field.field_type] || Type;
                 return (
-                  <div key={field.id} className="flex items-center gap-4 p-4 hover:bg-white/[0.02] transition-colors">
-                    <GripVertical className="w-4 h-4 text-white/20 cursor-grab" />
-                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                      <Icon className="w-4 h-4 text-white/40" />
+                  <div key={field.id} className="flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors">
+                    <GripVertical className="w-4 h-4 text-muted-foreground/20 cursor-grab" />
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                      <Icon className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-white">{field.label}</p>
-                        {field.is_required && <Badge variant="secondary" className="bg-[#be6464]/20 text-[#be6464] text-xs">Required</Badge>}
-                        {!field.is_active && <Badge variant="secondary" className="bg-white/10 text-white/50 text-xs">Inactive</Badge>}
+                        <p className="text-sm font-medium text-foreground">{field.label}</p>
+                        {field.is_required && <Badge variant="secondary" className="bg-hp-red/20 text-hp-red text-xs">Required</Badge>}
+                        {!field.is_active && <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">Inactive</Badge>}
                       </div>
-                      <p className="text-xs text-white/40 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {fieldTypeLabels[field.field_type]} · {field.name}
                         {field.options && ` · ${(field.options as string[]).length} options`}
                       </p>
                     </div>
                     <Switch checked={field.is_active} onCheckedChange={() => toggleField(field.id, field.is_active)} />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-[#be6464]" onClick={() => deleteField(field.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-hp-red" onClick={() => deleteField(field.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>

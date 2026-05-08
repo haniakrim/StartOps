@@ -197,7 +197,7 @@ export function QuotePreview({ quote, items, open, onClose, onUpdate }: QuotePre
 
           {quote.status === "draft" && (
             <div className="flex gap-2">
-              <Button onClick={() => updateStatus("sent")} className="flex-1 bg-blue-500 text-white hover:bg-blue-500/90">
+              <Button onClick={() => updateStatus("sent")} className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
                 <Send className="w-4 h-4 mr-2" />
                 Mark as Sent
               </Button>

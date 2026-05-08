@@ -234,10 +234,10 @@ export default function Analytics() {
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="bg-card border border-border">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><BarChart3 className="w-4 h-4 mr-2" />Overview</TabsTrigger>
-          <TabsTrigger value="funnel" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><Filter className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
-          <TabsTrigger value="cohorts" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><Users className="w-4 h-4 mr-2" />Cohorts</TabsTrigger>
-          <TabsTrigger value="sources" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><GitBranch className="w-4 h-4 mr-2" />Sources</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><BarChart3 className="w-4 h-4 mr-2" />Overview</TabsTrigger>
+          <TabsTrigger value="funnel" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Filter className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
+          <TabsTrigger value="cohorts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Users className="w-4 h-4 mr-2" />Cohorts</TabsTrigger>
+          <TabsTrigger value="sources" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><GitBranch className="w-4 h-4 mr-2" />Sources</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 space-y-4">
@@ -369,7 +369,7 @@ export default function Analytics() {
                             className="h-full rounded-expo-md transition-all duration-500 flex items-center justify-end pr-2"
                             style={{ width: `${Math.max(width, 5)}%`, backgroundColor: stage.color }}
                           >
-                            <span className="text-xs text-white font-medium">{width.toFixed(0)}%</span>
+                            <span className="text-xs text-primary-foreground font-medium">{width.toFixed(0)}%</span>
                           </div>
                         </div>
                       </div>

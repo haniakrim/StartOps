@@ -473,10 +473,10 @@ export default function Communications() {
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="bg-card border border-border">
-          <TabsTrigger value="all" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground">All ({filtered.length})</TabsTrigger>
-          <TabsTrigger value="emails" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><Mail className="w-4 h-4 mr-2" />Emails ({emails.length})</TabsTrigger>
-          <TabsTrigger value="calls" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><Phone className="w-4 h-4 mr-2" />Calls ({calls.length})</TabsTrigger>
-          <TabsTrigger value="meetings" className="data-[state=active]:bg-expo-blue data-[state=active]:text-white text-muted-foreground"><MessageSquare className="w-4 h-4 mr-2" />Meetings ({meetings.length})</TabsTrigger>
+          <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">All ({filtered.length})</TabsTrigger>
+          <TabsTrigger value="emails" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Mail className="w-4 h-4 mr-2" />Emails ({emails.length})</TabsTrigger>
+          <TabsTrigger value="calls" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Phone className="w-4 h-4 mr-2" />Calls ({calls.length})</TabsTrigger>
+          <TabsTrigger value="meetings" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><MessageSquare className="w-4 h-4 mr-2" />Meetings ({meetings.length})</TabsTrigger>
         </TabsList>
 
         {(["all", "emails", "calls", "meetings"] as const).map(tab => {

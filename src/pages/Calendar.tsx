@@ -240,7 +240,7 @@ export default function Calendar() {
                   onClick={() => setSelectedDate(new Date(year, month, dayNum))}
                   className={`min-h-[100px] border-b border-r border-border/50 p-1.5 cursor-pointer transition-colors ${isSelected ? "bg-expo-blue/10" : "hover:bg-accent/50"}`}
                 >
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm mb-1 ${isToday ? "bg-expo-blue text-white font-medium" : "text-muted-foreground"}`}>
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm mb-1 ${isToday ? "bg-primary text-primary-foreground font-medium" : "text-muted-foreground"}`}>
                     {dayNum}
                   </div>
                   <div className="space-y-1">

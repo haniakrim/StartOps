@@ -303,7 +303,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <span className="font-semibold text-sidebar-foreground tracking-tight text-[15px]">
                 StartOps
               </span>
-              <Badge className="bg-expo-blue/15 text-expo-blue border-expo-blue/20 text-[10px] px-1.5 py-0 h-4 hover:bg-expo-blue/15">
+              <Badge className="bg-primary/15 text-primary border-primary/20 text-[10px] px-1.5 py-0 h-4 hover:bg-primary/15">
                 Pro
               </Badge>
             </div>

@@ -20,14 +20,14 @@ export default function StatsSection() {
           transition={{ duration: 0.5, delay: i * 0.1 }}
           className="text-center"
         >
-          <div className="text-4xl lg:text-5xl font-bold text-white mb-2">
+          <div className="text-4xl lg:text-5xl font-bold text-foreground mb-2">
             <AnimatedCounter
               end={stat.value}
               suffix={stat.suffix}
               duration={2.5}
             />
           </div>
-          <div className="text-sm text-white/40 uppercase tracking-wider">{stat.label}</div>
+          <div className="text-sm text-muted-foreground uppercase tracking-wider">{stat.label}</div>
         </motion.div>
       ))}
     </div>

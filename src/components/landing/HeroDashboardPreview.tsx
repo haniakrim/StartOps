@@ -20,7 +20,7 @@ const statCards = [
     change: "+12.5%",
     up: true,
     icon: DollarSign,
-    color: "#0071E3",
+    color: "hsl(var(--primary))",
   },
   {
     title: "Active Deals",
@@ -28,7 +28,7 @@ const statCards = [
     change: "+8.2%",
     up: true,
     icon: TrendingUp,
-    color: "#FF2D55",
+    color: "hsl(var(--destructive))",
   },
   {
     title: "Contacts",
@@ -36,7 +36,7 @@ const statCards = [
     change: "+24%",
     up: true,
     icon: Users,
-    color: "#0071E3",
+    color: "hsl(var(--primary))",
   },
   {
     title: "Companies",
@@ -44,16 +44,16 @@ const statCards = [
     change: "-2.1%",
     up: false,
     icon: Building2,
-    color: "#2997FF",
+    color: "hsl(var(--hp-blue-light))",
   },
 ];
 
 const pipelineStages = [
-  { name: "Lead", count: 24, color: "#2997FF" },
-  { name: "Qualified", count: 18, color: "#0071E3" },
-  { name: "Proposal", count: 12, color: "#FF2D55" },
-  { name: "Negotiation", count: 8, color: "#2997FF" },
-  { name: "Closed Won", count: 6, color: "#0071E3" },
+  { name: "Lead", count: 24, color: "hsl(var(--hp-blue-light))" },
+  { name: "Qualified", count: 18, color: "hsl(var(--primary))" },
+  { name: "Proposal", count: 12, color: "hsl(var(--destructive))" },
+  { name: "Negotiation", count: 8, color: "hsl(var(--hp-blue-light))" },
+  { name: "Closed Won", count: 6, color: "hsl(var(--primary))" },
 ];
 
 const contacts = [
@@ -81,19 +81,19 @@ export default function HeroDashboardPreview() {
   return (
     <div className="relative w-full max-w-lg mx-auto lg:mx-0">
       {/* Glow effect behind */}
-      <div className="absolute -inset-4 bg-gradient-to-r from-hp-blue/20 via-hp-red/10 to-hp-blue-light/20 rounded-3xl blur-2xl animate-pulse-glow" />
+      <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-destructive/10 to-primary/20 rounded-3xl blur-2xl animate-pulse-glow" />
 
       {/* Dashboard card */}
-      <div className="relative bg-background border border-border rounded-2xl overflow-hidden shadow-2xl">
+      <div className="relative bg-card border border-border rounded-2xl overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
           <div className="flex gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
           </div>
           <div className="flex-1 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/5 text-xs text-white/40">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-muted text-xs text-muted-foreground">
               <BarChart3 className="w-3 h-3" />
               Dashboard
             </div>
@@ -132,8 +132,8 @@ export default function HeroDashboardPreview() {
                         {stat.change}
                       </span>
                     </div>
-                    <div className="text-lg font-bold text-white">{stat.value}</div>
-                    <div className="text-[10px] text-white/40">{stat.title}</div>
+                    <div className="text-lg font-bold text-foreground">{stat.value}</div>
+                    <div className="text-[10px] text-muted-foreground">{stat.title}</div>
                   </div>
                 ))}
               </motion.div>
@@ -149,7 +149,7 @@ export default function HeroDashboardPreview() {
                 className="space-y-3"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-white">Revenue Overview</span>
+                  <span className="text-sm font-medium text-foreground">Revenue Overview</span>
                   <span className="text-xs text-hp-green flex items-center gap-1">
                     <ArrowUpRight className="w-3 h-3" />
                     +23.5%
@@ -162,11 +162,11 @@ export default function HeroDashboardPreview() {
                       initial={{ height: 0 }}
                       animate={{ height: `${height}%` }}
                       transition={{ duration: 0.5, delay: i * 0.05 }}
-                      className="flex-1 rounded-t-sm bg-gradient-to-t from-hp-blue to-hp-red/60"
+                      className="flex-1 rounded-t-sm bg-gradient-to-t from-primary to-primary/40"
                     />
                   ))}
                 </div>
-                <div className="flex justify-between text-[10px] text-white/30">
+                <div className="flex justify-between text-[10px] text-muted-foreground">
                   <span>Jan</span>
                   <span>Jun</span>
                   <span>Dec</span>
@@ -184,8 +184,8 @@ export default function HeroDashboardPreview() {
                 className="space-y-3"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-white">Deal Pipeline</span>
-                  <span className="text-xs text-white/40">68 total</span>
+                  <span className="text-sm font-medium text-foreground">Deal Pipeline</span>
+                  <span className="text-xs text-muted-foreground">68 total</span>
                 </div>
                 <div className="space-y-2">
                   {pipelineStages.map((stage, i) => (
@@ -200,8 +200,8 @@ export default function HeroDashboardPreview() {
                         className="w-2 h-2 rounded-full shrink-0"
                         style={{ backgroundColor: stage.color }}
                       />
-                      <span className="text-xs text-white/60 w-20">{stage.name}</span>
-                      <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                      <span className="text-xs text-muted-foreground w-20">{stage.name}</span>
+                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${(stage.count / 24) * 100}%` }}
@@ -210,7 +210,7 @@ export default function HeroDashboardPreview() {
                           style={{ backgroundColor: stage.color }}
                         />
                       </div>
-                      <span className="text-xs text-white font-medium w-6 text-right">
+                      <span className="text-xs text-foreground font-medium w-6 text-right">
                         {stage.count}
                       </span>
                     </motion.div>
@@ -229,8 +229,8 @@ export default function HeroDashboardPreview() {
                 className="space-y-2"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-white">Recent Contacts</span>
-                  <MoreHorizontal className="w-4 h-4 text-white/30" />
+                  <span className="text-sm font-medium text-foreground">Recent Contacts</span>
+                  <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
                 </div>
                 {contacts.map((contact, i) => (
                   <motion.div
@@ -238,26 +238,26 @@ export default function HeroDashboardPreview() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors"
+                    className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border hover:border-border/80 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-hp-blue to-hp-red flex items-center justify-center text-xs font-bold text-primary-foreground">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-destructive flex items-center justify-center text-xs font-bold text-primary-foreground">
                       {contact.name.split(" ").map((n) => n[0]).join("")}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-white truncate">{contact.name}</div>
-                      <div className="text-[10px] text-white/40 truncate">{contact.company}</div>
+                      <div className="text-xs font-medium text-foreground truncate">{contact.name}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{contact.company}</div>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Mail className="w-3 h-3 text-white/20 hover:text-white/40 cursor-pointer" />
-                      <Phone className="w-3 h-3 text-white/20 hover:text-white/40 cursor-pointer" />
+                      <Mail className="w-3 h-3 text-muted-foreground hover:text-foreground cursor-pointer" />
+                      <Phone className="w-3 h-3 text-muted-foreground hover:text-foreground cursor-pointer" />
                     </div>
                     <span
                       className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                         contact.status === "Active"
                           ? "bg-hp-green/10 text-hp-green"
                           : contact.status === "Customer"
-                          ? "bg-hp-blue/10 text-hp-blue"
-                          : "bg-white/5 text-white/40"
+                          ? "bg-primary/10 text-primary"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
                       {contact.status}
@@ -270,13 +270,13 @@ export default function HeroDashboardPreview() {
         </div>
 
         {/* View indicators */}
-        <div className="flex items-center justify-center gap-1.5 py-3 border-t border-white/5">
+        <div className="flex items-center justify-center gap-1.5 py-3 border-t border-border">
           {views.map((v, i) => (
             <button
               key={v}
               onClick={() => setCurrentView(i)}
-              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                i === currentView ? "bg-hp-blue w-4" : "bg-white/20 hover:bg-white/30"
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === currentView ? "bg-primary w-4" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
               }`}
             />
           ))}
