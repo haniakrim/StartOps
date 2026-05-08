@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Zap, Plus, Play, Pause, Trash2, Edit3, Clock, Mail, Bell,
   GitBranch, UserPlus, AlertTriangle, CheckCircle2, Loader2,
-  ChevronDown, ChevronRight, Copy, MoreHorizontal
+  ChevronDown, ChevronRight, Copy
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   CreditCard, Plus, Search, Loader2, Calendar, DollarSign, Users,
   TrendingUp, AlertTriangle, CheckCircle2, XCircle, RefreshCw,
-  MoreHorizontal, Filter, Download
+  Filter, Download
 } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,11 +115,15 @@ export default function Subscriptions() {
     }
   }
 
-  const filtered = subscriptions.filter(s =>
-    s.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-    s.plan_name.toLowerCase().includes(search.toLowerCase()) ||
-    s.customer_email.toLowerCase().includes(search.toLowerCase())
-  );
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filtered = subscriptions.filter(s => {
+    const matchSearch = s.customer_name.toLowerCase().includes(search.toLowerCase()) ||
+      s.plan_name.toLowerCase().includes(search.toLowerCase()) ||
+      s.customer_email.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || s.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
 
   const activeSubs = subscriptions.filter(s => s.status === "active");
   const totalMRR = activeSubs.reduce((s, sub) => s + (sub.mrr || 0), 0);
@@ -302,9 +306,20 @@ export default function Subscriptions() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input type="text" placeholder="Search subscriptions..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring" />
         </div>
-        <Button variant="outline" size="sm">
-          <Filter className="w-4 h-4 mr-2" />Filter
-        </Button>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-36">
+            <Filter className="w-3 h-3 mr-2" />
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="trialing">Trialing</SelectItem>
+            <SelectItem value="past_due">Past Due</SelectItem>
+            <SelectItem value="canceled">Canceled</SelectItem>
+            <SelectItem value="paused">Paused</SelectItem>
+          </SelectContent>
+        </Select>
         <Button variant="outline" size="sm" onClick={() => {
           const exportData = subscriptions.map(s => ({
             "Customer": s.customer_name,

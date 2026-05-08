@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Search, Filter, Plus, MoreHorizontal, Building2, Globe, Users, MapPin, ArrowUpDown, Download, TrendingUp, Loader2, Pencil, Trash2
+  Search, Filter, Plus, Building2, Globe, Users, MapPin, ArrowUpDown, Download, TrendingUp, Loader2, Pencil, Trash2
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Plus, MoreHorizontal, DollarSign, Calendar, User, Building2, Filter, Search, Loader2, Download,
+  Plus, DollarSign, Calendar, User, Building2, Filter, Search, Loader2, Download,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

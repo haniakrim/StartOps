@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Building2, Users, Shield, ChevronRight, ChevronDown, Plus, Search, MoreHorizontal, Pencil, Trash2, UserPlus, Loader2,
+  Building2, Users, Shield, ChevronRight, ChevronDown, Plus, Search, Pencil, Trash2, UserPlus, Loader2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -319,7 +319,6 @@ export default function Organization() {
                       {dept.teams.map((team) => (
                         <div key={team.id} className="flex items-center justify-between p-3 rounded-md bg-muted border border-border/50">
                           <div className="flex items-center gap-3"><Users className="w-4 h-4 text-muted-foreground" /><span className="text-sm text-foreground">{team.name}</span></div>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground"><MoreHorizontal className="w-3 h-3" /></Button>
                         </div>
                       ))}
                     </div>

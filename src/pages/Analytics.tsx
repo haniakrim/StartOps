@@ -206,19 +206,17 @@ export default function Analytics() {
             <Loader2 className="w-4 h-4 mr-2" />Refresh
           </Button>
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="bg-card border-border text-foreground w-32">
+            <SelectTrigger className="w-32">
+              <Filter className="w-4 h-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border">
+            <SelectContent>
               <SelectItem value="week">This Week</SelectItem>
               <SelectItem value="month">This Month</SelectItem>
               <SelectItem value="quarter">This Quarter</SelectItem>
               <SelectItem value="year">This Year</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent">
-            <Filter className="w-4 h-4 mr-2" />Filter
-          </Button>
         </div>
       </div>
 

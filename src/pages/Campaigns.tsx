@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Mail, Plus, Search, Loader2, Send, Users, Eye, MousePointer,
   TrendingUp, AlertTriangle, CheckCircle2, Clock, Calendar,
-  MoreHorizontal, Filter, Copy, Trash2, Pause, Play, Download
+  Filter, Copy, Trash2, Pause, Download
 } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -118,10 +118,16 @@ export default function Campaigns() {
     }
   }
 
-  const filtered = campaigns.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.subject.toLowerCase().includes(search.toLowerCase())
-  );
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+
+  const filtered = campaigns.filter(c => {
+    const matchSearch = c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.subject.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || c.status === statusFilter;
+    const matchType = typeFilter === "all" || c.type === typeFilter;
+    return matchSearch && matchStatus && matchType;
+  });
 
   const totalSent = campaigns.filter(c => c.status === "sent").reduce((s, c) => s + (c.recipient_count || 0), 0);
   const totalOpens = campaigns.reduce((s, c) => s + (c.open_count || 0), 0);
@@ -239,9 +245,32 @@ export default function Campaigns() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input type="text" placeholder="Search campaigns..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-card border border-border rounded-expo-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-expo-blue/50" />
         </div>
-        <Button variant="outline" size="sm" className="border-border text-muted-foreground hover:text-foreground hover:bg-accent">
-          <Filter className="w-4 h-4 mr-2" />Filter
-        </Button>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-36 bg-card border-border text-foreground h-9 text-xs">
+            <Filter className="w-3 h-3 mr-2" />
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent className="bg-card border-border">
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+            <SelectItem value="sending">Sending</SelectItem>
+            <SelectItem value="sent">Sent</SelectItem>
+            <SelectItem value="paused">Paused</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-36 bg-card border-border text-foreground h-9 text-xs">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent className="bg-card border-border">
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="newsletter">Newsletter</SelectItem>
+            <SelectItem value="promotional">Promotional</SelectItem>
+            <SelectItem value="transactional">Transactional</SelectItem>
+            <SelectItem value="drip">Drip</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
@@ -310,7 +339,14 @@ export default function Campaigns() {
                                 <Pause className="w-4 h-4" />
                               </Button>
                             )}
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => {
+                              const newCampaign = { ...campaign, name: campaign.name + " (Copy)", status: "draft" };
+                              delete (newCampaign as any).id;
+                              supabase.from("campaigns").insert(newCampaign).then(({ error }) => {
+                                if (error) toast.error("Failed to duplicate: " + error.message);
+                                else { toast.success("Campaign duplicated"); fetchCampaigns(); }
+                              });
+                            }}>
                               <Copy className="w-4 h-4" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => deleteCampaign(campaign.id)}>

@@ -20,7 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Trash2, Pencil, SearchX } from "lucide-react";
+import { Upload, Plus, Trash2, Pencil, SearchX, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { validateCsvData } from "@/lib/csv-validation";
 
 interface Contact {
@@ -51,6 +52,7 @@ const Contacts = () => {
     company: "",
     title: "",
   });
+  const [selected, setSelected] = useState<string[]>([]);
 
   const fetchContacts = useCallback(async () => {
     if (!organizationId) {
@@ -276,6 +278,27 @@ const Contacts = () => {
         />
       </div>
 
+      {selected.length > 0 && (
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20 mb-4">
+          <span className="text-sm text-foreground">{selected.length} selected</span>
+          <div className="flex-1" />
+          <Button variant="ghost" size="sm" onClick={() => setSelected([])} className="text-muted-foreground hover:text-foreground">
+            <X className="w-4 h-4 mr-1" />Clear
+          </Button>
+          <Button variant="ghost" size="sm" onClick={async () => {
+            const { error } = await supabase.from("contacts").delete().in("id", selected);
+            if (error) toast({ title: "Error deleting", description: error.message, variant: "destructive" });
+            else {
+              toast({ title: `${selected.length} contacts deleted` });
+              setSelected([]);
+              fetchContacts();
+            }
+          }} className="text-destructive hover:text-destructive">
+            <Trash2 className="w-4 h-4 mr-1" />Delete Selected
+          </Button>
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>All Contacts ({filtered.length})</CardTitle>
@@ -291,6 +314,15 @@ const Contacts = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[40px]">
+                    <Checkbox
+                      checked={filtered.length > 0 && selected.length === filtered.length}
+                      onCheckedChange={(checked) => {
+                        if (checked) setSelected(filtered.map(c => c.id));
+                        else setSelected([]);
+                      }}
+                    />
+                  </TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
@@ -302,6 +334,15 @@ const Contacts = () => {
               <TableBody>
                 {filtered.map((contact) => (
                   <TableRow key={contact.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selected.includes(contact.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) setSelected(prev => [...prev, contact.id]);
+                          else setSelected(prev => prev.filter(id => id !== contact.id));
+                        }}
+                      />
+                    </TableCell>
                     <TableCell>
                       {contact.first_name} {contact.last_name}
                     </TableCell>
