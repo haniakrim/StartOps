@@ -27,10 +27,10 @@ export default function CTASection() {
           <Sparkles className="w-7 h-7 text-primary" />
         </motion.div>
 
-        <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+        <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
           Ready to grow your startup?
         </h2>
-        <p className="text-base text-muted-foreground max-w-xl mx-auto mb-8">
+        <p className="text-base text-white/50 max-w-xl mx-auto mb-8">
           Join thousands of founders who use StartOps to manage their entire
           business. Start free, scale as you grow.
         </p>
@@ -45,7 +45,7 @@ export default function CTASection() {
           </button>
           <button
             onClick={() => navigate("/login")}
-            className="px-8 h-12 text-base border border-border text-foreground hover:bg-accent rounded-lg transition-colors"
+            className="px-8 h-12 text-base border border-white/10 text-white hover:bg-white/5 rounded-lg transition-colors"
           >
             Sign In
           </button>

@@ -3,82 +3,32 @@
 @tailwind utilities;
 
 /* ============================================
-   Theme System — Light & Dark Mode
+   HP Design System — Hewlett-Packard Inspired
    ============================================ */
 
 @layer base {
-  /* ── Light Mode (Default) ── */
+  /* ── Dark Mode (HP Deep Slate + HP Blue accent) ── */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 220 30% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 30% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 12%;
-    --primary: 210 100% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 30% 12%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 45%;
-    --accent: 220 14% 96%;
-    --accent-foreground: 220 30% 12%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 14% 90%;
-    --input: 220 14% 90%;
-    --ring: 210 100% 45%;
-    --radius: 0.5rem;
-
-    --chart-1: 210 100% 45%;
-    --chart-2: 195 100% 50%;
-    --chart-3: 0 72% 51%;
-    --chart-4: 142 69% 45%;
-    --chart-5: 35 100% 50%;
-
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 30% 12%;
-    --sidebar-primary: 210 100% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 96%;
-    --sidebar-accent-foreground: 220 30% 12%;
-    --sidebar-border: 220 14% 90%;
-    --sidebar-ring: 210 100% 45%;
-
-    --hp-blue: 210 100% 45%;
-    --hp-blue-light: 210 100% 55%;
-    --hp-blue-dark: 210 100% 35%;
-    --hp-slate: 220 30% 12%;
-    --hp-surface: 0 0% 100%;
-    --hp-surface-raised: 220 14% 96%;
-    --hp-text-primary: 220 30% 12%;
-    --hp-text-secondary: 220 10% 45%;
-    --hp-green: 142 69% 45%;
-    --hp-orange: 35 100% 50%;
-    --hp-red: 0 72% 51%;
-  }
-
-  /* ── Dark Mode ── */
-  .dark {
-    --background: 220 18% 10%;
-    --foreground: 0 0% 98%;
-    --card: 220 16% 14%;
+    --background: 220 18% 10%;         /* #14181F — HP Dark Slate */
+    --foreground: 0 0% 98%;            /* near-white text */
+    --card: 220 16% 14%;               /* #1A1F28 — slightly lighter */
     --card-foreground: 0 0% 98%;
     --popover: 220 16% 14%;
     --popover-foreground: 0 0% 98%;
-    --primary: 210 100% 45%;
+    --primary: 210 100% 45%;           /* #0071E3 — HP Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 20%;
+    --secondary: 220 14% 20%;           /* #232833 */
     --secondary-foreground: 0 0% 98%;
     --muted: 220 14% 22%;
-    --muted-foreground: 220 10% 60%;
-    --accent: 220 14% 20%;
-    --accent-foreground: 0 0% 98%;
+    --muted-foreground: 220 10% 60%;    /* #8A929D */
+    --accent: 210 100% 45%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 14% 24%;
     --input: 220 14% 24%;
     --ring: 210 100% 45%;
+    --radius: 0.5rem;
 
     --chart-1: 210 100% 45%;
     --chart-2: 195 100% 50%;
@@ -95,6 +45,7 @@
     --sidebar-border: 220 14% 24%;
     --sidebar-ring: 210 100% 45%;
 
+    /* HP-specific tokens */
     --hp-blue: 210 100% 45%;
     --hp-blue-light: 210 100% 55%;
     --hp-blue-dark: 210 100% 35%;
@@ -103,6 +54,57 @@
     --hp-surface-raised: 220 14% 20%;
     --hp-text-primary: 0 0% 98%;
     --hp-text-secondary: 220 10% 60%;
+    --hp-green: 142 69% 45%;
+    --hp-orange: 35 100% 50%;
+    --hp-red: 0 72% 51%;
+  }
+
+  /* ── Light Mode (HP Clean White + HP Blue) ── */
+  .light {
+    --background: 0 0% 100%;            /* #FFFFFF — HP Clean White */
+    --foreground: 220 30% 12%;        /* #161B22 */
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 12%;
+    --primary: 210 100% 45%;          /* #0071E3 — HP Blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;          /* #F0F2F5 */
+    --secondary-foreground: 220 30% 12%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 210 100% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 210 100% 45%;
+
+    --chart-1: 210 100% 45%;
+    --chart-2: 195 100% 50%;
+    --chart-3: 0 72% 51%;
+    --chart-4: 142 69% 45%;
+    --chart-5: 35 100% 50%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 30% 12%;
+    --sidebar-primary: 210 100% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 220 30% 12%;
+    --sidebar-border: 220 14% 90%;
+    --sidebar-ring: 210 100% 45%;
+
+    /* HP-specific tokens (light) */
+    --hp-blue: 210 100% 45%;
+    --hp-blue-light: 210 100% 55%;
+    --hp-blue-dark: 210 100% 35%;
+    --hp-slate: 220 30% 12%;
+    --hp-surface: 0 0% 100%;
+    --hp-surface-raised: 220 14% 96%;
+    --hp-text-primary: 220 30% 12%;
+    --hp-text-secondary: 220 10% 45%;
     --hp-green: 142 69% 45%;
     --hp-orange: 35 100% 50%;
     --hp-red: 0 72% 51%;
@@ -123,7 +125,7 @@
 }
 
 /* ============================================
-   Scrollbar
+   Scrollbar — HP Style
    ============================================ */
 ::-webkit-scrollbar {
   width: 8px;
