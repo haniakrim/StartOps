@@ -48,14 +48,14 @@ export const COLORS = [
 ];
 
 export const statusColors: Record<string, string> = {
-  draft: "bg-white/10 text-white/50",
-  sent: "bg-[#5683da]/20 text-[#5683da]",
-  paid: "bg-[#8dc572]/20 text-[#8dc572]",
-  overdue: "bg-[#be6464]/20 text-[#be6464]",
-  pending: "bg-[#f0ad4e]/20 text-[#f0ad4e]",
-  open: "bg-[#5683da]/20 text-[#5683da]",
-  completed: "bg-[#8dc572]/20 text-[#8dc572]",
-  cancelled: "bg-[#be6464]/20 text-[#be6464]",
+  draft: "bg-muted text-muted-foreground",
+  sent: "bg-blue-500/15 text-blue-600",
+  paid: "bg-emerald-500/15 text-emerald-600",
+  overdue: "bg-red-500/15 text-red-600",
+  pending: "bg-yellow-500/15 text-yellow-600",
+  open: "bg-blue-500/15 text-blue-600",
+  completed: "bg-emerald-500/15 text-emerald-600",
+  cancelled: "bg-red-500/15 text-red-600",
 };
 
 export function downloadCSV(

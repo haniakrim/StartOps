@@ -56,7 +56,6 @@ export default function Goals() {
     key_results: { name: string; current_value: string; target_value: string; unit: string }[];
   }) {
     try {
-      // Insert goal
       const { data: goalData, error: goalError } = await supabase
         .from("goals")
         .insert({
@@ -71,7 +70,6 @@ export default function Goals() {
 
       if (goalError) throw goalError;
 
-      // Insert key results
       if (data.key_results.length > 0 && goalData) {
         const krs = data.key_results
           .filter((kr) => kr.name.trim())
@@ -101,7 +99,6 @@ export default function Goals() {
 
   async function updateGoalProgress(goalId: string, krId: string, newCurrent: number) {
     try {
-      // Update the key result
       const { error: krError } = await supabase
         .from("key_results")
         .update({ current_value: newCurrent })
@@ -109,7 +106,6 @@ export default function Goals() {
 
       if (krError) throw krError;
 
-      // Recalculate goal progress
       const { data: krs } = await supabase
         .from("key_results")
         .select("current_value, target_value")
@@ -154,7 +150,6 @@ export default function Goals() {
 
   async function deleteGoal(id: string) {
     try {
-      // Key results will be cascade deleted if FK is set up, otherwise delete manually
       const { error: krError } = await supabase
         .from("key_results")
         .delete()
@@ -208,7 +203,7 @@ export default function Goals() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -217,13 +212,13 @@ export default function Goals() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Goals & OKRs</h1>
-          <p className="text-sm text-white/50 mt-1">
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Goals & OKRs</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Track objectives and key results across your organization
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+          <Button variant="outline" size="sm" onClick={() => {
             const exportData = goals.map(g => ({
               "Name": g.name,
               "Description": g.description || "",
@@ -238,25 +233,25 @@ export default function Goals() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
-          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />
                 New Goal
               </Button>
             </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Create OKR</DialogTitle>
-            </DialogHeader>
-            <GoalForm onSubmit={createGoal} onCancel={() => setDialogOpen(false)} />
-          </DialogContent>
-        </Dialog>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Create OKR</DialogTitle>
+              </DialogHeader>
+              <GoalForm onSubmit={createGoal} onCancel={() => setDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <GoalStatCard icon={Target} iconColor="#6452db" value={periodGoals.length.toString()} label="Active Objectives" />
+        <GoalStatCard icon={Target} iconColor="hsl(var(--primary))" value={periodGoals.length.toString()} label="Active Objectives" />
         <GoalStatCard icon={CheckCircle2} iconColor="#8dc572" value={completedGoals.toString()} label="Completed" />
         <GoalStatCard icon={TrendingUp} iconColor="#ff8964" value={`${avgProgress}%`} label="Avg Progress" />
         <GoalStatCard icon={Zap} iconColor="#f0ad4e" value={periodGoals.filter((g) => g.status === "at_risk" || g.status === "behind").length.toString()} label="Need Attention" />
@@ -266,14 +261,20 @@ export default function Goals() {
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-          <input type="text" placeholder="Search objectives..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search objectives..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-background border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
+          />
         </div>
       </div>
 
       <div className="space-y-4">
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-sm text-white/40">
+          <div className="text-center py-12 text-sm text-muted-foreground">
             No goals yet. Create your first OKR to start tracking objectives.
           </div>
         )}

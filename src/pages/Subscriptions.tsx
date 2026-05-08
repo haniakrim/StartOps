@@ -35,11 +35,11 @@ interface Subscription {
 }
 
 const statusColors: Record<string, string> = {
-  active: "bg-[#8dc572]/20 text-[#8dc572]",
-  trialing: "bg-[#5683da]/20 text-[#5683da]",
-  past_due: "bg-[#f0ad4e]/20 text-[#f0ad4e]",
-  canceled: "bg-[#be6464]/20 text-[#be6464]",
-  paused: "bg-white/10 text-white/50",
+  active: "bg-emerald-500/15 text-emerald-600",
+  trialing: "bg-blue-500/15 text-blue-600",
+  past_due: "bg-yellow-500/15 text-yellow-600",
+  canceled: "bg-red-500/15 text-red-600",
+  paused: "bg-muted text-muted-foreground",
 };
 
 export default function Subscriptions() {
@@ -137,7 +137,7 @@ export default function Subscriptions() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -146,42 +146,42 @@ export default function Subscriptions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Subscriptions</h1>
-          <p className="text-sm text-white/50 mt-1">Recurring revenue and billing management</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Subscriptions</h1>
+          <p className="text-sm text-muted-foreground mt-1">Recurring revenue and billing management</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+            <Button size="sm">
               <Plus className="w-4 h-4 mr-2" />New Subscription
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white">
+          <DialogContent>
             <DialogHeader><DialogTitle>Create Subscription</DialogTitle></DialogHeader>
             <form onSubmit={createSubscription} className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label className="text-white/70">Customer Name</Label>
-                <Input required value={newSub.customer_name} onChange={(e) => setNewSub(p => ({ ...p, customer_name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label>Customer Name</Label>
+                <Input required value={newSub.customer_name} onChange={(e) => setNewSub(p => ({ ...p, customer_name: e.target.value }))} />
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Customer Email</Label>
-                <Input type="email" required value={newSub.customer_email} onChange={(e) => setNewSub(p => ({ ...p, customer_email: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                <Label>Customer Email</Label>
+                <Input type="email" required value={newSub.customer_email} onChange={(e) => setNewSub(p => ({ ...p, customer_email: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Plan Name</Label>
-                  <Input required value={newSub.plan_name} onChange={(e) => setNewSub(p => ({ ...p, plan_name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Pro Plan" />
+                  <Label>Plan Name</Label>
+                  <Input required value={newSub.plan_name} onChange={(e) => setNewSub(p => ({ ...p, plan_name: e.target.value }))} placeholder="Pro Plan" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Price ($)</Label>
-                  <Input type="number" required value={newSub.plan_price} onChange={(e) => setNewSub(p => ({ ...p, plan_price: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="99" />
+                  <Label>Price ($)</Label>
+                  <Input type="number" required value={newSub.plan_price} onChange={(e) => setNewSub(p => ({ ...p, plan_price: e.target.value }))} placeholder="99" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Billing Cycle</Label>
+                  <Label>Billing Cycle</Label>
                   <Select value={newSub.billing_cycle} onValueChange={(v) => setNewSub(p => ({ ...p, billing_cycle: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
                       <SelectItem value="monthly">Monthly</SelectItem>
                       <SelectItem value="quarterly">Quarterly</SelectItem>
                       <SelectItem value="yearly">Yearly</SelectItem>
@@ -189,10 +189,10 @@ export default function Subscriptions() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Payment Method</Label>
+                  <Label>Payment Method</Label>
                   <Select value={newSub.payment_method} onValueChange={(v) => setNewSub(p => ({ ...p, payment_method: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
                       <SelectItem value="credit_card">Credit Card</SelectItem>
                       <SelectItem value="ach">ACH</SelectItem>
                       <SelectItem value="invoice">Invoice</SelectItem>
@@ -200,97 +200,97 @@ export default function Subscriptions() {
                   </Select>
                 </div>
               </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Subscription</Button>
+              <Button type="submit" className="w-full">Create Subscription</Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <DollarSign className="w-5 h-5 text-[#8dc572] mb-3" />
-            <p className="text-2xl font-semibold text-white">${totalMRR.toLocaleString()}</p>
-            <p className="text-sm text-white/50">Monthly Recurring Revenue</p>
+            <DollarSign className="w-5 h-5 text-emerald-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">${totalMRR.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground">Monthly Recurring Revenue</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <TrendingUp className="w-5 h-5 text-[#6452db] mb-3" />
-            <p className="text-2xl font-semibold text-white">${totalARR.toLocaleString()}</p>
-            <p className="text-sm text-white/50">Annual Recurring Revenue</p>
+            <TrendingUp className="w-5 h-5 text-primary mb-3" />
+            <p className="text-2xl font-semibold text-foreground">${totalARR.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground">Annual Recurring Revenue</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <Users className="w-5 h-5 text-[#5683da] mb-3" />
-            <p className="text-2xl font-semibold text-white">{activeSubs.length}</p>
-            <p className="text-sm text-white/50">Active Subscribers</p>
+            <Users className="w-5 h-5 text-blue-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{activeSubs.length}</p>
+            <p className="text-sm text-muted-foreground">Active Subscribers</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <AlertTriangle className="w-5 h-5 text-[#f0ad4e] mb-3" />
-            <p className="text-2xl font-semibold text-white">{churnRate}%</p>
-            <p className="text-sm text-white/50">Churn Rate</p>
+            <AlertTriangle className="w-5 h-5 text-orange-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{churnRate}%</p>
+            <p className="text-sm text-muted-foreground">Churn Rate</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 bg-[#18191b] border-white/10">
+        <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-white text-base">Plan Breakdown</CardTitle>
+              <CardTitle className="text-base">Plan Breakdown</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {planBreakdown.map(plan => (
-                <div key={plan.name} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                <div key={plan.name} className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border/50">
                   <div>
-                    <p className="text-sm font-medium text-white">{plan.name}</p>
-                    <p className="text-xs text-white/40">{plan.count} active subscribers</p>
+                    <p className="text-sm font-medium text-foreground">{plan.name}</p>
+                    <p className="text-xs text-muted-foreground">{plan.count} active subscribers</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-white">${plan.mrr.toLocaleString()}/mo</p>
-                    <p className="text-xs text-white/40">${(plan.mrr * 12).toLocaleString()}/yr</p>
+                    <p className="text-sm font-medium text-foreground">${plan.mrr.toLocaleString()}/mo</p>
+                    <p className="text-xs text-muted-foreground">${(plan.mrr * 12).toLocaleString()}/yr</p>
                   </div>
                 </div>
               ))}
               {planBreakdown.length === 0 && (
-                <p className="text-sm text-white/40 text-center py-8">No active subscriptions</p>
+                <p className="text-sm text-muted-foreground text-center py-8">No active subscriptions</p>
               )}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base">Health Metrics</CardTitle>
+            <CardTitle className="text-base">Health Metrics</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-white/50">Active Rate</span>
-                  <span className="text-white">{subscriptions.length > 0 ? Math.round((activeSubs.length / subscriptions.length) * 100) : 0}%</span>
+                  <span className="text-muted-foreground">Active Rate</span>
+                  <span className="text-foreground">{subscriptions.length > 0 ? Math.round((activeSubs.length / subscriptions.length) * 100) : 0}%</span>
                 </div>
-                <Progress value={subscriptions.length > 0 ? (activeSubs.length / subscriptions.length) * 100 : 0} className="h-2 bg-white/10" />
+                <Progress value={subscriptions.length > 0 ? (activeSubs.length / subscriptions.length) * 100 : 0} className="h-2" />
               </div>
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-white/50">At Risk</span>
-                  <span className="text-[#f0ad4e]">{subscriptions.filter(s => s.status === "past_due").length}</span>
+                  <span className="text-muted-foreground">At Risk</span>
+                  <span className="text-orange-500">{subscriptions.filter(s => s.status === "past_due").length}</span>
                 </div>
-                <Progress value={subscriptions.length > 0 ? (subscriptions.filter(s => s.status === "past_due").length / subscriptions.length) * 100 : 0} className="h-2 bg-white/10" />
+                <Progress value={subscriptions.length > 0 ? (subscriptions.filter(s => s.status === "past_due").length / subscriptions.length) * 100 : 0} className="h-2" />
               </div>
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-white/50">Churned</span>
-                  <span className="text-[#be6464]">{churned}</span>
+                  <span className="text-muted-foreground">Churned</span>
+                  <span className="text-red-500">{churned}</span>
                 </div>
-                <Progress value={subscriptions.length > 0 ? (churned / subscriptions.length) * 100 : 0} className="h-2 bg-white/10" />
+                <Progress value={subscriptions.length > 0 ? (churned / subscriptions.length) * 100 : 0} className="h-2" />
               </div>
             </div>
           </CardContent>
@@ -299,13 +299,13 @@ export default function Subscriptions() {
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-          <input type="text" placeholder="Search subscriptions..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input type="text" placeholder="Search subscriptions..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring" />
         </div>
-        <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5">
+        <Button variant="outline" size="sm">
           <Filter className="w-4 h-4 mr-2" />Filter
         </Button>
-        <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+        <Button variant="outline" size="sm" onClick={() => {
           const exportData = subscriptions.map(s => ({
             "Customer": s.customer_name,
             "Email": s.customer_email,
@@ -324,46 +324,46 @@ export default function Subscriptions() {
         </Button>
       </div>
 
-      <Card className="bg-[#18191b] border-white/10">
+      <Card>
         <CardContent className="p-0">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Customer</th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Plan</th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Price</th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Status</th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Next Billing</th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">MRR</th>
+              <tr className="border-b border-border">
+                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Customer</th>
+                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Plan</th>
+                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Price</th>
+                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Status</th>
+                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Next Billing</th>
+                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">MRR</th>
                 <th className="w-10"></th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
-                <tr><td colSpan={7} className="py-12 text-center text-sm text-white/40">No subscriptions found</td></tr>
+                <tr><td colSpan={7} className="py-12 text-center text-sm text-muted-foreground/50">No subscriptions found</td></tr>
               )}
               {filtered.map(sub => (
-                <tr key={sub.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                <tr key={sub.id} className="border-b border-border/50 hover:bg-muted/30">
                   <td className="py-3 px-4">
-                    <p className="text-sm text-white font-medium">{sub.customer_name}</p>
-                    <p className="text-xs text-white/40">{sub.customer_email}</p>
+                    <p className="text-sm font-medium text-foreground">{sub.customer_name}</p>
+                    <p className="text-xs text-muted-foreground">{sub.customer_email}</p>
                   </td>
-                  <td className="py-3 px-4 text-sm text-white">{sub.plan_name}</td>
-                  <td className="py-3 px-4 text-sm text-white">${(sub.plan_price || 0).toLocaleString()}/{sub.billing_cycle === "monthly" ? "mo" : sub.billing_cycle === "quarterly" ? "qtr" : "yr"}</td>
+                  <td className="py-3 px-4 text-sm text-foreground">{sub.plan_name}</td>
+                  <td className="py-3 px-4 text-sm text-foreground">${(sub.plan_price || 0).toLocaleString()}/{sub.billing_cycle === "monthly" ? "mo" : sub.billing_cycle === "quarterly" ? "qtr" : "yr"}</td>
                   <td className="py-3 px-4">
                     <Badge variant="secondary" className={`text-xs ${statusColors[sub.status] || statusColors.active}`}>{sub.status}</Badge>
                   </td>
-                  <td className="py-3 px-4 text-sm text-white/50">{sub.next_billing_date ? new Date(sub.next_billing_date).toLocaleDateString() : "-"}</td>
-                  <td className="py-3 px-4 text-sm text-white">${(sub.mrr || 0).toLocaleString()}</td>
+                  <td className="py-3 px-4 text-sm text-muted-foreground">{sub.next_billing_date ? new Date(sub.next_billing_date).toLocaleDateString() : "-"}</td>
+                  <td className="py-3 px-4 text-sm text-foreground">${(sub.mrr || 0).toLocaleString()}</td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-1">
                       {sub.status === "active" && (
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-white/30 hover:text-[#f0ad4e]" onClick={() => updateStatus(sub.id, "paused")}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-orange-500" onClick={() => updateStatus(sub.id, "paused")}>
                           <RefreshCw className="w-3.5 h-3.5" />
                         </Button>
                       )}
                       {sub.status !== "canceled" && (
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-white/30 hover:text-[#be6464]" onClick={() => updateStatus(sub.id, "canceled")}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => updateStatus(sub.id, "canceled")}>
                           <XCircle className="w-3.5 h-3.5" />
                         </Button>
                       )}

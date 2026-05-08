@@ -150,7 +150,7 @@ export default function Timesheets() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -159,11 +159,11 @@ export default function Timesheets() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Timesheets</h1>
-          <p className="text-sm text-white/50 mt-1">Track time across projects and tasks</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Timesheets</h1>
+          <p className="text-sm text-muted-foreground mt-1">Track time across projects and tasks</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+          <Button variant="outline" size="sm" onClick={() => {
             const exportData = entries.map(e => ({
               "Date": e.date,
               "Project": e.projects?.name || "",
@@ -176,59 +176,59 @@ export default function Timesheets() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
-          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
-              <Plus className="w-4 h-4 mr-2" />Manual Entry
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white">
-            <DialogHeader><DialogTitle>Log Time Entry</DialogTitle></DialogHeader>
-            <form onSubmit={createEntry} className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label className="text-white/70">Project</Label>
-                <Select value={newEntry.project_id} onValueChange={(v) => {
-                  setNewEntry(p => ({ ...p, project_id: v, task_id: "" }));
-                  setSelectedProject(v);
-                }}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select project" /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                    {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white/70">Task (optional)</Label>
-                <Select value={newEntry.task_id} onValueChange={(v) => setNewEntry(p => ({ ...p, task_id: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select task" /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                    {filteredTasks.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white/70">Description</Label>
-                <Input value={newEntry.description} onChange={(e) => setNewEntry(p => ({ ...p, description: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="What did you work on?" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <DialogTrigger asChild>
+              <Button size="sm">
+                <Plus className="w-4 h-4 mr-2" />Manual Entry
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Log Time Entry</DialogTitle></DialogHeader>
+              <form onSubmit={createEntry} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Hours</Label>
-                  <Input type="number" step="0.25" required value={newEntry.hours} onChange={(e) => setNewEntry(p => ({ ...p, hours: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="8.0" />
+                  <Label>Project</Label>
+                  <Select value={newEntry.project_id} onValueChange={(v) => {
+                    setNewEntry(p => ({ ...p, project_id: v, task_id: "" }));
+                    setSelectedProject(v);
+                  }}>
+                    <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
+                    <SelectContent>
+                      {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Date</Label>
-                  <Input type="date" required value={newEntry.date} onChange={(e) => setNewEntry(p => ({ ...p, date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Task (optional)</Label>
+                  <Select value={newEntry.task_id} onValueChange={(v) => setNewEntry(p => ({ ...p, task_id: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Select task" /></SelectTrigger>
+                    <SelectContent>
+                      {filteredTasks.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <input type="checkbox" checked={newEntry.billable} onChange={(e) => setNewEntry(p => ({ ...p, billable: e.target.checked }))} className="rounded border-white/20 bg-transparent" />
-                <Label className="text-white/70">Billable</Label>
-              </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Log Entry</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Input value={newEntry.description} onChange={(e) => setNewEntry(p => ({ ...p, description: e.target.value }))} placeholder="What did you work on?" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Hours</Label>
+                    <Input type="number" step="0.25" required value={newEntry.hours} onChange={(e) => setNewEntry(p => ({ ...p, hours: e.target.value }))} placeholder="8.0" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Date</Label>
+                    <Input type="date" required value={newEntry.date} onChange={(e) => setNewEntry(p => ({ ...p, date: e.target.value }))} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" checked={newEntry.billable} onChange={(e) => setNewEntry(p => ({ ...p, billable: e.target.checked }))} className="rounded border-border bg-background" />
+                  <Label className="text-muted-foreground">Billable</Label>
+                </div>
+                <Button type="submit" className="w-full">Log Entry</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Timer */}
@@ -236,25 +236,25 @@ export default function Timesheets() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <Clock className="w-5 h-5 text-[#6452db] mb-3" />
-            <p className="text-2xl font-semibold text-white">{totalHours.toFixed(1)}</p>
-            <p className="text-sm text-white/50">Total Hours Logged</p>
+            <Clock className="w-5 h-5 text-primary mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{totalHours.toFixed(1)}</p>
+            <p className="text-sm text-muted-foreground">Total Hours Logged</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <TrendingUp className="w-5 h-5 text-[#8dc572] mb-3" />
-            <p className="text-2xl font-semibold text-white">{billableHours.toFixed(1)}</p>
-            <p className="text-sm text-white/50">Billable Hours</p>
+            <TrendingUp className="w-5 h-5 text-emerald-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{billableHours.toFixed(1)}</p>
+            <p className="text-sm text-muted-foreground">Billable Hours</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <Calendar className="w-5 h-5 text-[#ff8964] mb-3" />
-            <p className="text-2xl font-semibold text-white">{thisWeekHours.toFixed(1)}</p>
-            <p className="text-sm text-white/50">This Week</p>
+            <Calendar className="w-5 h-5 text-orange-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{thisWeekHours.toFixed(1)}</p>
+            <p className="text-sm text-muted-foreground">This Week</p>
           </CardContent>
         </Card>
       </div>
@@ -262,50 +262,50 @@ export default function Timesheets() {
       <RecentSessions sessions={entries} />
 
       <Tabs defaultValue="entries" className="w-full">
-        <TabsList className="bg-[#18191b] border border-white/10">
-          <TabsTrigger value="entries" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Clock className="w-4 h-4 mr-2" />Entries</TabsTrigger>
-          <TabsTrigger value="projects" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Briefcase className="w-4 h-4 mr-2" />By Project</TabsTrigger>
+        <TabsList>
+          <TabsTrigger value="entries"><Clock className="w-4 h-4 mr-2" />Entries</TabsTrigger>
+          <TabsTrigger value="projects"><Briefcase className="w-4 h-4 mr-2" />By Project</TabsTrigger>
         </TabsList>
 
         <TabsContent value="entries" className="mt-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-              <input type="text" placeholder="Search entries..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input type="text" placeholder="Search entries..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-background border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring" />
             </div>
           </div>
-          <Card className="bg-[#18191b] border-white/10">
+          <Card>
             <CardContent className="p-0">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Date</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Project</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Task</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Description</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Hours</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Status</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Date</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Project</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Task</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Description</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Hours</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Status</th>
                     <th className="w-10"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredEntries.length === 0 && (
-                    <tr><td colSpan={7} className="py-12 text-center text-sm text-white/40">No time entries yet</td></tr>
+                    <tr><td colSpan={7} className="py-12 text-center text-sm text-muted-foreground/50">No time entries yet</td></tr>
                   )}
                   {filteredEntries.map(entry => (
-                    <tr key={entry.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                      <td className="py-3 px-4 text-sm text-white/70">{new Date(entry.date).toLocaleDateString()}</td>
-                      <td className="py-3 px-4 text-sm text-white">{entry.projects?.name || "-"}</td>
-                      <td className="py-3 px-4 text-sm text-white/70">{entry.project_tasks?.name || "-"}</td>
-                      <td className="py-3 px-4 text-sm text-white/70">{entry.description || "-"}</td>
-                      <td className="py-3 px-4 text-sm font-medium text-white">{entry.hours || 0}</td>
+                    <tr key={entry.id} className="border-b border-border/50 hover:bg-muted/30">
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(entry.date).toLocaleDateString()}</td>
+                      <td className="py-3 px-4 text-sm text-foreground">{entry.projects?.name || "-"}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{entry.project_tasks?.name || "-"}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{entry.description || "-"}</td>
+                      <td className="py-3 px-4 text-sm font-medium text-foreground">{entry.hours || 0}</td>
                       <td className="py-3 px-4">
-                        <Badge variant="secondary" className={`text-xs ${entry.billable ? "bg-[#8dc572]/20 text-[#8dc572]" : "bg-white/10 text-white/50"}`}>
+                        <Badge variant="secondary" className={`text-xs ${entry.billable ? "bg-emerald-500/15 text-emerald-600" : "bg-muted text-muted-foreground"}`}>
                           {entry.billable ? "Billable" : "Non-billable"}
                         </Badge>
                       </td>
                       <td className="py-3 px-4">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-white/30 hover:text-[#be6464]" onClick={() => deleteEntry(entry.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => deleteEntry(entry.id)}>
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </td>
@@ -323,25 +323,25 @@ export default function Timesheets() {
               const maxHours = Math.max(...Object.values(projectHours));
               const pct = maxHours > 0 ? (hours / maxHours) * 100 : 0;
               return (
-                <Card key={name} className="bg-[#18191b] border-white/10">
+                <Card key={name}>
                   <CardContent className="p-5">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
-                          <Briefcase className="w-4 h-4 text-[#6452db]" />
+                        <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                          <Briefcase className="w-4 h-4 text-primary" />
                         </div>
-                        <h3 className="text-sm font-medium text-white">{name}</h3>
+                        <h3 className="text-sm font-medium text-foreground">{name}</h3>
                       </div>
-                      <span className="text-sm font-semibold text-white">{hours.toFixed(1)}h</span>
+                      <span className="text-sm font-semibold text-foreground">{hours.toFixed(1)}h</span>
                     </div>
-                    <Progress value={pct} className="h-2 bg-white/10" />
-                    <p className="text-xs text-white/40 mt-2">{pct.toFixed(0)}% of total tracked time</p>
+                    <Progress value={pct} className="h-2" />
+                    <p className="text-xs text-muted-foreground mt-2">{pct.toFixed(0)}% of total tracked time</p>
                   </CardContent>
                 </Card>
               );
             })}
             {Object.entries(projectHours).length === 0 && (
-              <div className="col-span-full text-center py-12 text-sm text-white/40">No time tracked yet</div>
+              <div className="col-span-full text-center py-12 text-sm text-muted-foreground/50">No time tracked yet</div>
             )}
           </div>
         </TabsContent>

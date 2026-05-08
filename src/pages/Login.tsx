@@ -118,21 +118,21 @@ const Login = () => {
     <div className="min-h-screen flex">
       {/* Left side - Hero */}
       <div className="hidden lg:flex lg:w-1/2 bg-hp-slate relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-hp-blue/20 via-transparent to-hp-blue-light/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10" />
 
         <div className="relative z-10 flex flex-col p-12 h-full">
           <div className="shrink-0">
             <div className="flex items-center gap-3 mb-6">
               <HeroLogo className="w-10 h-10" />
-              <span className="text-xl font-bold text-white">StartOps</span>
+              <span className="text-xl font-bold text-foreground">StartOps</span>
             </div>
 
-            <h1 className="text-3xl font-bold text-white leading-tight mb-4">
+            <h1 className="text-3xl font-bold text-foreground leading-tight mb-4">
               The all-in-one{" "}
-              <span className="text-hp-blue-light">operating system</span>{" "}
+              <span className="text-primary">operating system</span>{" "}
               for startups
             </h1>
-            <p className="text-base text-white/50 max-w-md">
+            <p className="text-base text-muted-foreground max-w-md">
               CRM, finance, projects, inventory, and analytics — unified in one powerful platform.
             </p>
           </div>
@@ -148,8 +148,8 @@ const Login = () => {
               { icon: Users, text: "Team collaboration" },
               { icon: BarChart3, text: "Real-time analytics" },
             ].map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 text-white/60">
-                <feature.icon className="w-5 h-5 text-hp-blue-light" />
+              <div key={i} className="flex items-center gap-3 text-muted-foreground">
+                <feature.icon className="w-5 h-5 text-primary" />
                 <span className="text-sm">{feature.text}</span>
               </div>
             ))}
@@ -160,14 +160,14 @@ const Login = () => {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="w-8 h-8 rounded-full bg-hp-surface border-2 border-hp-slate flex items-center justify-center"
+                  className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center"
                 >
-                  <span className="text-xs text-white/60">{i}</span>
+                  <span className="text-xs text-muted-foreground">{i}</span>
                 </div>
               ))}
             </div>
-            <p className="text-sm text-white/40">
-              Trusted by <span className="text-white/60 font-medium">2,000+ startups</span>
+            <p className="text-sm text-muted-foreground">
+              Trusted by <span className="text-foreground font-medium">2,000+ startups</span>
             </p>
           </div>
         </div>

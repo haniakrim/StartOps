@@ -51,16 +51,16 @@ interface Vendor {
 }
 
 const statusColors: Record<string, string> = {
-  draft: "bg-white/10 text-white/50",
-  sent: "bg-[#5683da]/20 text-[#5683da]",
-  paid: "bg-[#8dc572]/20 text-[#8dc572]",
-  overdue: "bg-[#be6464]/20 text-[#be6464]",
-  pending: "bg-[#f0ad4e]/20 text-[#f0ad4e]",
-  approved: "bg-[#8dc572]/20 text-[#8dc572]",
-  rejected: "bg-[#be6464]/20 text-[#be6464]",
+  draft: "bg-muted text-muted-foreground",
+  sent: "bg-blue-500/15 text-blue-600",
+  paid: "bg-emerald-500/15 text-emerald-600",
+  overdue: "bg-red-500/15 text-red-600",
+  pending: "bg-yellow-500/15 text-yellow-600",
+  approved: "bg-emerald-500/15 text-emerald-600",
+  rejected: "bg-red-500/15 text-red-600",
 };
 
-const COLORS = ["#6452db", "#ff8964", "#5683da", "#8dc572", "#f0ad4e", "#be6464"];
+const COLORS = ["hsl(var(--primary))", "#ff8964", "#5683da", "#8dc572", "#f0ad4e", "#be6464"];
 
 export default function Finance() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -148,7 +148,6 @@ export default function Finance() {
   }
 
   async function detectAnomalies() {
-    // AI-powered anomaly detection simulation
     const detected = [
       { type: "duplicate", severity: "high", description: "Potential duplicate invoice #INV-2045 detected", amount: 12500 },
       { type: "spike", severity: "medium", description: "Marketing spend 340% above monthly average", amount: 8400 },
@@ -201,7 +200,7 @@ export default function Finance() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -210,42 +209,42 @@ export default function Finance() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Finance</h1>
-          <p className="text-sm text-white/50 mt-1">AI-powered financial operations and cash flow</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Finance</h1>
+          <p className="text-sm text-muted-foreground mt-1">AI-powered financial operations and cash flow</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+            <Button size="sm">
               <Plus className="w-4 h-4 mr-2" />New Invoice
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white">
+          <DialogContent>
             <DialogHeader><DialogTitle>Create Invoice</DialogTitle></DialogHeader>
             <form onSubmit={createInvoice} className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label className="text-white/70">Invoice Number</Label>
-                <Input required value={newInvoice.invoice_number} onChange={(e) => setNewInvoice(p => ({ ...p, invoice_number: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="INV-001" />
+                <Label>Invoice Number</Label>
+                <Input required value={newInvoice.invoice_number} onChange={(e) => setNewInvoice(p => ({ ...p, invoice_number: e.target.value }))} placeholder="INV-001" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Amount ($)</Label>
-                  <Input type="number" required value={newInvoice.amount} onChange={(e) => setNewInvoice(p => ({ ...p, amount: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Amount ($)</Label>
+                  <Input type="number" required value={newInvoice.amount} onChange={(e) => setNewInvoice(p => ({ ...p, amount: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Due Date</Label>
-                  <Input type="date" value={newInvoice.due_date} onChange={(e) => setNewInvoice(p => ({ ...p, due_date: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Due Date</Label>
+                  <Input type="date" value={newInvoice.due_date} onChange={(e) => setNewInvoice(p => ({ ...p, due_date: e.target.value }))} />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Contact</Label>
+                <Label>Contact</Label>
                 <Select value={newInvoice.contact_id} onValueChange={(v) => setNewInvoice(p => ({ ...p, contact_id: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select contact" /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectTrigger><SelectValue placeholder="Select contact" /></SelectTrigger>
+                  <SelectContent>
                     {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Invoice</Button>
+              <Button type="submit" className="w-full">Create Invoice</Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -253,68 +252,68 @@ export default function Finance() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <DollarSign className="w-5 h-5 text-[#8dc572]" />
-              <Badge variant="outline" className="border-white/10 text-white/50 text-xs"><TrendingUp className="w-3 h-3 mr-1 text-[#8dc572]" />+12%</Badge>
+              <DollarSign className="w-5 h-5 text-emerald-500" />
+              <Badge variant="outline" className="text-xs"><TrendingUp className="w-3 h-3 mr-1 text-emerald-500" />+12%</Badge>
             </div>
-            <p className="text-2xl font-semibold text-white">${totalRevenue.toLocaleString()}</p>
-            <p className="text-sm text-white/50 mt-1">Revenue (Paid)</p>
+            <p className="text-2xl font-semibold text-foreground">${totalRevenue.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground mt-1">Revenue (Paid)</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <FileText className="w-5 h-5 text-[#5683da]" />
-              <Badge variant="outline" className="border-white/10 text-white/50 text-xs"><ArrowUpRight className="w-3 h-3 mr-1 text-[#5683da]" />Active</Badge>
+              <FileText className="w-5 h-5 text-blue-500" />
+              <Badge variant="outline" className="text-xs"><ArrowUpRight className="w-3 h-3 mr-1 text-blue-500" />Active</Badge>
             </div>
-            <p className="text-2xl font-semibold text-white">${outstanding.toLocaleString()}</p>
-            <p className="text-sm text-white/50 mt-1">Outstanding</p>
+            <p className="text-2xl font-semibold text-foreground">${outstanding.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground mt-1">Outstanding</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <AlertTriangle className="w-5 h-5 text-[#be6464]" />
-              <Badge variant="outline" className="border-[#be6464]/30 text-[#be6464] text-xs">{invoices.filter(i => i.status === "overdue").length} invoices</Badge>
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              <Badge variant="outline" className="text-xs border-red-500/30 text-red-500">{invoices.filter(i => i.status === "overdue").length} invoices</Badge>
             </div>
-            <p className="text-2xl font-semibold text-white">${overdueAmount.toLocaleString()}</p>
-            <p className="text-sm text-white/50 mt-1">Overdue</p>
+            <p className="text-2xl font-semibold text-foreground">${overdueAmount.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground mt-1">Overdue</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-3">
-              <CreditCard className="w-5 h-5 text-[#ff8964]" />
-              <Badge variant="outline" className="border-white/10 text-white/50 text-xs"><TrendingDown className="w-3 h-3 mr-1 text-[#be6464]" />+8%</Badge>
+              <CreditCard className="w-5 h-5 text-orange-500" />
+              <Badge variant="outline" className="text-xs"><TrendingDown className="w-3 h-3 mr-1 text-red-500" />+8%</Badge>
             </div>
-            <p className="text-2xl font-semibold text-white">${totalExpenses.toLocaleString()}</p>
-            <p className="text-sm text-white/50 mt-1">Expenses</p>
+            <p className="text-2xl font-semibold text-foreground">${totalExpenses.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground mt-1">Expenses</p>
           </CardContent>
         </Card>
       </div>
 
       {/* AI Anomaly Detection */}
       {anomalies.length > 0 && (
-        <Card className="bg-[#be6464]/5 border-[#be6464]/20">
+        <Card className="border-red-500/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-white text-base flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-[#be6464]" />
+            <CardTitle className="text-base flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
               AI Anomaly Detection
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {anomalies.map((a, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border/50">
                   <div className="flex items-center gap-3">
-                    <Badge className={`text-xs border-0 ${a.severity === "high" ? "bg-[#be6464]/20 text-[#be6464]" : a.severity === "medium" ? "bg-[#f0ad4e]/20 text-[#f0ad4e]" : "bg-[#5683da]/20 text-[#5683da]"}`}>
+                    <Badge className={`text-xs border-0 ${a.severity === "high" ? "bg-red-500/15 text-red-600" : a.severity === "medium" ? "bg-orange-500/15 text-orange-600" : "bg-blue-500/15 text-blue-600"}`}>
                       {a.severity}
                     </Badge>
-                    <span className="text-sm text-white">{a.description}</span>
+                    <span className="text-sm text-foreground">{a.description}</span>
                   </div>
-                  <span className="text-sm font-medium text-white">${a.amount.toLocaleString()}</span>
+                  <span className="text-sm font-medium text-foreground">${a.amount.toLocaleString()}</span>
                 </div>
               ))}
             </div>
@@ -323,37 +322,37 @@ export default function Finance() {
       )}
 
       <Tabs defaultValue="invoices" className="w-full">
-        <TabsList className="bg-[#18191b] border border-white/10">
-          <TabsTrigger value="invoices" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><FileText className="w-4 h-4 mr-2" />Invoices</TabsTrigger>
-          <TabsTrigger value="expenses" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><CreditCard className="w-4 h-4 mr-2" />Expenses</TabsTrigger>
-          <TabsTrigger value="vendors" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Truck className="w-4 h-4 mr-2" />Vendors</TabsTrigger>
-          <TabsTrigger value="cashflow" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><BarChart3 className="w-4 h-4 mr-2" />Cash Flow</TabsTrigger>
+        <TabsList>
+          <TabsTrigger value="invoices"><FileText className="w-4 h-4 mr-2" />Invoices</TabsTrigger>
+          <TabsTrigger value="expenses"><CreditCard className="w-4 h-4 mr-2" />Expenses</TabsTrigger>
+          <TabsTrigger value="vendors"><Truck className="w-4 h-4 mr-2" />Vendors</TabsTrigger>
+          <TabsTrigger value="cashflow"><BarChart3 className="w-4 h-4 mr-2" />Cash Flow</TabsTrigger>
         </TabsList>
 
         <TabsContent value="invoices" className="mt-6">
-          <Card className="bg-[#18191b] border-white/10">
+          <Card>
             <CardContent className="p-0">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Invoice</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Client</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Amount</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Status</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Due Date</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Invoice</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Client</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Amount</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Status</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Due Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {invoices.length === 0 && (
-                    <tr><td colSpan={5} className="py-12 text-center text-sm text-white/40">No invoices yet. Create your first invoice!</td></tr>
+                    <tr><td colSpan={5} className="py-12 text-center text-sm text-muted-foreground/50">No invoices yet. Create your first invoice!</td></tr>
                   )}
                   {invoices.map(inv => (
-                    <tr key={inv.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                      <td className="py-3 px-4 text-sm text-white font-medium">{inv.invoice_number}</td>
-                      <td className="py-3 px-4 text-sm text-white/70">{inv.contacts ? `${inv.contacts.first_name} ${inv.contacts.last_name}` : "-"}</td>
-                      <td className="py-3 px-4 text-sm text-white">${(inv.amount || 0).toLocaleString()}</td>
+                    <tr key={inv.id} className="border-b border-border/50 hover:bg-muted/30">
+                      <td className="py-3 px-4 text-sm font-medium text-foreground">{inv.invoice_number}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{inv.contacts ? `${inv.contacts.first_name} ${inv.contacts.last_name}` : "-"}</td>
+                      <td className="py-3 px-4 text-sm text-foreground">${(inv.amount || 0).toLocaleString()}</td>
                       <td className="py-3 px-4"><Badge variant="secondary" className={`text-xs ${statusColors[inv.status] || statusColors.draft}`}>{inv.status}</Badge></td>
-                      <td className="py-3 px-4 text-sm text-white/50">{inv.due_date ? new Date(inv.due_date).toLocaleDateString() : "-"}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{inv.due_date ? new Date(inv.due_date).toLocaleDateString() : "-"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -363,26 +362,26 @@ export default function Finance() {
         </TabsContent>
 
         <TabsContent value="expenses" className="mt-6">
-          <Card className="bg-[#18191b] border-white/10">
+          <Card>
             <CardContent className="p-0">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Category</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Description</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Amount</th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-white/50 uppercase">Status</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Category</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Description</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Amount</th>
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {expenses.length === 0 && (
-                    <tr><td colSpan={4} className="py-12 text-center text-sm text-white/40">No expenses recorded yet.</td></tr>
+                    <tr><td colSpan={4} className="py-12 text-center text-sm text-muted-foreground/50">No expenses recorded yet.</td></tr>
                   )}
                   {expenses.map(exp => (
-                    <tr key={exp.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                      <td className="py-3 px-4 text-sm text-white/70 capitalize">{exp.category || "Other"}</td>
-                      <td className="py-3 px-4 text-sm text-white">{exp.description || "-"}</td>
-                      <td className="py-3 px-4 text-sm text-white">${(exp.amount || 0).toLocaleString()}</td>
+                    <tr key={exp.id} className="border-b border-border/50 hover:bg-muted/30">
+                      <td className="py-3 px-4 text-sm text-muted-foreground capitalize">{exp.category || "Other"}</td>
+                      <td className="py-3 px-4 text-sm text-foreground">{exp.description || "-"}</td>
+                      <td className="py-3 px-4 text-sm text-foreground">${(exp.amount || 0).toLocaleString()}</td>
                       <td className="py-3 px-4"><Badge variant="secondary" className={`text-xs ${statusColors[exp.status] || statusColors.pending}`}>{exp.status}</Badge></td>
                     </tr>
                   ))}
@@ -395,107 +394,111 @@ export default function Finance() {
         <TabsContent value="vendors" className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-              <input type="text" placeholder="Search vendors..." className="w-64 bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search vendors..."
+                className="w-64 bg-muted border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
+              />
             </div>
             <Dialog open={vendorDialogOpen} onOpenChange={setVendorDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+                <Button size="sm">
                   <Plus className="w-4 h-4 mr-2" />Add Vendor
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-[#18191b] border-white/10 text-white">
+              <DialogContent>
                 <DialogHeader><DialogTitle>Add Vendor</DialogTitle></DialogHeader>
                 <form onSubmit={createVendor} className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">Vendor Name</Label>
-                    <Input required value={newVendor.name} onChange={(e) => setNewVendor(p => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Label>Vendor Name</Label>
+                    <Input required value={newVendor.name} onChange={(e) => setNewVendor(p => ({ ...p, name: e.target.value }))} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-white/70">Email</Label>
-                      <Input type="email" value={newVendor.email} onChange={(e) => setNewVendor(p => ({ ...p, email: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                      <Label>Email</Label>
+                      <Input type="email" value={newVendor.email} onChange={(e) => setNewVendor(p => ({ ...p, email: e.target.value }))} />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70">Phone</Label>
-                      <Input value={newVendor.phone} onChange={(e) => setNewVendor(p => ({ ...p, phone: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                      <Label>Phone</Label>
+                      <Input value={newVendor.phone} onChange={(e) => setNewVendor(p => ({ ...p, phone: e.target.value }))} />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Website</Label>
-                    <Input value={newVendor.website} onChange={(e) => setNewVendor(p => ({ ...p, website: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="https://..." />
+                    <Label>Website</Label>
+                    <Input value={newVendor.website} onChange={(e) => setNewVendor(p => ({ ...p, website: e.target.value }))} placeholder="https://..." />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Address</Label>
-                    <Input value={newVendor.address} onChange={(e) => setNewVendor(p => ({ ...p, address: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Label>Address</Label>
+                    <Input value={newVendor.address} onChange={(e) => setNewVendor(p => ({ ...p, address: e.target.value }))} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-white/70">Category</Label>
-                      <Input value={newVendor.category} onChange={(e) => setNewVendor(p => ({ ...p, category: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., Software" />
+                      <Label>Category</Label>
+                      <Input value={newVendor.category} onChange={(e) => setNewVendor(p => ({ ...p, category: e.target.value }))} placeholder="e.g., Software" />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70">Payment Terms</Label>
-                      <Input value={newVendor.payment_terms} onChange={(e) => setNewVendor(p => ({ ...p, payment_terms: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Net 30" />
+                      <Label>Payment Terms</Label>
+                      <Input value={newVendor.payment_terms} onChange={(e) => setNewVendor(p => ({ ...p, payment_terms: e.target.value }))} placeholder="Net 30" />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Add Vendor</Button>
+                  <Button type="submit" className="w-full">Add Vendor</Button>
                 </form>
               </DialogContent>
             </Dialog>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {vendors.map(vendor => (
-              <Card key={vendor.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
+              <Card key={vendor.id} className="hover:border-border/80 transition-colors">
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
-                      <Truck className="w-5 h-5 text-[#6452db]" />
+                    <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                      <Truck className="w-5 h-5 text-primary" />
                     </div>
-                    <Badge variant="secondary" className={`text-xs ${vendor.is_active ? "bg-[#8dc572]/20 text-[#8dc572]" : "bg-white/10 text-white/50"}`}>
+                    <Badge variant="secondary" className={`text-xs ${vendor.is_active ? "bg-emerald-500/15 text-emerald-600" : "bg-muted text-muted-foreground"}`}>
                       {vendor.is_active ? "Active" : "Inactive"}
                     </Badge>
                   </div>
-                  <h3 className="text-base font-semibold text-white mb-1">{vendor.name}</h3>
-                  <p className="text-sm text-white/50 mb-3">{vendor.category || "No category"}</p>
+                  <h3 className="text-base font-semibold text-foreground mb-1">{vendor.name}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">{vendor.category || "No category"}</p>
                   <div className="space-y-2">
                     {vendor.email && (
-                      <div className="flex items-center gap-2 text-sm text-white/60">
-                        <Mail className="w-3.5 h-3.5 text-white/30" />
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Mail className="w-3.5 h-3.5 text-muted-foreground/50" />
                         {vendor.email}
                       </div>
                     )}
                     {vendor.website && (
-                      <div className="flex items-center gap-2 text-sm text-white/60">
-                        <Globe className="w-3.5 h-3.5 text-white/30" />
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Globe className="w-3.5 h-3.5 text-muted-foreground/50" />
                         {vendor.website}
                       </div>
                     )}
                     {vendor.address && (
-                      <div className="flex items-center gap-2 text-sm text-white/60">
-                        <MapPin className="w-3.5 h-3.5 text-white/30" />
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="w-3.5 h-3.5 text-muted-foreground/50" />
                         {vendor.address}
                       </div>
                     )}
-                    <div className="flex items-center gap-2 text-sm text-white/60">
-                      <Star className="w-3.5 h-3.5 text-[#f0ad4e]" />
-                      <span className="text-white">{vendor.rating || 0}/5</span>
-                      {vendor.payment_terms && <span className="text-white/40">· {vendor.payment_terms}</span>}
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Star className="w-3.5 h-3.5 text-yellow-500" />
+                      <span className="text-foreground">{vendor.rating || 0}/5</span>
+                      {vendor.payment_terms && <span className="text-muted-foreground/60">· {vendor.payment_terms}</span>}
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
             {vendors.length === 0 && (
-              <div className="col-span-full text-center py-12 text-sm text-white/40">No vendors yet. Add your first vendor!</div>
+              <div className="col-span-full text-center py-12 text-sm text-muted-foreground/50">No vendors yet. Add your first vendor!</div>
             )}
           </div>
         </TabsContent>
 
         <TabsContent value="cashflow" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Card className="lg:col-span-2 bg-[#18191b] border-white/10">
-              <CardHeader className="pb-2"><CardTitle className="text-white text-base">Cash Flow Forecast</CardTitle></CardHeader>
+            <Card className="lg:col-span-2">
+              <CardHeader className="pb-2"><CardTitle className="text-base">Cash Flow Forecast</CardTitle></CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={cashFlowData}>
@@ -513,8 +516,8 @@ export default function Finance() {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-            <Card className="bg-[#18191b] border-white/10">
-              <CardHeader className="pb-2"><CardTitle className="text-white text-base">Expense Breakdown</CardTitle></CardHeader>
+            <Card>
+              <CardHeader className="pb-2"><CardTitle className="text-base">Expense Breakdown</CardTitle></CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
                   <RechartsPieChart>
@@ -529,8 +532,8 @@ export default function Finance() {
                 <div className="space-y-1 mt-2">
                   {pieData.map((entry, index) => (
                     <div key={entry.name} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} /><span className="text-white/60">{entry.name}</span></div>
-                      <span className="text-white">${(entry.value as number).toLocaleString()}</span>
+                      <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} /><span className="text-muted-foreground">{entry.name}</span></div>
+                      <span className="text-foreground">${(entry.value as number).toLocaleString()}</span>
                     </div>
                   ))}
                 </div>

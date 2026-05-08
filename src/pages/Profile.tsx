@@ -46,7 +46,6 @@ export default function Profile() {
         avatar_url: profile.avatar_url || "",
       });
     }
-    // Check email verification status from auth user
     if (user?.email_confirmed_at) {
       setEmailVerified(true);
     } else {
@@ -90,7 +89,7 @@ export default function Profile() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -98,39 +97,39 @@ export default function Profile() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white tracking-tight">
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">
           Profile & Settings
         </h1>
-        <p className="text-sm text-white/50 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Manage your account and preferences
         </p>
       </div>
 
-      <div className="flex items-center gap-6 p-6 rounded-xl bg-[#18191b] border border-white/10">
+      <div className="flex items-center gap-6 p-6 rounded-xl border border-border bg-card">
         <div className="relative">
-          <Avatar className="w-20 h-20 bg-[#6452db]">
-            <AvatarFallback className="bg-[#6452db] text-white text-2xl">
+          <Avatar className="w-20 h-20">
+            <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
               {userInitials}
             </AvatarFallback>
           </Avatar>
-          <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#0b0d10] border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-[#6452db] transition-colors">
+          <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-primary transition-colors">
             <Camera className="w-3.5 h-3.5" />
           </button>
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-white">{userName}</h2>
-          <p className="text-sm text-white/50">{user?.email}</p>
+          <h2 className="text-lg font-semibold text-foreground">{userName}</h2>
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
           <div className="flex items-center gap-2 mt-2">
             <Badge
               variant="secondary"
-              className="bg-[#6452db]/20 text-[#6452db] text-xs capitalize"
+              className="bg-primary/15 text-primary text-xs capitalize"
             >
               {profile?.role || "User"}
             </Badge>
             {emailVerified ? (
               <Badge
                 variant="secondary"
-                className="bg-emerald-500/20 text-emerald-400 text-xs"
+                className="bg-emerald-500/20 text-emerald-600 text-xs"
               >
                 <CheckCircle2 className="w-3 h-3 mr-1" />
                 Email Verified
@@ -138,7 +137,7 @@ export default function Profile() {
             ) : (
               <Badge
                 variant="secondary"
-                className="bg-orange-500/20 text-orange-400 text-xs"
+                className="bg-orange-500/20 text-orange-600 text-xs"
               >
                 <AlertTriangle className="w-3 h-3 mr-1" />
                 Email Unverified
@@ -149,34 +148,25 @@ export default function Profile() {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="bg-[#18191b] border border-white/10">
-          <TabsTrigger
-            value="profile"
-            className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"
-          >
+        <TabsList>
+          <TabsTrigger value="profile">
             <User className="w-4 h-4 mr-2" />
             Profile
           </TabsTrigger>
-          <TabsTrigger
-            value="notifications"
-            className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"
-          >
+          <TabsTrigger value="notifications">
             <Bell className="w-4 h-4 mr-2" />
             Notifications
           </TabsTrigger>
-          <TabsTrigger
-            value="security"
-            className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"
-          >
+          <TabsTrigger value="security">
             <Key className="w-4 h-4 mr-2" />
             Security
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-6">
-          <Card className="bg-[#18191b] border-white/10">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-white text-base">
+              <CardTitle className="text-base">
                 Personal Information
               </CardTitle>
             </CardHeader>
@@ -184,61 +174,53 @@ export default function Profile() {
               <form onSubmit={saveProfile} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">First Name</Label>
+                    <Label>First Name</Label>
                     <Input
                       value={form.first_name}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, first_name: e.target.value }))
                       }
-                      className="bg-[#0b0d10] border-white/10 text-white"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Last Name</Label>
+                    <Label>Last Name</Label>
                     <Input
                       value={form.last_name}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, last_name: e.target.value }))
                       }
-                      className="bg-[#0b0d10] border-white/10 text-white"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Email</Label>
+                  <Label>Email</Label>
                   <Input
                     type="email"
                     value={form.email}
                     disabled
-                    className="bg-[#0b0d10] border-white/10 text-white/50"
                   />
-                  <p className="text-xs text-white/30">
+                  <p className="text-xs text-muted-foreground/60">
                     Email cannot be changed. Contact support to update.
                   </p>
                   {!emailVerified && (
-                    <p className="text-xs text-orange-400 mt-1 flex items-center gap-1">
+                    <p className="text-xs text-orange-500 mt-1 flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3" />
                       Your email is not verified. Some features may be restricted.
                     </p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Phone</Label>
+                  <Label>Phone</Label>
                   <Input
                     value={form.phone}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, phone: e.target.value }))
                     }
-                    className="bg-[#0b0d10] border-white/10 text-white"
                     placeholder="+1 (555) 000-0000"
                   />
                 </div>
                 <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    disabled={saving}
-                    className="bg-[#6452db] text-white hover:bg-[#6452db]/90"
-                  >
+                  <Button type="submit" disabled={saving}>
                     {saving ? (
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     ) : (
@@ -253,7 +235,7 @@ export default function Profile() {
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-6 space-y-4">
-          <Card className="bg-[#18191b] border-white/10">
+          <Card>
             <CardContent className="p-5 space-y-4">
               {[
                 {
@@ -279,19 +261,19 @@ export default function Profile() {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="flex items-start justify-between py-3 border-b border-white/5 last:border-0"
+                  className="flex items-start justify-between py-3 border-b border-border/50 last:border-0"
                 >
                   <div>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-foreground">
                       {item.label}
                     </p>
-                    <p className="text-xs text-white/40 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {item.desc}
                     </p>
                   </div>
                   <Switch
                     defaultChecked={item.defaultChecked}
-                    className="data-[state=checked]:bg-[#6452db]"
+                    className="data-[state=checked]:bg-primary"
                   />
                 </div>
               ))}
@@ -300,71 +282,59 @@ export default function Profile() {
         </TabsContent>
 
         <TabsContent value="security" className="mt-6 space-y-4">
-          <Card className="bg-[#18191b] border-white/10">
+          <Card>
             <CardContent className="p-5 space-y-4">
-              <div className="flex items-start justify-between py-3 border-b border-white/5">
+              <div className="flex items-start justify-between py-3 border-b border-border/50">
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#5683da]/20 flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-4 h-4 text-[#5683da]" />
+                  <div className="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 text-blue-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-foreground">
                       Two-Factor Authentication
                     </p>
-                    <p className="text-xs text-white/40 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       Add an extra layer of security to your account
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"
-                >
+                <Button variant="outline" size="sm">
                   Enable
                 </Button>
               </div>
-              <div className="flex items-start justify-between py-3 border-b border-white/5">
+              <div className="flex items-start justify-between py-3 border-b border-border/50">
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#ff8964]/20 flex items-center justify-center flex-shrink-0">
-                    <Key className="w-4 h-4 text-[#ff8964]" />
+                  <div className="w-9 h-9 rounded-lg bg-orange-500/15 flex items-center justify-center flex-shrink-0">
+                    <Key className="w-4 h-4 text-orange-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-foreground">
                       Change Password
                     </p>
-                    <p className="text-xs text-white/40 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       Last changed 3 months ago
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"
-                >
+                <Button variant="outline" size="sm">
                   Update
                 </Button>
               </div>
               <div className="flex items-start justify-between py-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#be6464]/20 flex items-center justify-center flex-shrink-0">
-                    <Bell className="w-4 h-4 text-[#be6464]" />
+                  <div className="w-9 h-9 rounded-lg bg-red-500/15 flex items-center justify-center flex-shrink-0">
+                    <Bell className="w-4 h-4 text-red-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-foreground">
                       Active Sessions
                     </p>
-                    <p className="text-xs text-white/40 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       3 devices currently logged in
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white/10 text-white/70 hover:text-white hover:bg-white/5"
-                >
+                <Button variant="outline" size="sm">
                   Manage
                 </Button>
               </div>

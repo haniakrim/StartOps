@@ -206,7 +206,7 @@ export default function Workflows() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -215,39 +215,39 @@ export default function Workflows() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Workflows</h1>
-          <p className="text-sm text-white/50 mt-1">Automate repetitive tasks and business processes</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Workflows</h1>
+          <p className="text-sm text-muted-foreground mt-1">Automate repetitive tasks and business processes</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
           if (!open) { setEditingWorkflow(null); resetForm(); }
         }}>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+            <Button size="sm">
               <Plus className="w-4 h-4 mr-2" />New Workflow
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingWorkflow ? "Edit Workflow" : "Create Workflow"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={saveWorkflow} className="space-y-6 pt-4">
               <div className="space-y-2">
-                <Label className="text-white/70">Workflow Name</Label>
-                <Input required value={form.name} onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="e.g., High-Value Deal Alert" />
+                <Label>Workflow Name</Label>
+                <Input required value={form.name} onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g., High-Value Deal Alert" />
               </div>
               <div className="space-y-2">
-                <Label className="text-white/70">Description</Label>
-                <Input value={form.description} onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="What does this workflow do?" />
+                <Label>Description</Label>
+                <Input value={form.description} onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))} placeholder="What does this workflow do?" />
               </div>
 
               <div className="space-y-3">
-                <Label className="text-white/70">Trigger</Label>
+                <Label>Trigger</Label>
                 <Select value={form.trigger_type} onValueChange={(v) => setForm(p => ({ ...p, trigger_type: v, trigger_config: {} }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                  <SelectContent>
                     {triggerTypes.map(t => (
                       <SelectItem key={t.id} value={t.id}>
                         <div className="flex items-center gap-2">
@@ -261,10 +261,8 @@ export default function Workflows() {
 
                 {form.trigger_type === "deal_stage_changed" && (
                   <Select value={form.trigger_config?.stage || "lead"} onValueChange={(v) => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, stage: v } }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white">
-                      <SelectValue placeholder="Select stage" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectTrigger><SelectValue placeholder="Select stage" /></SelectTrigger>
+                    <SelectContent>
                       <SelectItem value="lead">Lead</SelectItem>
                       <SelectItem value="qualified">Qualified</SelectItem>
                       <SelectItem value="proposal">Proposal</SelectItem>
@@ -276,26 +274,26 @@ export default function Workflows() {
                 )}
 
                 {form.trigger_type === "deal_value_threshold" && (
-                  <Input type="number" value={form.trigger_config?.threshold || ""} onChange={(e) => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, threshold: parseFloat(e.target.value) } }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Minimum deal value ($)" />
+                  <Input type="number" value={form.trigger_config?.threshold || ""} onChange={(e) => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, threshold: parseFloat(e.target.value) } }))} placeholder="Minimum deal value ($)" />
                 )}
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Label className="text-white/70">Actions</Label>
-                  <Button type="button" variant="ghost" size="sm" onClick={addAction} className="text-[#6452db] hover:text-[#6452db] hover:bg-[#6452db]/10">
+                  <Label>Actions</Label>
+                  <Button type="button" variant="ghost" size="sm" onClick={addAction} className="text-primary hover:text-primary hover:bg-primary/10">
                     <Plus className="w-4 h-4 mr-1" />Add Action
                   </Button>
                 </div>
                 {form.actions.map((action, i) => (
-                  <Card key={i} className="bg-[#0b0d10] border-white/10">
+                  <Card key={i} className="bg-muted border-border/50">
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <Select value={action.type} onValueChange={(v) => updateAction(i, { type: v, config: {} })}>
-                          <SelectTrigger className="bg-[#18191b] border-white/10 text-white w-48">
+                          <SelectTrigger className="w-48">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                          <SelectContent>
                             {actionTypes.map(a => (
                               <SelectItem key={a.id} value={a.id}>
                                 <div className="flex items-center gap-2">
@@ -306,30 +304,28 @@ export default function Workflows() {
                             ))}
                           </SelectContent>
                         </Select>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeAction(i)} className="text-white/30 hover:text-[#be6464]">
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeAction(i)} className="text-muted-foreground hover:text-destructive">
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
 
                       {action.type === "send_notification" && (
-                        <Input value={action.config?.message || ""} onChange={(e) => updateAction(i, { config: { ...action.config, message: e.target.value } })} className="bg-[#18191b] border-white/10 text-white" placeholder="Notification message..." />
+                        <Input value={action.config?.message || ""} onChange={(e) => updateAction(i, { config: { ...action.config, message: e.target.value } })} placeholder="Notification message..." />
                       )}
 
                       {action.type === "send_email" && (
                         <div className="space-y-2">
-                          <Input value={action.config?.subject || ""} onChange={(e) => updateAction(i, { config: { ...action.config, subject: e.target.value } })} className="bg-[#18191b] border-white/10 text-white" placeholder="Email subject" />
-                          <Input value={action.config?.body || ""} onChange={(e) => updateAction(i, { config: { ...action.config, body: e.target.value } })} className="bg-[#18191b] border-white/10 text-white" placeholder="Email body" />
+                          <Input value={action.config?.subject || ""} onChange={(e) => updateAction(i, { config: { ...action.config, subject: e.target.value } })} placeholder="Email subject" />
+                          <Input value={action.config?.body || ""} onChange={(e) => updateAction(i, { config: { ...action.config, body: e.target.value } })} placeholder="Email body" />
                         </div>
                       )}
 
                       {action.type === "create_task" && (
                         <div className="space-y-2">
-                          <Input value={action.config?.subject || ""} onChange={(e) => updateAction(i, { config: { ...action.config, subject: e.target.value } })} className="bg-[#18191b] border-white/10 text-white" placeholder="Task subject" />
+                          <Input value={action.config?.subject || ""} onChange={(e) => updateAction(i, { config: { ...action.config, subject: e.target.value } })} placeholder="Task subject" />
                           <Select value={action.config?.priority || "medium"} onValueChange={(v) => updateAction(i, { config: { ...action.config, priority: v } })}>
-                            <SelectTrigger className="bg-[#18191b] border-white/10 text-white">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
                               <SelectItem value="low">Low</SelectItem>
                               <SelectItem value="medium">Medium</SelectItem>
                               <SelectItem value="high">High</SelectItem>
@@ -339,14 +335,14 @@ export default function Workflows() {
                       )}
 
                       {action.type === "webhook" && (
-                        <Input value={action.config?.url || ""} onChange={(e) => updateAction(i, { config: { ...action.config, url: e.target.value } })} className="bg-[#18191b] border-white/10 text-white" placeholder="Webhook URL" />
+                        <Input value={action.config?.url || ""} onChange={(e) => updateAction(i, { config: { ...action.config, url: e.target.value } })} placeholder="Webhook URL" />
                       )}
                     </CardContent>
                   </Card>
                 ))}
               </div>
 
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button type="submit" className="w-full">
                 {editingWorkflow ? "Update Workflow" : "Create Workflow"}
               </Button>
             </form>
@@ -356,11 +352,11 @@ export default function Workflows() {
 
       <div className="space-y-3">
         {workflows.length === 0 && (
-          <Card className="bg-[#18191b] border-white/10">
+          <Card>
             <CardContent className="p-12 text-center">
-              <Zap className="w-12 h-12 text-white/20 mx-auto mb-4" />
-              <p className="text-sm text-white/40">No workflows yet</p>
-              <p className="text-xs text-white/30 mt-1">Create your first automation to save time</p>
+              <Zap className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-sm text-muted-foreground">No workflows yet</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Create your first automation to save time</p>
             </CardContent>
           </Card>
         )}
@@ -370,21 +366,21 @@ export default function Workflows() {
           const isExpanded = expandedWorkflow === workflow.id;
 
           return (
-            <Card key={workflow.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
+            <Card key={workflow.id} className="hover:border-border/80 transition-colors">
               <CardContent className="p-0">
                 <div className="flex items-center gap-4 p-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#6452db]/20 flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-5 h-5 text-[#6452db]" />
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-medium text-white">{workflow.name}</h3>
-                      <Badge variant="secondary" className={`text-xs ${workflow.is_active ? "bg-[#8dc572]/20 text-[#8dc572]" : "bg-white/10 text-white/50"}`}>
+                      <h3 className="text-sm font-medium text-foreground">{workflow.name}</h3>
+                      <Badge variant="secondary" className={`text-xs ${workflow.is_active ? "bg-emerald-500/15 text-emerald-600" : "bg-muted text-muted-foreground"}`}>
                         {workflow.is_active ? "Active" : "Paused"}
                       </Badge>
                     </div>
-                    <p className="text-xs text-white/40 mt-0.5 truncate">{workflow.description || "No description"}</p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-white/30">
+                    <p className="text-xs text-muted-foreground mt-0.5 truncate">{workflow.description || "No description"}</p>
+                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground/50">
                       <span className="flex items-center gap-1"><TriggerIcon className="w-3 h-3" />{getTriggerLabel(workflow.trigger_type)}</span>
                       <span>·</span>
                       <span>{(workflow.actions || []).length} action{(workflow.actions || []).length !== 1 ? "s" : ""}</span>
@@ -400,16 +396,16 @@ export default function Workflows() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch checked={workflow.is_active} onCheckedChange={() => toggleWorkflow(workflow.id, workflow.is_active)} />
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white" onClick={() => editWorkflow(workflow)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => editWorkflow(workflow)}>
                       <Edit3 className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white" onClick={() => duplicateWorkflow(workflow)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => duplicateWorkflow(workflow)}>
                       <Copy className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-[#be6464]" onClick={() => deleteWorkflow(workflow.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => deleteWorkflow(workflow.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                    <button onClick={() => setExpandedWorkflow(isExpanded ? null : workflow.id)} className="text-white/30 hover:text-white">
+                    <button onClick={() => setExpandedWorkflow(isExpanded ? null : workflow.id)} className="text-muted-foreground hover:text-foreground">
                       {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                     </button>
                   </div>
@@ -417,18 +413,18 @@ export default function Workflows() {
 
                 {isExpanded && (
                   <div className="px-4 pb-4 pl-14 space-y-2">
-                    <div className="text-xs text-white/40 uppercase tracking-wider mb-2">Actions</div>
+                    <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Actions</div>
                     {(workflow.actions || []).map((action: any, i: number) => {
                       const ActionIcon = actionTypes.find(a => a.id === action.type)?.icon || Zap;
                       return (
-                        <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-                          <div className="w-7 h-7 rounded-md bg-white/5 flex items-center justify-center">
-                            <ActionIcon className="w-3.5 h-3.5 text-white/40" />
+                        <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted border border-border/50">
+                          <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
+                            <ActionIcon className="w-3.5 h-3.5 text-muted-foreground" />
                           </div>
                           <div>
-                            <p className="text-sm text-white/70">{getActionLabel(action.type)}</p>
-                            {action.config?.message && <p className="text-xs text-white/40">{action.config.message}</p>}
-                            {action.config?.subject && <p className="text-xs text-white/40">{action.config.subject}</p>}
+                            <p className="text-sm text-foreground">{getActionLabel(action.type)}</p>
+                            {action.config?.message && <p className="text-xs text-muted-foreground">{action.config.message}</p>}
+                            {action.config?.subject && <p className="text-xs text-muted-foreground">{action.config.subject}</p>}
                           </div>
                         </div>
                       );

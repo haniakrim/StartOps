@@ -175,7 +175,7 @@ export default function Forecasts() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -184,31 +184,31 @@ export default function Forecasts() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Forecasts</h1>
-          <p className="text-sm text-white/50 mt-1">Revenue forecasting and scenario planning</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Forecasts</h1>
+          <p className="text-sm text-muted-foreground mt-1">Revenue forecasting and scenario planning</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={generateAIForecast} className="border-white/10 text-white/70 hover:text-white hover:bg-white/5">
+          <Button variant="outline" size="sm" onClick={generateAIForecast}>
             <Sparkles className="w-4 h-4 mr-2" />Generate AI Forecast
           </Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />New Forecast
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#18191b] border-white/10 text-white">
+            <DialogContent>
               <DialogHeader><DialogTitle>Create Forecast</DialogTitle></DialogHeader>
               <form onSubmit={createForecast} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label className="text-white/70">Forecast Name</Label>
-                  <Input required value={newForecast.name} onChange={(e) => setNewForecast(p => ({ ...p, name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" placeholder="Q1 2024 Revenue Forecast" />
+                  <Label>Forecast Name</Label>
+                  <Input required value={newForecast.name} onChange={(e) => setNewForecast(p => ({ ...p, name: e.target.value }))} placeholder="Q1 2024 Revenue Forecast" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Period</Label>
+                  <Label>Period</Label>
                   <Select value={newForecast.period} onValueChange={(v) => setNewForecast(p => ({ ...p, period: v }))}>
-                    <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-[#1f2126] border-white/10 text-white">
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
                       <SelectItem value="Q1 2024">Q1 2024</SelectItem>
                       <SelectItem value="Q2 2024">Q2 2024</SelectItem>
                       <SelectItem value="Q3 2024">Q3 2024</SelectItem>
@@ -219,25 +219,25 @@ export default function Forecasts() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">Projected Revenue ($)</Label>
-                    <Input type="number" value={newForecast.projected_revenue} onChange={(e) => setNewForecast(p => ({ ...p, projected_revenue: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Label>Projected Revenue ($)</Label>
+                    <Input type="number" value={newForecast.projected_revenue} onChange={(e) => setNewForecast(p => ({ ...p, projected_revenue: e.target.value }))} />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Weighted Revenue ($)</Label>
-                    <Input type="number" value={newForecast.weighted_revenue} onChange={(e) => setNewForecast(p => ({ ...p, weighted_revenue: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Label>Weighted Revenue ($)</Label>
+                    <Input type="number" value={newForecast.weighted_revenue} onChange={(e) => setNewForecast(p => ({ ...p, weighted_revenue: e.target.value }))} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white/70">Confidence Low ($)</Label>
-                    <Input type="number" value={newForecast.confidence_low} onChange={(e) => setNewForecast(p => ({ ...p, confidence_low: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Label>Confidence Low ($)</Label>
+                    <Input type="number" value={newForecast.confidence_low} onChange={(e) => setNewForecast(p => ({ ...p, confidence_low: e.target.value }))} />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Confidence High ($)</Label>
-                    <Input type="number" value={newForecast.confidence_high} onChange={(e) => setNewForecast(p => ({ ...p, confidence_high: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                    <Label>Confidence High ($)</Label>
+                    <Input type="number" value={newForecast.confidence_high} onChange={(e) => setNewForecast(p => ({ ...p, confidence_high: e.target.value }))} />
                   </div>
                 </div>
-                <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Create Forecast</Button>
+                <Button type="submit" className="w-full">Create Forecast</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -245,12 +245,12 @@ export default function Forecasts() {
       </div>
 
       {forecasts.length === 0 ? (
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-12 text-center">
-            <BrainCircuit className="w-12 h-12 text-white/20 mx-auto mb-4" />
-            <p className="text-sm text-white/40">No forecasts yet</p>
-            <p className="text-xs text-white/30 mt-1">Generate an AI forecast or create one manually</p>
-            <Button onClick={generateAIForecast} className="mt-4 bg-[#6452db] text-white hover:bg-[#6452db]/90">
+            <BrainCircuit className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-sm text-muted-foreground">No forecasts yet</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">Generate an AI forecast or create one manually</p>
+            <Button onClick={generateAIForecast} className="mt-4">
               <Sparkles className="w-4 h-4 mr-2" />Generate AI Forecast
             </Button>
           </CardContent>
@@ -262,30 +262,30 @@ export default function Forecasts() {
             {forecasts.map((forecast) => (
               <Card
                 key={forecast.id}
-                className={`bg-[#18191b] border-white/10 cursor-pointer transition-colors ${activeForecast === forecast.id ? "border-[#6452db]/50" : "hover:border-white/20"}`}
+                className={`cursor-pointer transition-colors ${activeForecast === forecast.id ? "border-primary/50" : "hover:border-border/80"}`}
                 onClick={() => { setActiveForecast(forecast.id); generateScenarioData(forecast); }}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-medium text-white">{forecast.name}</h3>
-                        {forecast.name.includes("AI") && <Badge className="bg-[#6452db]/20 text-[#6452db] text-xs border-0">AI</Badge>}
+                        <h3 className="text-sm font-medium text-foreground">{forecast.name}</h3>
+                        {forecast.name.includes("AI") && <Badge className="bg-primary/15 text-primary text-xs border-0">AI</Badge>}
                       </div>
-                      <p className="text-xs text-white/40 mt-1">{forecast.period}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{forecast.period}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-white/30 hover:text-[#be6464]" onClick={(e) => { e.stopPropagation(); deleteForecast(forecast.id); }}>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={(e) => { e.stopPropagation(); deleteForecast(forecast.id); }}>
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   </div>
                   <div className="mt-3 grid grid-cols-2 gap-2">
-                    <div className="p-2 rounded bg-[#0b0d10] border border-white/5">
-                      <p className="text-[10px] text-white/40 uppercase">Projected</p>
-                      <p className="text-sm font-semibold text-white">${(forecast.projected_revenue || 0).toLocaleString()}</p>
+                    <div className="p-2 rounded bg-muted border border-border/50">
+                      <p className="text-[10px] text-muted-foreground uppercase">Projected</p>
+                      <p className="text-sm font-semibold text-foreground">${(forecast.projected_revenue || 0).toLocaleString()}</p>
                     </div>
-                    <div className="p-2 rounded bg-[#0b0d10] border border-white/5">
-                      <p className="text-[10px] text-white/40 uppercase">Weighted</p>
-                      <p className="text-sm font-semibold text-[#6452db]">${(forecast.weighted_revenue || 0).toLocaleString()}</p>
+                    <div className="p-2 rounded bg-muted border border-border/50">
+                      <p className="text-[10px] text-muted-foreground uppercase">Weighted</p>
+                      <p className="text-sm font-semibold text-primary">${(forecast.weighted_revenue || 0).toLocaleString()}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -297,33 +297,33 @@ export default function Forecasts() {
           <div className="lg:col-span-2 space-y-4">
             {currentForecast && (
               <>
-                <Card className="bg-[#18191b] border-white/10">
+                <Card>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-[#6452db]" />
+                      <CardTitle className="text-base font-medium flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4 text-primary" />
                         {currentForecast.name}
                       </CardTitle>
-                      <Badge variant="outline" className="border-white/10 text-white/50 text-xs">{currentForecast.period}</Badge>
+                      <Badge variant="outline" className="text-xs text-muted-foreground">{currentForecast.period}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                      <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-                        <p className="text-xs text-white/40 mb-1">Projected</p>
-                        <p className="text-lg font-semibold text-white">${(currentForecast.projected_revenue || 0).toLocaleString()}</p>
+                      <div className="p-3 rounded-lg bg-muted border border-border/50">
+                        <p className="text-xs text-muted-foreground mb-1">Projected</p>
+                        <p className="text-lg font-semibold text-foreground">${(currentForecast.projected_revenue || 0).toLocaleString()}</p>
                       </div>
-                      <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-                        <p className="text-xs text-white/40 mb-1">Weighted</p>
-                        <p className="text-lg font-semibold text-[#6452db]">${(currentForecast.weighted_revenue || 0).toLocaleString()}</p>
+                      <div className="p-3 rounded-lg bg-muted border border-border/50">
+                        <p className="text-xs text-muted-foreground mb-1">Weighted</p>
+                        <p className="text-lg font-semibold text-primary">${(currentForecast.weighted_revenue || 0).toLocaleString()}</p>
                       </div>
-                      <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-                        <p className="text-xs text-white/40 mb-1">Confidence Low</p>
-                        <p className="text-lg font-semibold text-[#be6464]">${(currentForecast.confidence_low || 0).toLocaleString()}</p>
+                      <div className="p-3 rounded-lg bg-muted border border-border/50">
+                        <p className="text-xs text-muted-foreground mb-1">Confidence Low</p>
+                        <p className="text-lg font-semibold text-red-500">${(currentForecast.confidence_low || 0).toLocaleString()}</p>
                       </div>
-                      <div className="p-3 rounded-lg bg-[#0b0d10] border border-white/5">
-                        <p className="text-xs text-white/40 mb-1">Confidence High</p>
-                        <p className="text-lg font-semibold text-[#8dc572]">${(currentForecast.confidence_high || 0).toLocaleString()}</p>
+                      <div className="p-3 rounded-lg bg-muted border border-border/50">
+                        <p className="text-xs text-muted-foreground mb-1">Confidence High</p>
+                        <p className="text-lg font-semibold text-emerald-500">${(currentForecast.confidence_high || 0).toLocaleString()}</p>
                       </div>
                     </div>
 
@@ -331,8 +331,8 @@ export default function Forecasts() {
                       <AreaChart data={scenarioData}>
                         <defs>
                           <linearGradient id="colorProjected" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#6452db" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#6452db" stopOpacity={0} />
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                           </linearGradient>
                           <linearGradient id="colorWeighted" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="#8dc572" stopOpacity={0.3} />
@@ -353,31 +353,31 @@ export default function Forecasts() {
                 </Card>
 
                 {/* Factors */}
-                <Card className="bg-[#18191b] border-white/10">
+                <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-white text-base font-medium flex items-center gap-2">
-                      <Target className="w-4 h-4 text-[#ff8964]" />
+                    <CardTitle className="text-base font-medium flex items-center gap-2">
+                      <Target className="w-4 h-4 text-orange-500" />
                       Key Factors
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       {(currentForecast.factors || []).map((factor: any, i: number) => (
-                        <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-[#0b0d10] border border-white/5">
+                        <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border/50">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-[#6452db]/20 flex items-center justify-center">
-                              <DollarSign className="w-4 h-4 text-[#6452db]" />
+                            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                              <DollarSign className="w-4 h-4 text-primary" />
                             </div>
                             <div>
-                              <p className="text-sm text-white">{factor.name}</p>
-                              <p className="text-xs text-white/40">Influencing forecast accuracy</p>
+                              <p className="text-sm text-foreground">{factor.name}</p>
+                              <p className="text-xs text-muted-foreground">Influencing forecast accuracy</p>
                             </div>
                           </div>
-                          <span className="text-sm font-semibold text-white">{typeof factor.value === "number" ? factor.value.toLocaleString() : factor.value}</span>
+                          <span className="text-sm font-semibold text-foreground">{typeof factor.value === "number" ? factor.value.toLocaleString() : factor.value}</span>
                         </div>
                       ))}
                       {(!currentForecast.factors || currentForecast.factors.length === 0) && (
-                        <p className="text-sm text-white/40 text-center py-4">No factors recorded for this forecast</p>
+                        <p className="text-sm text-muted-foreground text-center py-4">No factors recorded for this forecast</p>
                       )}
                     </div>
                   </CardContent>

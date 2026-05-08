@@ -120,7 +120,7 @@ export default function Employees() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-[#6452db] animate-spin" />
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -129,11 +129,11 @@ export default function Employees() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">People & Projects</h1>
-          <p className="text-sm text-white/50 mt-1">Workforce intelligence and skill graph</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">People & Projects</h1>
+          <p className="text-sm text-muted-foreground mt-1">Workforce intelligence and skill graph</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-white/10 text-white/70 hover:text-white hover:bg-white/5" onClick={() => {
+          <Button variant="outline" size="sm" onClick={() => {
             const exportData = employees.map(e => ({
               "First Name": e.first_name,
               "Last Name": e.last_name,
@@ -148,147 +148,153 @@ export default function Employees() {
           }}>
             <Download className="w-4 h-4 mr-2" />Export
           </Button>
-          </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-[#6452db] text-white hover:bg-[#6452db]/90">
+              <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />Add Employee
               </Button>
             </DialogTrigger>
-          <DialogContent className="bg-[#18191b] border-white/10 text-white">
-            <DialogHeader><DialogTitle>Add Employee</DialogTitle></DialogHeader>
-            <form onSubmit={createEmployee} className="space-y-4 pt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-white/70">First Name</Label>
-                  <Input required value={newEmployee.first_name} onChange={(e) => setNewEmployee(p => ({ ...p, first_name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+            <DialogContent>
+              <DialogHeader><DialogTitle>Add Employee</DialogTitle></DialogHeader>
+              <form onSubmit={createEmployee} className="space-y-4 pt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>First Name</Label>
+                    <Input required value={newEmployee.first_name} onChange={(e) => setNewEmployee(p => ({ ...p, first_name: e.target.value }))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Last Name</Label>
+                    <Input required value={newEmployee.last_name} onChange={(e) => setNewEmployee(p => ({ ...p, last_name: e.target.value }))} />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white/70">Last Name</Label>
-                  <Input required value={newEmployee.last_name} onChange={(e) => setNewEmployee(p => ({ ...p, last_name: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
+                  <Label>Email</Label>
+                  <Input type="email" required value={newEmployee.email} onChange={(e) => setNewEmployee(p => ({ ...p, email: e.target.value }))} />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white/70">Email</Label>
-                <Input type="email" required value={newEmployee.email} onChange={(e) => setNewEmployee(p => ({ ...p, email: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white/70">Title</Label>
-                <Input value={newEmployee.title} onChange={(e) => setNewEmployee(p => ({ ...p, title: e.target.value }))} className="bg-[#0b0d10] border-white/10 text-white" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white/70">Department</Label>
-                <Select value={newEmployee.department_id} onValueChange={(v) => setNewEmployee(p => ({ ...p, department_id: v }))}>
-                  <SelectTrigger className="bg-[#0b0d10] border-white/10 text-white"><SelectValue placeholder="Select department" /></SelectTrigger>
-                  <SelectContent className="bg-[#1f2126] border-white/10 text-white">
-                    {departments.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" className="w-full bg-[#6452db] text-white hover:bg-[#6452db]/90">Add Employee</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <div className="space-y-2">
+                  <Label>Title</Label>
+                  <Input value={newEmployee.title} onChange={(e) => setNewEmployee(p => ({ ...p, title: e.target.value }))} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Department</Label>
+                  <Select value={newEmployee.department_id} onValueChange={(v) => setNewEmployee(p => ({ ...p, department_id: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
+                    <SelectContent>
+                      {departments.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" className="w-full">Add Employee</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <Users className="w-5 h-5 text-[#6452db] mb-3" />
-            <p className="text-2xl font-semibold text-white">{employees.length}</p>
-            <p className="text-sm text-white/50">Total Employees</p>
+            <Users className="w-5 h-5 text-primary mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{employees.length}</p>
+            <p className="text-sm text-muted-foreground">Total Employees</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <Zap className="w-5 h-5 text-[#ff8964] mb-3" />
-            <p className="text-2xl font-semibold text-white">{skills.length}</p>
-            <p className="text-sm text-white/50">Skills Tracked</p>
+            <Zap className="w-5 h-5 text-orange-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{skills.length}</p>
+            <p className="text-sm text-muted-foreground">Skills Tracked</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#18191b] border-white/10">
+        <Card>
           <CardContent className="p-5">
-            <TrendingUp className="w-5 h-5 text-[#8dc572] mb-3" />
-            <p className="text-2xl font-semibold text-white">{Math.round(employees.reduce((s, e) => s + (e.utilization_target || 80), 0) / (employees.length || 1))}%</p>
-            <p className="text-sm text-white/50">Avg Utilization Target</p>
+            <TrendingUp className="w-5 h-5 text-emerald-500 mb-3" />
+            <p className="text-2xl font-semibold text-foreground">{Math.round(employees.reduce((s, e) => s + (e.utilization_target || 80), 0) / (employees.length || 1))}%</p>
+            <p className="text-sm text-muted-foreground">Avg Utilization Target</p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="directory" className="w-full">
-        <TabsList className="bg-[#18191b] border border-white/10">
-          <TabsTrigger value="directory" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Users className="w-4 h-4 mr-2" />Directory</TabsTrigger>
-          <TabsTrigger value="skills" className="data-[state=active]:bg-[#6452db] data-[state=active]:text-white text-white/50"><Award className="w-4 h-4 mr-2" />Skill Graph</TabsTrigger>
+        <TabsList>
+          <TabsTrigger value="directory"><Users className="w-4 h-4 mr-2" />Directory</TabsTrigger>
+          <TabsTrigger value="skills"><Award className="w-4 h-4 mr-2" />Skill Graph</TabsTrigger>
         </TabsList>
 
         <TabsContent value="directory" className="mt-6">
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-            <input type="text" placeholder="Search employees..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#18191b] border border-white/10 rounded-md pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#6452db]/50" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search employees..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-muted border border-border rounded-md pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
+            />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map(emp => {
               const empSkills = employeeSkills[emp.id] || [];
               const initials = `${emp.first_name?.[0] || ""}${emp.last_name?.[0] || ""}`.toUpperCase();
               return (
-                <Card key={emp.id} className="bg-[#18191b] border-white/10 hover:border-white/20 transition-colors">
+                <Card key={emp.id} className="hover:border-border/80 transition-colors">
                   <CardContent className="p-5">
                     <div className="flex items-start gap-4">
-                      <Avatar className="w-12 h-12 bg-[#6452db]">
-                        <AvatarFallback className="bg-[#6452db] text-white text-sm">{initials}</AvatarFallback>
+                      <Avatar className="w-12 h-12">
+                        <AvatarFallback className="bg-primary text-primary-foreground text-sm">{initials}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-semibold text-white">{emp.first_name} {emp.last_name}</h3>
-                        <p className="text-sm text-white/50">{emp.title || "No title"}</p>
+                        <h3 className="text-base font-semibold text-foreground">{emp.first_name} {emp.last_name}</h3>
+                        <p className="text-sm text-muted-foreground">{emp.title || "No title"}</p>
                         <div className="flex items-center gap-2 mt-2">
-                          {emp.departments && <Badge variant="secondary" className="bg-white/10 text-white/60 text-xs">{emp.departments.name}</Badge>}
-                          {emp.teams && <Badge variant="secondary" className="bg-white/10 text-white/60 text-xs">{emp.teams.name}</Badge>}
+                          {emp.departments && <Badge variant="secondary" className="text-xs">{emp.departments.name}</Badge>}
+                          {emp.teams && <Badge variant="secondary" className="text-xs">{emp.teams.name}</Badge>}
                         </div>
                       </div>
                     </div>
                     {empSkills.length > 0 && (
                       <div className="mt-4 space-y-2">
-                        <p className="text-xs text-white/40 uppercase tracking-wider">Skills</p>
+                        <p className="text-xs text-muted-foreground/60 uppercase tracking-wider">Skills</p>
                         <div className="flex flex-wrap gap-1.5">
                           {empSkills.slice(0, 4).map(es => (
-                            <Badge key={es.skill_id} variant="outline" className="text-xs border-white/10 text-white/60">
-                              {es.skills?.name} <Star className="w-3 h-3 ml-1 text-[#f0ad4e]" />
+                            <Badge key={es.skill_id} variant="outline" className="text-xs text-muted-foreground">
+                              {es.skills?.name} <Star className="w-3 h-3 ml-1 text-yellow-500" />
                             </Badge>
                           ))}
-                          {empSkills.length > 4 && <Badge variant="outline" className="text-xs border-white/10 text-white/40">+{empSkills.length - 4}</Badge>}
+                          {empSkills.length > 4 && <Badge variant="outline" className="text-xs text-muted-foreground/50">+{empSkills.length - 4}</Badge>}
                         </div>
                       </div>
                     )}
                     <div className="mt-4">
                       <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-white/40">Utilization Target</span>
-                        <span className="text-white">{emp.utilization_target || 80}%</span>
+                        <span className="text-muted-foreground/60">Utilization Target</span>
+                        <span className="text-foreground">{emp.utilization_target || 80}%</span>
                       </div>
-                      <Progress value={emp.utilization_target || 80} className="h-1 bg-white/10" />
+                      <Progress value={emp.utilization_target || 80} className="h-1" />
                     </div>
                   </CardContent>
                 </Card>
               );
             })}
-            {filtered.length === 0 && <div className="col-span-full text-center py-12 text-sm text-white/40">No employees found</div>}
+            {filtered.length === 0 && <div className="col-span-full text-center py-12 text-sm text-muted-foreground/50">No employees found</div>}
           </div>
         </TabsContent>
 
         <TabsContent value="skills" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {skillCategories.map(category => (
-              <Card key={category} className="bg-[#18191b] border-white/10">
+              <Card key={category}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-white text-base capitalize">{category || "General"}</CardTitle>
+                  <CardTitle className="text-base capitalize">{category || "General"}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     {skills.filter(s => s.category === category).map(skill => {
                       const count = Object.values(employeeSkills).flat().filter(es => es.skill_id === skill.id).length;
                       return (
-                        <div key={skill.id} className="flex items-center justify-between p-2 rounded bg-[#0b0d10] border border-white/5">
-                          <span className="text-sm text-white">{skill.name}</span>
-                          <Badge variant="secondary" className="bg-[#6452db]/20 text-[#6452db] text-xs">{count} people</Badge>
+                        <div key={skill.id} className="flex items-center justify-between p-2 rounded bg-muted border border-border/50">
+                          <span className="text-sm text-foreground">{skill.name}</span>
+                          <Badge variant="secondary" className="text-xs text-primary">{count} people</Badge>
                         </div>
                       );
                     })}
@@ -296,7 +302,7 @@ export default function Employees() {
                 </CardContent>
               </Card>
             ))}
-            {skillCategories.length === 0 && <div className="col-span-full text-center py-12 text-sm text-white/40">No skills configured yet</div>}
+            {skillCategories.length === 0 && <div className="col-span-full text-center py-12 text-sm text-muted-foreground/50">No skills configured yet</div>}
           </div>
         </TabsContent>
       </Tabs>
