@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/components/ThemeToggle";
 import FadeIn from "@/components/landing/FadeIn";
 import { StaggerContainer, StaggerItem } from "@/components/landing/StaggerContainer";
 import HeroLogo from "@/components/landing/HeroLogo";
@@ -35,6 +36,7 @@ export default function Index() {
             ))}
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle className="text-white/50 hover:text-white hover:bg-white/5" />
             <button
               onClick={() => navigate("/login")}
               className="px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
