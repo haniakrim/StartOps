@@ -62,15 +62,28 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // StartOps Brand Colors (Original)
-        startops: {
-          dark: "#0A1628",
-          blue: "#0066B1",
-          light: "#00BFFF",
-          red: "#E63946",
-          gray: "#1A2332",
+        // HP Design System Colors
+        hp: {
+          blue: "#0071E3",
+          "blue-light": "#2997FF",
+          "blue-dark": "#005BB5",
+          slate: "#14181F",
+          surface: "#1A1F28",
+          "surface-raised": "#232833",
+          "text-primary": "#F5F5F7",
+          "text-secondary": "#8A929D",
+          green: "#34C759",
+          orange: "#FF9500",
+          red: "#FF2D55",
         },
-        // Expo Design System Colors (available as utilities)
+        // Legacy aliases for backwards compatibility
+        startops: {
+          dark: "#14181F",
+          blue: "#0071E3",
+          light: "#2997FF",
+          red: "#FF2D55",
+          gray: "#1A1F28",
+        },
         expo: {
           black: "#000000",
           white: "#FFFFFF",
@@ -86,8 +99,8 @@ export default {
             800: "#2C2C2E",
             900: "#1C1C1E",
           },
-          blue: "#007AFF",
-          "blue-light": "#5AC8FA",
+          blue: "#0071E3",
+          "blue-light": "#2997FF",
           indigo: "#5856D6",
           purple: "#AF52DE",
           pink: "#FF2D55",
@@ -96,10 +109,10 @@ export default {
           green: "#34C759",
           teal: "#5AC8FA",
           dark: {
-            bg: "#000000",
-            surface: "#1C1C1E",
-            elevated: "#2C2C2E",
-            border: "#38383A",
+            bg: "#14181F",
+            surface: "#1A1F28",
+            elevated: "#232833",
+            border: "#2C2C3E",
           },
         },
       },
@@ -107,9 +120,10 @@ export default {
         sans: [
           "-apple-system",
           "BlinkMacSystemFont",
-          "'SF Pro Display'",
           "'Segoe UI'",
           "Roboto",
+          "'Helvetica Neue'",
+          "Arial",
           "sans-serif",
         ],
         mono: [

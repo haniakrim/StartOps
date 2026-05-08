@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowRight, Play, Building2 } from "lucide-react";
+import { ArrowRight, Play, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FadeIn from "@/components/landing/FadeIn";
 import { StaggerContainer, StaggerItem } from "@/components/landing/StaggerContainer";
@@ -16,13 +15,13 @@ export default function Index() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#0A1628] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-hp-slate text-white overflow-x-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0A1628]/80 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-hp-slate/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#0066B1] flex items-center justify-center">
-              <Building2 className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-hp-blue flex items-center justify-center">
+              <Cpu className="w-4 h-4 text-white" />
             </div>
             <span className="font-semibold text-white">StartOps</span>
           </div>
@@ -45,7 +44,7 @@ export default function Index() {
             </button>
             <button
               onClick={() => navigate("/login")}
-              className="px-4 py-2 text-sm bg-[#0066B1] text-white hover:bg-[#0066B1]/90 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm bg-hp-blue text-white hover:bg-hp-blue-dark rounded-lg transition-colors"
             >
               Get Started
             </button>
@@ -59,10 +58,10 @@ export default function Index() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
               <FadeIn>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0066B1]/10 border border-[#0066B1]/20 text-sm text-[#00BFFF] mb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-hp-blue/10 border border-hp-blue/20 text-sm text-hp-blue-light mb-6">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00BFFF] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00BFFF]"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-hp-blue-light opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-hp-blue-light"></span>
                   </span>
                   Now with AI-powered insights
                 </div>
@@ -71,7 +70,7 @@ export default function Index() {
               <FadeIn delay={0.1}>
                 <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight mb-6">
                   The all-in-one{" "}
-                  <span className="text-[#00BFFF]">operating system</span>{" "}
+                  <span className="text-hp-blue-light">operating system</span>{" "}
                   for startups
                 </h1>
               </FadeIn>
@@ -87,7 +86,7 @@ export default function Index() {
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <button
                     onClick={() => navigate("/login")}
-                    className="flex items-center gap-2 px-8 h-12 text-base bg-[#0066B1] text-white hover:bg-[#0066B1]/90 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-8 h-12 text-base bg-hp-blue text-white hover:bg-hp-blue-dark rounded-lg transition-colors"
                   >
                     Start Free Trial
                     <ArrowRight className="w-4 h-4" />
@@ -107,7 +106,7 @@ export default function Index() {
                     {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
-                        className="w-8 h-8 rounded-full bg-[#1A2332] border-2 border-[#0A1628] flex items-center justify-center"
+                        className="w-8 h-8 rounded-full bg-hp-surface border-2 border-hp-slate flex items-center justify-center"
                       >
                         <span className="text-xs text-white/60">{i}</span>
                       </div>
@@ -152,7 +151,7 @@ export default function Index() {
             <FadeIn>
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
                 Everything you need to{" "}
-                <span className="text-[#E63946]">operate at scale</span>
+                <span className="text-hp-red">operate at scale</span>
               </h2>
             </FadeIn>
             <FadeIn delay={0.1}>
@@ -180,7 +179,7 @@ export default function Index() {
                 >
                   <p className="text-xs text-white/40 mb-1">{stat.label}</p>
                   <p className="text-lg font-semibold text-white">{stat.value}</p>
-                  <p className="text-xs text-[#8dc572]">{stat.change}</p>
+                  <p className="text-xs text-hp-green">{stat.change}</p>
                 </div>
               ))}
             </div>
@@ -194,9 +193,9 @@ export default function Index() {
           >
             <div className="space-y-3">
               {[
-                { label: "Monthly Revenue", value: "$124,500", bar: 75, color: "#0066B1" },
-                { label: "Burn Rate", value: "$48,200", bar: 45, color: "#E63946" },
-                { label: "Runway", value: "18 months", bar: 60, color: "#00BFFF" },
+                { label: "Monthly Revenue", value: "$124,500", bar: 75, color: "#0071E3" },
+                { label: "Burn Rate", value: "$48,200", bar: 45, color: "#FF2D55" },
+                { label: "Runway", value: "18 months", bar: 60, color: "#2997FF" },
               ].map((item) => (
                 <div key={item.label} className="p-4 rounded-xl bg-card border border-border">
                   <div className="flex items-center justify-between mb-2">
@@ -223,7 +222,7 @@ export default function Index() {
             <FadeIn>
               <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
                 30+ integrated{" "}
-                <span className="text-[#00BFFF]">modules</span>
+                <span className="text-hp-blue-light">modules</span>
               </h2>
             </FadeIn>
             <FadeIn delay={0.1}>

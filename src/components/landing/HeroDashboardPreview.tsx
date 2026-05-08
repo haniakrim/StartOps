@@ -20,7 +20,7 @@ const statCards = [
     change: "+12.5%",
     up: true,
     icon: DollarSign,
-    color: "#0066B1",
+    color: "#0071E3",
   },
   {
     title: "Active Deals",
@@ -28,7 +28,7 @@ const statCards = [
     change: "+8.2%",
     up: true,
     icon: TrendingUp,
-    color: "#E63946",
+    color: "#FF2D55",
   },
   {
     title: "Contacts",
@@ -36,7 +36,7 @@ const statCards = [
     change: "+24%",
     up: true,
     icon: Users,
-    color: "#0066B1",
+    color: "#0071E3",
   },
   {
     title: "Companies",
@@ -44,16 +44,16 @@ const statCards = [
     change: "-2.1%",
     up: false,
     icon: Building2,
-    color: "#00BFFF",
+    color: "#2997FF",
   },
 ];
 
 const pipelineStages = [
-  { name: "Lead", count: 24, color: "#00BFFF" },
-  { name: "Qualified", count: 18, color: "#0066B1" },
-  { name: "Proposal", count: 12, color: "#E63946" },
-  { name: "Negotiation", count: 8, color: "#00BFFF" },
-  { name: "Closed Won", count: 6, color: "#0066B1" },
+  { name: "Lead", count: 24, color: "#2997FF" },
+  { name: "Qualified", count: 18, color: "#0071E3" },
+  { name: "Proposal", count: 12, color: "#FF2D55" },
+  { name: "Negotiation", count: 8, color: "#2997FF" },
+  { name: "Closed Won", count: 6, color: "#0071E3" },
 ];
 
 const contacts = [
@@ -81,7 +81,7 @@ export default function HeroDashboardPreview() {
   return (
     <div className="relative w-full max-w-lg mx-auto lg:mx-0">
       {/* Glow effect behind */}
-      <div className="absolute -inset-4 bg-gradient-to-r from-[#0066B1]/20 via-[#E63946]/10 to-[#00BFFF]/20 rounded-3xl blur-2xl animate-pulse-glow" />
+      <div className="absolute -inset-4 bg-gradient-to-r from-hp-blue/20 via-hp-red/10 to-hp-blue-light/20 rounded-3xl blur-2xl animate-pulse-glow" />
 
       {/* Dashboard card */}
       <div className="relative bg-background border border-border rounded-2xl overflow-hidden shadow-2xl">
@@ -121,7 +121,7 @@ export default function HeroDashboardPreview() {
                       <stat.icon className="w-4 h-4" style={{ color: stat.color }} />
                       <span
                         className={`text-[10px] font-medium flex items-center gap-0.5 ${
-                          stat.up ? "text-emerald-400" : "text-red-400"
+                          stat.up ? "text-hp-green" : "text-hp-red"
                         }`}
                       >
                         {stat.up ? (
@@ -150,7 +150,7 @@ export default function HeroDashboardPreview() {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-white">Revenue Overview</span>
-                  <span className="text-xs text-emerald-400 flex items-center gap-1">
+                  <span className="text-xs text-hp-green flex items-center gap-1">
                     <ArrowUpRight className="w-3 h-3" />
                     +23.5%
                   </span>
@@ -162,7 +162,7 @@ export default function HeroDashboardPreview() {
                       initial={{ height: 0 }}
                       animate={{ height: `${height}%` }}
                       transition={{ duration: 0.5, delay: i * 0.05 }}
-                      className="flex-1 rounded-t-sm bg-gradient-to-t from-primary to-destructive/60"
+                      className="flex-1 rounded-t-sm bg-gradient-to-t from-hp-blue to-hp-red/60"
                     />
                   ))}
                 </div>
@@ -240,7 +240,7 @@ export default function HeroDashboardPreview() {
                     transition={{ delay: i * 0.1 }}
                     className="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-destructive flex items-center justify-center text-xs font-bold text-primary-foreground">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-hp-blue to-hp-red flex items-center justify-center text-xs font-bold text-primary-foreground">
                       {contact.name.split(" ").map((n) => n[0]).join("")}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -254,9 +254,9 @@ export default function HeroDashboardPreview() {
                     <span
                       className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                         contact.status === "Active"
-                          ? "bg-emerald-500/10 text-emerald-400"
+                          ? "bg-hp-green/10 text-hp-green"
                           : contact.status === "Customer"
-                          ? "bg-[#0066B1]/10 text-[#0066B1]"
+                          ? "bg-hp-blue/10 text-hp-blue"
                           : "bg-white/5 text-white/40"
                       }`}
                     >
@@ -276,7 +276,7 @@ export default function HeroDashboardPreview() {
               key={v}
               onClick={() => setCurrentView(i)}
               className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                i === currentView ? "bg-[#0066B1] w-4" : "bg-white/20 hover:bg-white/30"
+                i === currentView ? "bg-hp-blue w-4" : "bg-white/20 hover:bg-white/30"
               }`}
             />
           ))}

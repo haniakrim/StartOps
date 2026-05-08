@@ -45,9 +45,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { cn } from "@/lib/utils";
 import CommandPalette from "@/components/CommandPalette";
 import RealtimeNotifications from "@/components/RealtimeNotifications";
-import { cn } from "@/lib/utils";
 
 interface NavItem {
   path: string;
