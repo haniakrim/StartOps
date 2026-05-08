@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Play, Cpu } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FadeIn from "@/components/landing/FadeIn";
 import { StaggerContainer, StaggerItem } from "@/components/landing/StaggerContainer";
+import HeroLogo from "@/components/landing/HeroLogo";
 import HeroDashboardPreview from "@/components/landing/HeroDashboardPreview";
 import FeatureSection from "@/components/landing/FeatureSection";
 import StatsSection from "@/components/landing/StatsSection";
@@ -19,12 +20,10 @@ export default function Index() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-hp-slate/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-hp-blue flex items-center justify-center">
-              <Cpu className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-semibold text-white">StartOps</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <HeroLogo className="w-8 h-8" />
+          <span className="font-semibold text-white">StartOps</span>
+        </div>
           <div className="hidden md:flex items-center gap-8">
             {["Features", "Modules", "Pricing", "Docs"].map((item) => (
               <span

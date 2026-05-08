@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Cpu, ArrowRight, Zap, Shield, Users, BarChart3 } from "lucide-react";
+import { ArrowRight, Zap, Shield, Users, BarChart3 } from "lucide-react";
+import HeroLogo from "@/components/landing/HeroLogo";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -121,9 +122,7 @@ const Login = () => {
         <div className="relative z-10 flex flex-col justify-between p-12">
           <div>
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-hp-blue flex items-center justify-center">
-                <Cpu className="w-5 h-5 text-white" />
-              </div>
+              <HeroLogo className="w-10 h-10" />
               <span className="text-xl font-bold text-white">StartOps</span>
             </div>
 
@@ -174,9 +173,7 @@ const Login = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-hp-blue flex items-center justify-center">
-                <Cpu className="w-4 h-4 text-white" />
-              </div>
+              <HeroLogo className="w-8 h-8" />
               <span className="font-semibold text-lg">StartOps</span>
             </div>
             <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>

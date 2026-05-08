@@ -40,6 +40,7 @@ import {
   FolderOpen,
   type LucideIcon,
 } from "lucide-react";
+import HeroLogo from "@/components/landing/HeroLogo";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -324,9 +325,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       >
         {/* Logo */}
         <div className="h-16 flex items-center px-4 border-b border-border flex-shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0 shadow-sm">
-            <span className="text-white font-bold text-sm">S</span>
-          </div>
+          <HeroLogo className="w-8 h-8 flex-shrink-0" />
           {!collapsed && (
             <div className="ml-3 flex items-center gap-2">
               <span className="font-semibold text-sidebar-foreground tracking-tight text-[15px]">

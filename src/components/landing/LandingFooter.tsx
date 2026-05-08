@@ -1,4 +1,4 @@
-import { Cpu } from "lucide-react";
+import HeroLogo from "@/components/landing/HeroLogo";
 
 const footerLinks = [
   {
@@ -26,9 +26,7 @@ export default function LandingFooter() {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-hp-blue flex items-center justify-center">
-                <Cpu className="w-4 h-4 text-white" />
-              </div>
+              <HeroLogo className="w-8 h-8" />
               <span className="text-lg font-semibold text-white">StartOps</span>
             </div>
             <p className="text-sm text-white/40 max-w-xs">
