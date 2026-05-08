@@ -1,0 +1,1 @@
+SELECT id, name, organization_id, created_by FROM public.workflows WHERE created_by = 'a9d8171b-44b9-47c8-9572-ddc6beb7f5d9';

@@ -1,0 +1,1 @@
+SELECT COUNT(*) as total_quote_items FROM public.quote_items;

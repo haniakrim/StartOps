@@ -1,0 +1,1 @@
+SELECT COUNT(*) as total_comments FROM public.comments WHERE organization_id IS NULL;

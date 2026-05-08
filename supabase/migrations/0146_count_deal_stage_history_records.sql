@@ -1,0 +1,1 @@
+SELECT COUNT(*) as total_deal_stage_history FROM public.deal_stage_history;

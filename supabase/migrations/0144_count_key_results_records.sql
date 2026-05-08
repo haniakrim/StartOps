@@ -1,0 +1,1 @@
+SELECT COUNT(*) as total_key_results FROM public.key_results;

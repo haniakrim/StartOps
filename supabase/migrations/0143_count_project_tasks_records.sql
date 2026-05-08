@@ -1,0 +1,1 @@
+SELECT COUNT(*) as total_project_tasks FROM public.project_tasks;

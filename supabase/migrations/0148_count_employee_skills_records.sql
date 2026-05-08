@@ -1,0 +1,1 @@
+SELECT COUNT(*) as total_employee_skills FROM public.employee_skills;
