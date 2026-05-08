@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   User,
   Mail,
@@ -26,8 +27,11 @@ import { toast } from "sonner";
 
 export default function Profile() {
   const { user, profile, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -52,6 +56,37 @@ export default function Profile() {
       setEmailVerified(false);
     }
   }, [profile, user]);
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be under 2MB");
+      return;
+    }
+    try {
+      setUploadingAvatar(true);
+      const fileExt = file.name.split(".").pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(filePath);
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: publicUrl + "?t=" + Date.now(), updated_at: new Date().toISOString() })
+        .eq("id", user.id);
+      if (updateError) throw updateError;
+      setForm((p) => ({ ...p, avatar_url: publicUrl + "?t=" + Date.now() }));
+      toast.success("Avatar updated");
+    } catch (error: any) {
+      toast.error("Failed to upload avatar: " + (error.message || "Unknown error"));
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
@@ -108,13 +143,27 @@ export default function Profile() {
       <div className="flex items-center gap-6 p-6 rounded-xl border border-border bg-card">
         <div className="relative">
           <Avatar className="w-20 h-20">
+            {form.avatar_url ? (
+              <img src={form.avatar_url} alt={userName} className="w-full h-full object-cover rounded-full" />
+            ) : null}
             <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
               {userInitials}
             </AvatarFallback>
           </Avatar>
-          <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-primary transition-colors">
-            <Camera className="w-3.5 h-3.5" />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingAvatar}
+            className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-primary transition-colors disabled:opacity-50"
+          >
+            {uploadingAvatar ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarUpload}
+            className="hidden"
+          />
         </div>
         <div>
           <h2 className="text-lg font-semibold text-foreground">{userName}</h2>
@@ -316,7 +365,7 @@ export default function Profile() {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => window.location.href = "/security"}>
+                <Button variant="outline" size="sm" onClick={() => navigate("/security")}>
                   Update
                 </Button>
               </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -252,6 +252,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     () => new Set(navGroups.map((g) => g.label))
   );
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
 
   const toggleGroup = (label: string) => {
@@ -357,7 +358,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             {!collapsed && (
               <>
                 <button
-                  onClick={() => (window.location.href = "/profile")}
+                  onClick={() => navigate("/profile")}
                   className="flex-1 min-w-0 text-left"
                 >
                   <p className="text-sm font-medium text-sidebar-foreground/90 truncate group-hover:text-sidebar-foreground transition-colors">

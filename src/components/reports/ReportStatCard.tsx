@@ -3,14 +3,16 @@ import type { LucideIcon } from "lucide-react";
 
 interface ReportStatCardProps {
   icon: LucideIcon;
-  iconColor: string;
+  iconColor?: string;
   value: string;
   label: string;
+  trend?: string;
+  trendValue?: string;
 }
 
 export function ReportStatCard({
   icon: Icon,
-  iconColor,
+  iconColor = "hsl(var(--primary))",
   value,
   label,
 }: ReportStatCardProps) {

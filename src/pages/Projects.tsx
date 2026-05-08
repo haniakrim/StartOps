@@ -117,19 +117,33 @@ export default function Projects() {
     e.preventDefault();
     if (!organizationId) { toast.error("No organization"); return; }
     try {
-      const { error } = await supabase.from("projects").insert({
-        name: newProject.name,
-        description: newProject.description || null,
-        budget: parseFloat(newProject.budget) || 0,
-        priority: newProject.priority,
-        start_date: newProject.start_date || null,
-        end_date: newProject.end_date || null,
-        status: "planning",
-        organization_id: organizationId,
-      });
-      if (error) throw error;
-      toast.success("Project created");
+      if (editingProject) {
+        const { error } = await supabase.from("projects").update({
+          name: newProject.name,
+          description: newProject.description || null,
+          budget: parseFloat(newProject.budget) || 0,
+          priority: newProject.priority,
+          start_date: newProject.start_date || null,
+          end_date: newProject.end_date || null,
+        }).eq("id", editingProject.id);
+        if (error) throw error;
+        toast.success("Project updated");
+      } else {
+        const { error } = await supabase.from("projects").insert({
+          name: newProject.name,
+          description: newProject.description || null,
+          budget: parseFloat(newProject.budget) || 0,
+          priority: newProject.priority,
+          start_date: newProject.start_date || null,
+          end_date: newProject.end_date || null,
+          status: "planning",
+          organization_id: organizationId,
+        });
+        if (error) throw error;
+        toast.success("Project created");
+      }
       setDialogOpen(false);
+      setEditingProject(null);
       setNewProject({ name: "", description: "", budget: "", priority: "medium", start_date: "", end_date: "" });
       fetchProjects();
     } catch (error: any) {
@@ -147,6 +161,19 @@ export default function Projects() {
     } catch (error: any) {
       toast.error("Failed: " + error.message);
     }
+  }
+
+  function openEdit(project: Project) {
+    setEditingProject(project);
+    setNewProject({
+      name: project.name,
+      description: project.description || "",
+      budget: String(project.budget || ""),
+      priority: project.priority,
+      start_date: project.start_date || "",
+      end_date: project.end_date || "",
+    });
+    setDialogOpen(true);
   }
 
   async function createTask(e: React.FormEvent) {
@@ -201,14 +228,14 @@ export default function Projects() {
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">Projects</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage projects and deliverables</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setEditingProject(null); setNewProject({ name: "", description: "", budget: "", priority: "medium", start_date: "", end_date: "" }); } }}>
           <DialogTrigger asChild>
             <Button size="sm">
               <Plus className="w-4 h-4 mr-2" />New Project
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>{editingProject ? "Edit Project" : "Create Project"}</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{editingProject ? "Edit Project" : "New Project"}</DialogTitle></DialogHeader>
             <form onSubmit={createProject} className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label>Name</Label>
@@ -286,6 +313,9 @@ export default function Projects() {
                     <div className="flex items-center justify-between mt-3">
                       <span className="text-xs text-muted-foreground">{taskCount} tasks</span>
                       <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); openEdit(p); }}>
+                          <Pencil className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={e => { e.stopPropagation(); deleteProject(p.id); }}>
                           <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
                         </Button>

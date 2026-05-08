@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { ReportStatCard } from "./ReportStatCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 import {
   BarChart,
   Bar,
@@ -28,6 +29,7 @@ import type { DateRange } from "@/lib/reports";
 import { downloadCSV, COLORS, statusColors } from "@/lib/reports";
 
 export function PipelineReport({ range }: { range: DateRange }) {
+  const { organizationId } = useOrganization();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalDeals: 0,
@@ -40,18 +42,22 @@ export function PipelineReport({ range }: { range: DateRange }) {
 
   useEffect(() => {
     fetchPipelineReport();
-  }, [range.start, range.end]);
+  }, [range.start, range.end, organizationId]);
 
   async function fetchPipelineReport() {
     try {
       setLoading(true);
-      const { data: dealsData } = await supabase
+      let query = supabase
         .from("deals")
         .select(
           "id, name, value, stage, probability, status, expected_close_date, created_at, contacts:contact_id (first_name, last_name, company)"
         )
         .gte("created_at", range.start)
         .lte("created_at", range.end);
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data: dealsData } = await query;
 
       const dealsList = (dealsData || []).map((d: any) => ({
         ...d,
@@ -101,144 +107,71 @@ export function PipelineReport({ range }: { range: DateRange }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <ReportStatCard
           icon={GitBranch}
-          iconColor="#6452db"
-          value={stats.totalDeals.toString()}
           label="Total Deals"
+          value={stats.totalDeals.toString()}
+          trend="up"
+          trendValue=""
         />
         <ReportStatCard
           icon={DollarSign}
-          iconColor="#ff8964"
+          label="Total Value"
           value={`$${stats.totalValue.toLocaleString()}`}
-          label="Pipeline Value"
+          trend="up"
+          trendValue=""
         />
         <ReportStatCard
           icon={BarChart3}
-          iconColor="#5683da"
-          value={`$${stats.avgDealSize.toLocaleString()}`}
           label="Avg Deal Size"
+          value={`$${stats.avgDealSize.toLocaleString()}`}
+          trend="up"
+          trendValue=""
         />
         <ReportStatCard
           icon={TrendingUp}
-          iconColor="#8dc572"
-          value={stats.winRate}
           label="Win Rate"
+          value={stats.winRate}
+          trend="up"
+          trendValue=""
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 bg-card border-border">
-          <CardHeader className="pb-2 flex flex-row items-center justify-between">
-            <CardTitle className="text-foreground text-base font-medium">
-              Deals by Stage
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() =>
-                downloadCSV(
-                  stageData.map((d: any) => ({
-                    Stage: d.name,
-                    "Deal Count": d.value,
-                  })),
-                  "pipeline-stage-report.csv"
-                )
-              }
-              className="text-muted-foreground hover:text-foreground hover:bg-accent"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Deals by Stage</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={stageData}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
-                />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    color: "hsl(var(--card-foreground))",
-                  }}
-                />
-                <Bar
-                  dataKey="value"
-                  fill="hsl(var(--primary))"
-                  radius={[4, 4, 0, 0]}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--card-foreground))" }} />
+                <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-foreground text-base font-medium">
-              Stage Distribution
-            </CardTitle>
+            <CardTitle className="text-base">Recent Deals</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={stageData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {stageData.map((_: any, index: number) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    color: "hsl(var(--card-foreground))",
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="space-y-1 mt-2">
-              {stageData.map((entry: any, index: number) => (
-                <div
-                  key={entry.name}
-                  className="flex items-center justify-between text-xs"
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{
-                        backgroundColor: COLORS[index % COLORS.length],
-                      }}
-                    />
-                    <span className="text-muted-foreground">{entry.name}</span>
+            <div className="space-y-2 max-h-[250px] overflow-y-auto">
+              {deals.slice(0, 8).map((deal: any) => (
+                <div key={deal.id} className="flex items-center justify-between p-2 rounded bg-muted border border-border/50 text-sm">
+                  <div>
+                    <span className="text-foreground">{deal.name}</span>
+                    {deal.contacts && <span className="text-muted-foreground ml-2">· {deal.contacts.first_name} {deal.contacts.last_name}</span>}
                   </div>
-                  <span className="text-foreground">{entry.value}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-foreground">${(deal.value || 0).toLocaleString()}</span>
+                    <Badge variant="secondary" className={`text-xs ${statusColors[deal.status] || "bg-muted text-muted-foreground"}`}>{deal.stage}</Badge>
+                  </div>
                 </div>
               ))}
             </div>
@@ -246,100 +179,9 @@ export function PipelineReport({ range }: { range: DateRange }) {
         </Card>
       </div>
 
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="text-foreground text-base font-medium">
-            Deal Details
-          </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() =>
-              downloadCSV(
-                deals.map((d: any) => ({
-                  Name: d.name,
-                  Company: d.contacts?.company || "-",
-                  Stage: d.stage,
-                  Value: d.value || 0,
-                  Probability: `${d.probability || 0}%`,
-                  Status: d.status,
-                })),
-                "deals-report.csv"
-              )
-            }
-            className="text-muted-foreground hover:text-foreground hover:bg-accent"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export CSV
-          </Button>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
-                    Deal
-                  </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
-                    Company
-                  </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
-                    Stage
-                  </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
-                    Value
-                  </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase">
-                    Probability
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {deals.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="py-12 text-center text-sm text-muted-foreground"
-                    >
-                      No deals in selected period
-                    </td>
-                  </tr>
-                )}
-                {deals.map((deal: any) => (
-                  <tr
-                    key={deal.id}
-                    className="border-b border-border/50 hover:bg-accent/50"
-                  >
-                    <td className="py-3 px-4 text-sm text-foreground font-medium">
-                      {deal.name}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">
-                      {deal.contacts?.company || "-"}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge
-                        variant="secondary"
-                        className={`text-xs ${
-                          statusColors[deal.status] || statusColors.open
-                        }`}
-                      >
-                        {deal.stage}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-foreground">
-                      ${(deal.value || 0).toLocaleString()}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">
-                      {deal.probability || 0}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      <Button variant="outline" size="sm" onClick={() => downloadCSV(deals, "pipeline")}>
+        <Download className="w-4 h-4 mr-2" />Export CSV
+      </Button>
     </div>
   );
 }

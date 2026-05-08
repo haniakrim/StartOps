@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { TimeTracker } from "@/components/timesheets/TimeTracker";
 import { RecentSessions } from "@/components/timesheets/RecentSessions";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface TimeEntry {
   id: string;
@@ -44,6 +45,7 @@ interface ProjectTask {
 }
 
 export default function Timesheets() {
+  const { organizationId } = useOrganization();
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<ProjectTask[]>([]);
@@ -68,11 +70,17 @@ export default function Timesheets() {
   async function fetchData() {
     try {
       setLoading(true);
-      const { data: entryData, error: entryError } = await supabase
-        .from("time_entries")
-        .select(`*, projects:project_id (name), project_tasks:task_id (name)`)
-        .order("date", { ascending: false })
-        .limit(100);
+      let entryQuery = supabase.from("time_entries").select(`*, projects:project_id (name), project_tasks:task_id (name)`).order("date", { ascending: false }).limit(100);
+      let projQuery = supabase.from("projects").select("id, name").order("name");
+      let taskQuery = supabase.from("project_tasks").select("id, name, project_id").order("name");
+
+      if (organizationId) {
+        entryQuery = entryQuery.eq("organization_id", organizationId);
+        projQuery = projQuery.eq("organization_id", organizationId);
+        taskQuery = taskQuery.eq("organization_id", organizationId);
+      }
+
+      const { data: entryData, error: entryError } = await entryQuery;
       if (entryError) throw entryError;
       setEntries((entryData || []).map((d: any) => ({
         ...d,
@@ -80,10 +88,10 @@ export default function Timesheets() {
         project_tasks: d.project_tasks?.[0] ?? null,
       })));
 
-      const { data: projData } = await supabase.from("projects").select("id, name").order("name");
+      const { data: projData } = await projQuery;
       setProjects(projData || []);
 
-      const { data: taskData } = await supabase.from("project_tasks").select("id, name, project_id").order("name");
+      const { data: taskData } = await taskQuery;
       setTasks(taskData || []);
     } catch (error: any) {
       toast.error("Failed to load timesheets: " + error.message);

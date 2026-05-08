@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface SupportTicket {
   id: string;
@@ -62,6 +63,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Support() {
+  const { organizationId } = useOrganization();
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -79,10 +81,11 @@ export default function Support() {
   async function fetchTickets() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("support_tickets")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase.from("support_tickets").select("*").order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       setTickets(data || []);
     } catch (error: any) {
@@ -95,13 +98,15 @@ export default function Support() {
   async function createTicket(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const { error } = await supabase.from("support_tickets").insert({
+      const insertPayload: any = {
         subject: newTicket.subject,
         description: newTicket.description,
         category: newTicket.category,
         priority: newTicket.priority,
         status: "open",
-      });
+      };
+      if (organizationId) insertPayload.organization_id = organizationId;
+      const { error } = await supabase.from("support_tickets").insert(insertPayload);
       if (error) throw error;
       toast.success("Support ticket created");
       setDialogOpen(false);

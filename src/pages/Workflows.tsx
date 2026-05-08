@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Workflow {
   id: string;
@@ -47,6 +48,7 @@ const actionTypes = [
 ];
 
 export default function Workflows() {
+  const { organizationId } = useOrganization();
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -73,10 +75,11 @@ export default function Workflows() {
   async function fetchWorkflows() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("workflows")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase.from("workflows").select("*").order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       setWorkflows(data || []);
     } catch (error: any) {
@@ -89,7 +92,7 @@ export default function Workflows() {
   async function saveWorkflow(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const payload = {
+      const payload: any = {
         name: form.name,
         description: form.description || null,
         trigger_type: form.trigger_type,
@@ -97,6 +100,7 @@ export default function Workflows() {
         actions: form.actions,
         is_active: true,
       };
+      if (organizationId) payload.organization_id = organizationId;
 
       if (editingWorkflow) {
         const { error } = await supabase.from("workflows").update(payload).eq("id", editingWorkflow.id);

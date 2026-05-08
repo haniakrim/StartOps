@@ -11,6 +11,7 @@ import { QuotePreview } from "@/components/quotes/QuotePreview";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Quote { id: string; quote_number: string; title: string | null; status: string; subtotal: number; tax_rate: number; tax_amount: number; total: number; valid_until: string | null; notes: string | null; terms: string | null; created_at: string; contacts: { first_name: string; last_name: string; company: string | null; email: string | null } | null; deals: { name: string } | null; }
 interface QuoteItem { id: string; description: string; quantity: number; unit_price: number; discount_percent: number; total: number; products: { name: string } | null; }
@@ -23,6 +24,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Quotes() {
+  const { organizationId } = useOrganization();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -37,7 +39,16 @@ export default function Quotes() {
   useRealtimeTable("quotes", fetchQuotes);
 
   async function fetchQuotes() {
-    try { setLoading(true); const { data, error } = await supabase.from("quotes").select(`id, quote_number, title, status, subtotal, tax_rate, tax_amount, total, valid_until, notes, terms, created_at, contacts:contact_id (first_name, last_name, company, email), deals:deal_id (name)`).order("created_at", { ascending: false }); if (error) throw error; setQuotes((data || []).map((d: any) => ({ ...d, contacts: d.contacts?.[0] ?? null, deals: d.deals?.[0] ?? null }))); } catch (error: any) { toast.error("Failed: " + error.message); } finally { setLoading(false); }
+    try {
+      setLoading(true);
+      let query = supabase.from("quotes").select(`id, quote_number, title, status, subtotal, tax_rate, tax_amount, total, valid_until, notes, terms, created_at, contacts:contact_id (first_name, last_name, company, email), deals:deal_id (name)`).order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      setQuotes((data || []).map((d: any) => ({ ...d, contacts: d.contacts?.[0] ?? null, deals: d.deals?.[0] ?? null })));
+    } catch (error: any) { toast.error("Failed: " + error.message); } finally { setLoading(false); }
   }
   async function fetchQuoteItems(quoteId: string) { const { data } = await supabase.from("quote_items").select("*, products:product_id (name)").eq("quote_id", quoteId); return (data || []).map((d: any) => ({ ...d, products: d.products?.[0] ?? null })); }
   async function openPreview(quote: Quote) { const items = await fetchQuoteItems(quote.id); setSelectedItems(items); setSelectedQuote(quote); setPreviewOpen(true); }
