@@ -77,7 +77,7 @@ export default function Inventory() {
         <Card className="bg-hp-red/5 border-hp-red/20"><CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-hp-red" />Reorder Required</CardTitle></CardHeader><CardContent>{lowStock.map(p => (
           <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border mb-2">
             <div><p className="text-sm font-medium text-foreground">{p.name}</p><p className="text-xs text-muted-foreground">{p.sku || "No SKU"}</p></div>
-            <div className="flex items-center gap-3"><Badge className="bg-hp-red/20 text-hp-red border-0">{p.quantity_on_hand} left</Badge><Button size="sm" className="h-7 text-xs"><ShoppingCart className="w-3 h-3 mr-1" />Reorder</Button></div>
+            <div className="flex items-center gap-3"><Badge className="bg-hp-red/20 text-hp-red border-0">{p.quantity_on_hand} left</Badge><Button size="sm" className="h-7 text-xs" onClick={() => { setNewProduct({ name: p.name, sku: p.sku || "", category: p.category || "", unit_price: String(p.unit_price || 0), cost_price: String(p.cost_price || 0), quantity_on_hand: String((p.quantity_on_hand || 0) + Math.max(p.reorder_point - p.quantity_on_hand, 0) * 2), reorder_point: String(p.reorder_point || 0) }); setDialogOpen(true); }}><ShoppingCart className="w-3 h-3 mr-1" />Reorder</Button></div>
           </div>
         ))}</CardContent></Card>
       )}

@@ -64,7 +64,22 @@ const Notifications = () => {
   };
 
   if (loading) {
-    return <div className="p-8">Loading notifications...</div>;
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Notifications</h1>
+          <p className="text-muted-foreground">Stay updated on your CRM activity</p>
+        </div>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} className="animate-pulse">
+            <CardContent className="p-5">
+              <div className="h-4 bg-muted rounded w-1/3 mb-2"></div>
+              <div className="h-3 bg-muted rounded w-2/3"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
   }
 
   return (

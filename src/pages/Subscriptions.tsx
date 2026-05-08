@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Subscription {
   id: string;
@@ -43,6 +44,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Subscriptions() {
+  const { organizationId } = useOrganization();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -62,10 +64,11 @@ export default function Subscriptions() {
   async function fetchSubscriptions() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("subscriptions")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase.from("subscriptions").select("*").order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       setSubscriptions(data || []);
     } catch (error: any) {
@@ -81,7 +84,7 @@ export default function Subscriptions() {
       const price = parseFloat(newSub.plan_price) || 0;
       const mrr = newSub.billing_cycle === "monthly" ? price : price / 12;
       const arr = mrr * 12;
-      const { error } = await supabase.from("subscriptions").insert({
+      const insertPayload: any = {
         customer_name: newSub.customer_name,
         customer_email: newSub.customer_email,
         plan_name: newSub.plan_name,
@@ -93,7 +96,9 @@ export default function Subscriptions() {
         arr,
         start_date: new Date().toISOString(),
         next_billing_date: new Date(Date.now() + 30 * 86400000).toISOString(),
-      });
+      };
+      if (organizationId) insertPayload.organization_id = organizationId;
+      const { error } = await supabase.from("subscriptions").insert(insertPayload);
       if (error) throw error;
       toast.success("Subscription created");
       setDialogOpen(false);

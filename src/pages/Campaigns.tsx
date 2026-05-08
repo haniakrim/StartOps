@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 interface Campaign {
   id: string;
@@ -43,6 +44,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Campaigns() {
+  const { organizationId } = useOrganization();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -54,16 +56,17 @@ export default function Campaigns() {
     scheduled_at: "",
   });
 
-  useEffect(() => { fetchCampaigns(); }, []);
-  useRealtimeTable("campaigns", fetchCampaigns);
+  useEffect(() => { fetchCampaigns(); }, [organizationId]);
+  useRealtimeTable("campaigns", fetchCampaigns, [organizationId], organizationId);
 
   async function fetchCampaigns() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("campaigns")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase.from("campaigns").select("*").order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       setCampaigns(data || []);
     } catch (error: any) {
@@ -76,7 +79,7 @@ export default function Campaigns() {
   async function createCampaign(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const { error } = await supabase.from("campaigns").insert({
+      const insertPayload: any = {
         name: newCampaign.name,
         subject: newCampaign.subject,
         type: newCampaign.type,
@@ -85,7 +88,9 @@ export default function Campaigns() {
         recipient_count: 0,
         open_count: 0,
         click_count: 0,
-      });
+      };
+      if (organizationId) insertPayload.organization_id = organizationId;
+      const { error } = await supabase.from("campaigns").insert(insertPayload);
       if (error) throw error;
       toast.success("Campaign created");
       setDialogOpen(false);

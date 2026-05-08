@@ -54,10 +54,14 @@ export default function Forecasts() {
   async function fetchForecasts() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from("forecasts")
         .select("*")
         .order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       setForecasts(data || []);
       if (data && data.length > 0 && !activeForecast) {
@@ -149,21 +153,22 @@ export default function Forecasts() {
       }, 0) || 0;
       const stdDev = Math.sqrt(variance / Math.max(deals?.length || 1, 1));
 
-      const { error } = await supabase.from("forecasts").insert({
+      const insertPayload: any = {
         name: `AI Forecast ${new Date().toLocaleDateString()}`,
         period: new Date().toLocaleString("default", { month: "short", year: "numeric" }),
         projected_revenue: totalValue,
         weighted_revenue: weighted,
         confidence_low: Math.max(0, weighted - stdDev * 1.5),
         confidence_high: weighted + stdDev * 1.5,
-        organization_id: organizationId,
         factors: [
           { name: "Pipeline Value", value: totalValue },
           { name: "Win Probability", value: deals?.length ? Math.round(deals.reduce((s, d) => s + (d.probability || 0), 0) / deals.length) : 0 },
           { name: "Active Deals", value: deals?.length || 0 },
         ],
-      });
+      };
+      if (organizationId) insertPayload.organization_id = organizationId;
 
+      const { error } = await supabase.from("forecasts").insert(insertPayload);
       if (error) throw error;
       toast.success("AI forecast generated from live pipeline data");
       fetchForecasts();

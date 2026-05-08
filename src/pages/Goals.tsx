@@ -9,8 +9,10 @@ import { GoalChart } from "@/components/goals/GoalChart";
 import { GoalCard, type Goal } from "@/components/goals/GoalCard";
 import { GoalForm } from "@/components/goals/GoalForm";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useOrganization } from "@/hooks/useOrganization";
 
 export default function Goals() {
+  const { organizationId } = useOrganization();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -18,20 +20,24 @@ export default function Goals() {
 
   useEffect(() => {
     fetchGoals();
-  }, []);
-  useRealtimeTable("goals", fetchGoals);
-  useRealtimeTable("key_results", fetchGoals);
+  }, [organizationId]);
+  useRealtimeTable("goals", fetchGoals, [organizationId], organizationId);
+  useRealtimeTable("key_results", fetchGoals, [organizationId], organizationId);
 
   async function fetchGoals() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from("goals")
         .select(`
           *,
           key_results (*)
         `)
         .order("created_at", { ascending: false });
+      if (organizationId) {
+        query = query.eq("organization_id", organizationId);
+      }
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -56,15 +62,19 @@ export default function Goals() {
     key_results: { name: string; current_value: string; target_value: string; unit: string }[];
   }) {
     try {
+      const orgId = organizationId || null;
+      const insertPayload: any = {
+        name: data.name,
+        description: data.description || null,
+        period: data.period,
+        status: data.status,
+        progress: 0,
+      };
+      if (orgId) insertPayload.organization_id = orgId;
+
       const { data: goalData, error: goalError } = await supabase
         .from("goals")
-        .insert({
-          name: data.name,
-          description: data.description || null,
-          period: data.period,
-          status: data.status,
-          progress: 0,
-        })
+        .insert(insertPayload)
         .select()
         .single();
 

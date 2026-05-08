@@ -32,10 +32,11 @@ export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [typeFilter, setTypeFilter] = useState("all");
-
   const [newEvent, setNewEvent] = useState({
     title: "", type: "activity", date: "", time: "", description: "",
   });
+
+  const { organizationId } = useOrganization();
 
   useEffect(() => { fetchEvents(); }, [currentDate]);
 
@@ -45,12 +46,22 @@ export default function Calendar() {
       const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
+      let actQuery = supabase.from("activities").select("id, subject, due_date, status, type, description").gte("due_date", startOfMonth.toISOString()).lte("due_date", endOfMonth.toISOString());
+      let dealsQuery = supabase.from("deals").select("id, name, expected_close_date, stage, status").gte("expected_close_date", startOfMonth.toISOString()).lte("expected_close_date", endOfMonth.toISOString());
+      let invQuery = supabase.from("invoices").select("id, invoice_number, due_date, status, amount").gte("due_date", startOfMonth.toISOString()).lte("due_date", endOfMonth.toISOString());
+      let projQuery = supabase.from("projects").select("id, name, end_date, status").gte("end_date", startOfMonth.toISOString()).lte("end_date", endOfMonth.toISOString());
+      let taskQuery = supabase.from("project_tasks").select("id, name, due_date, status").gte("due_date", startOfMonth.toISOString()).lte("due_date", endOfMonth.toISOString());
+
+      if (organizationId) {
+        actQuery = actQuery.eq("organization_id", organizationId);
+        dealsQuery = dealsQuery.eq("organization_id", organizationId);
+        invQuery = invQuery.eq("organization_id", organizationId);
+        projQuery = projQuery.eq("organization_id", organizationId);
+        taskQuery = taskQuery.eq("organization_id", organizationId);
+      }
+
       const [actsRes, dealsRes, invoicesRes, projectsRes, tasksRes] = await Promise.all([
-        supabase.from("activities").select("id, subject, due_date, status, type, description").gte("due_date", startOfMonth.toISOString()).lte("due_date", endOfMonth.toISOString()),
-        supabase.from("deals").select("id, name, expected_close_date, stage, status").gte("expected_close_date", startOfMonth.toISOString()).lte("expected_close_date", endOfMonth.toISOString()),
-        supabase.from("invoices").select("id, invoice_number, due_date, status, amount").gte("due_date", startOfMonth.toISOString()).lte("due_date", endOfMonth.toISOString()),
-        supabase.from("projects").select("id, name, end_date, status").gte("end_date", startOfMonth.toISOString()).lte("end_date", endOfMonth.toISOString()),
-        supabase.from("project_tasks").select("id, name, due_date, status").gte("due_date", startOfMonth.toISOString()).lte("due_date", endOfMonth.toISOString()),
+        actQuery, dealsQuery, invQuery, projQuery, taskQuery,
       ]);
 
       const allEvents: CalendarEvent[] = [
@@ -88,8 +99,6 @@ export default function Calendar() {
       setLoading(false);
     }
   }
-
-  const { organizationId } = useOrganization();
 
   async function createEvent(e: React.FormEvent) {
     e.preventDefault();

@@ -7,7 +7,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { Search, Clock } from "lucide-react";
+import {
+  LayoutDashboard, Users, Building2, GitBranch, FileText, Mail,
+  Calendar as CalendarIcon, FolderKanban, Package, DollarSign, Clock,
+  Clock as ClockIcon, BrainCircuit, Target, BarChart3, FileBarChart,
+  Zap, Send, BookOpen, ListFilter, FolderOpen, Sparkles, Bell,
+  CreditCard, Settings, Shield, Webhook, FileSearch, LifeBuoy, Cog,
+  Search as SearchIcon
+} from "lucide-react";
 
 const RECENT_KEY = "startops_recent";
 const MAX_RECENT = 5;
@@ -16,23 +23,55 @@ interface CommandItem {
   id: string;
   label: string;
   path: string;
-  icon?: React.ReactNode;
+  icon: React.ElementType;
 }
 
 const commands: CommandItem[] = [
-  { id: "dashboard", label: "Go to Dashboard", path: "/" },
-  { id: "contacts", label: "Go to Contacts", path: "/contacts" },
-  { id: "deals", label: "Go to Deals", path: "/deals" },
-  { id: "organizations", label: "Go to Organizations", path: "/organizations" },
-  { id: "settings", label: "Go to Settings", path: "/settings" },
-  { id: "security", label: "Go to Security", path: "/security" },
-  { id: "notifications", label: "Go to Notifications", path: "/notifications" },
+  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { id: "today", label: "Today", path: "/today", icon: Clock },
+  { id: "activities", label: "Activities", path: "/activities", icon: ClockIcon },
+  { id: "contacts", label: "Contacts", path: "/contacts", icon: Users },
+  { id: "companies", label: "Companies", path: "/companies", icon: Building2 },
+  { id: "deals", label: "Deals", path: "/deals", icon: GitBranch },
+  { id: "quotes", label: "Quotes", path: "/quotes", icon: FileText },
+  { id: "communications", label: "Communications", path: "/communications", icon: Mail },
+  { id: "calendar", label: "Calendar", path: "/calendar", icon: CalendarIcon },
+  { id: "projects", label: "Projects", path: "/projects", icon: FolderKanban },
+  { id: "inventory", label: "Inventory", path: "/inventory", icon: Package },
+  { id: "finance", label: "Finance", path: "/finance", icon: DollarSign },
+  { id: "timesheets", label: "Timesheets", path: "/timesheets", icon: ClockIcon },
+  { id: "employees", label: "People", path: "/employees", icon: Users },
+  { id: "forecasts", label: "Forecasts", path: "/forecasts", icon: BrainCircuit },
+  { id: "goals", label: "Goals", path: "/goals", icon: Target },
+  { id: "analytics", label: "Analytics", path: "/analytics", icon: BarChart3 },
+  { id: "reports", label: "Reports", path: "/reports", icon: FileBarChart },
+  { id: "workflows", label: "Workflows", path: "/workflows", icon: Zap },
+  { id: "campaigns", label: "Campaigns", path: "/campaigns", icon: Send },
+  { id: "email-templates", label: "Email Templates", path: "/email-templates", icon: BookOpen },
+  { id: "custom-fields", label: "Custom Fields", path: "/custom-fields", icon: ListFilter },
+  { id: "documents", label: "Documents", path: "/documents", icon: FolderOpen },
+  { id: "assistant", label: "AI Assistant", path: "/assistant", icon: Sparkles },
+  { id: "notifications", label: "Notifications", path: "/notifications", icon: Bell },
+  { id: "subscriptions", label: "Subscriptions", path: "/subscriptions", icon: CreditCard },
+  { id: "organization", label: "Organization", path: "/organization", icon: Settings },
+  { id: "security", label: "Security", path: "/security", icon: Shield },
+  { id: "api", label: "API & Webhooks", path: "/api", icon: Webhook },
+  { id: "audit", label: "Audit Logs", path: "/audit", icon: FileSearch },
+  { id: "support", label: "Support", path: "/support", icon: LifeBuoy },
+  { id: "settings", label: "Settings", path: "/settings", icon: Cog },
 ];
 
 function getRecentCommands(): CommandItem[] {
   try {
     const stored = sessionStorage.getItem(RECENT_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    const parsed = JSON.parse(stored);
+    // Filter out any stored items that don't have a valid icon reference
+    const validIds = new Set(commands.map(c => c.id));
+    return parsed.filter((c: any) => validIds.has(c.id)).map((c: any) => {
+      const full = commands.find(cmd => cmd.id === c.id);
+      return full || c;
+    });
   } catch {
     return [];
   }
@@ -89,7 +128,7 @@ const CommandPalette = () => {
         </DialogHeader>
         <div className="space-y-2">
           <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Type a command..."
               value={search}
@@ -105,14 +144,15 @@ const CommandPalette = () => {
                   <Clock className="h-3 w-3" /> Recent
                 </p>
                 {recentCommands.map((command) => (
-                  <button
-                    key={command.id}
-                    onClick={() => handleSelect(command)}
-                    className="w-full text-left px-3 py-2 rounded-md hover:bg-accent text-sm"
-                  >
-                    {command.label}
-                  </button>
-                ))}
+                    <button
+                      key={command.id}
+                      onClick={() => handleSelect(command)}
+                      className="w-full flex items-center gap-2 text-left px-3 py-2 rounded-md hover:bg-accent text-sm"
+                    >
+                      <command.icon className="w-4 h-4 text-muted-foreground" />
+                      {command.label}
+                    </button>
+                  ))}
                 <div className="border-t my-2" />
               </>
             )}
@@ -120,8 +160,9 @@ const CommandPalette = () => {
               <button
                 key={command.id}
                 onClick={() => handleSelect(command)}
-                className="w-full text-left px-3 py-2 rounded-md hover:bg-accent text-sm"
+                className="w-full flex items-center gap-2 text-left px-3 py-2 rounded-md hover:bg-accent text-sm"
               >
+                <command.icon className="w-4 h-4 text-muted-foreground" />
                 {command.label}
               </button>
             ))}

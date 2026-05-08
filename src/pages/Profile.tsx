@@ -298,7 +298,7 @@ export default function Profile() {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => toast.info("Coming soon: Two-factor authentication setup")}>
                   Enable
                 </Button>
               </div>
@@ -316,7 +316,7 @@ export default function Profile() {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => window.location.href = "/security"}>
                   Update
                 </Button>
               </div>
@@ -334,7 +334,7 @@ export default function Profile() {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => toast.info("Session management coming soon")}>
                   Manage
                 </Button>
               </div>

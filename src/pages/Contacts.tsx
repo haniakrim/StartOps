@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Trash2, Pencil, SearchX, X } from "lucide-react";
+import { Upload, Plus, Trash2, Pencil, Search, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { validateCsvData } from "@/lib/csv-validation";
 
@@ -269,7 +269,7 @@ const Contacts = () => {
       </div>
 
       <div className="relative max-w-md mb-4">
-        <SearchX className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search contacts..."
           value={search}
