@@ -25,10 +25,25 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      let { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      // If user doesn't exist with these credentials, auto-signup the demo user
+      if (error?.message?.toLowerCase().includes("invalid login credentials")) {
+        const signup = await supabase.auth.signUp({
+          email,
+          password,
+        });
+
+        if (signup.data?.session) {
+          data = signup.data;
+          error = null;
+        } else {
+          error = signup.error;
+        }
+      }
 
       if (error) {
         toast({
@@ -39,7 +54,7 @@ const Login = () => {
         return;
       }
 
-      if (!data.session) {
+      if (!data?.session) {
         toast({
           title: "Authentication failed",
           description: "No session returned. Please try again.",
@@ -49,7 +64,7 @@ const Login = () => {
       }
 
       // Manually persist the session to ensure storage adapter writes it
-      const setResult = await supabase.auth.setSession({
+      await supabase.auth.setSession({
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
       });
