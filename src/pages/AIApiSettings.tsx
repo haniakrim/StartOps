@@ -411,13 +411,13 @@ export default function AIApiSettings() {
         <CardHeader>
           <CardTitle className="text-foreground text-base">Quick Start</CardTitle>
           <CardDescription className="text-muted-foreground text-sm">
-            Common OpenAI-compatible providers you can add
+            Pre-fill common OpenAI-compatible providers
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 pt-0 space-y-3">
           <button
             onClick={() => {
-              setForm({ name: "Ollama Cloud", baseUrl: "https://ollama.com/v1", apiKey: "", defaultModel: "llama3" });
+              setForm({ name: "Local Ollama", baseUrl: "http://localhost:11434/v1", apiKey: "", defaultModel: "llama3" });
               setEditingId(null);
               setDialogOpen(true);
             }}
@@ -425,12 +425,47 @@ export default function AIApiSettings() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-foreground">Ollama Cloud</p>
-                <p className="text-xs text-muted-foreground">https://ollama.com/v1</p>
+                <p className="text-sm font-medium text-foreground">Local Ollama</p>
+                <p className="text-xs text-muted-foreground">http://localhost:11434/v1 · requires CORS</p>
               </div>
               <Plus className="w-4 h-4 text-muted-foreground" />
             </div>
           </button>
+          <button
+            onClick={() => {
+              setForm({ name: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", apiKey: "", defaultModel: "anthropic/claude-3.5-sonnet" });
+              setEditingId(null);
+              setDialogOpen(true);
+            }}
+            className="w-full text-left p-3 rounded-lg border border-border bg-muted/50 hover:bg-muted transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">OpenRouter</p>
+                <p className="text-xs text-muted-foreground">https://openrouter.ai/api/v1 · requires API key</p>
+              </div>
+              <Plus className="w-4 h-4 text-muted-foreground" />
+            </div>
+          </button>
+          <button
+            onClick={() => {
+              setForm({ name: "Groq", baseUrl: "https://api.groq.com/openai/v1", apiKey: "", defaultModel: "llama3-70b-8192" });
+              setEditingId(null);
+              setDialogOpen(true);
+            }}
+            className="w-full text-left p-3 rounded-lg border border-border bg-muted/50 hover:bg-muted transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">Groq</p>
+                <p className="text-xs text-muted-foreground">https://api.groq.com/openai/v1 · requires API key</p>
+              </div>
+              <Plus className="w-4 h-4 text-muted-foreground" />
+            </div>
+          </button>
+          <p className="text-xs text-muted-foreground/60 pt-1">
+            For local Ollama, run: <code className="bg-muted rounded px-1">OLLAMA_ORIGINS=* ollama serve</code> to enable browser access.
+          </p>
         </CardContent>
       </Card>
 
