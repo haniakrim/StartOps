@@ -85,6 +85,7 @@ interface TestResult {
   chatError?: string;
   chatErrorType?: string;
   chatResponse?: string;
+  chatModel?: string;
   latencyMs: number;
 }
 
@@ -243,34 +244,47 @@ export default function AIApiSettings() {
       result.connectionError = error.message || String(error);
     }
 
-    // Step 2: Test chat completion
-    try {
-      const chatUrl = `${provider.baseUrl.replace(/\/$/, "")}/chat/completions`;
-      const testModel = provider.defaultModel || result.models?.[0] || "";
-      const chatRes = await fetch(chatUrl, {
-        method: "POST",
-        headers: chatHeaders(),
-        body: JSON.stringify({
-          model: testModel,
-          messages: [{ role: "user", content: "Say exactly: OK" }],
-          max_tokens: 10,
-          temperature: 0,
-        }),
-      });
+    // Step 2: Test chat completion (try default model, fallback to discovered models)
+    const chatModels = [provider.defaultModel, ...(result.models || [])].filter(Boolean) as string[];
+    for (const model of [...new Set(chatModels)].slice(0, 4)) {
+      try {
+        const chatUrl = `${provider.baseUrl.replace(/\/$/, "")}/chat/completions`;
+        const chatRes = await fetch(chatUrl, {
+          method: "POST",
+          headers: chatHeaders(),
+          body: JSON.stringify({
+            model,
+            messages: [{ role: "user", content: "Say exactly: OK" }],
+            max_tokens: 10,
+            temperature: 0,
+          }),
+        });
 
-      if (chatRes.ok) {
-        const data = await chatRes.json().catch(() => ({}));
-        const content = data.choices?.[0]?.message?.content;
-        result.chatOk = true;
-        result.chatResponse = content;
-      } else {
-        const body = await chatRes.text().catch(() => "");
-        result.chatError = `${chatRes.status}: ${body.slice(0, 200)}`;
+        if (chatRes.ok) {
+          const data = await chatRes.json().catch(() => ({}));
+          const content = data.choices?.[0]?.message?.content;
+          result.chatOk = true;
+          result.chatResponse = content;
+          result.chatModel = model;
+          break;
+        } else {
+          const body = await chatRes.text().catch(() => "");
+          const err = `${chatRes.status}: ${body.slice(0, 200)}`;
+          // Only record the last error if all models fail
+          result.chatError = err;
+          if (body.toLowerCase().includes("model") && chatRes.status === 404) {
+            // Model not found, try next
+            continue;
+          }
+          // Non-model error, don't retry
+          break;
+        }
+      } catch (error: any) {
+        console.error("[AI Test] Chat error:", error);
+        result.chatErrorType = error?.name || "Error";
+        result.chatError = error.message || String(error);
+        break;
       }
-    } catch (error: any) {
-      console.error("[AI Test] Chat error:", error);
-      result.chatErrorType = error?.name || "Error";
-      result.chatError = error.message || String(error);
     }
 
     result.latencyMs = Math.round(performance.now() - start);
@@ -555,7 +569,7 @@ export default function AIApiSettings() {
       </Dialog>
 
       <Dialog open={testDialogOpen} onOpenChange={setTestDialogOpen}>
-        <DialogContent className="bg-card border-border text-card-foreground sm:max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-card-foreground sm:max-w-lg max-h-[80vh] overflow-y-auto overflow-x-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-primary" />
@@ -564,16 +578,16 @@ export default function AIApiSettings() {
           </DialogHeader>
           {testResult && (
             <div className="space-y-4 pt-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">{testResult.providerName}</span>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium text-foreground truncate">{testResult.providerName}</span>
                 <Badge
                   variant="outline"
                   className={
                     testResult.connectionOk && testResult.chatOk
-                      ? "border-emerald-500 text-emerald-500"
+                      ? "border-emerald-500 text-emerald-500 flex-shrink-0"
                       : testResult.connectionOk
-                      ? "border-amber-500 text-amber-500"
-                      : "border-destructive text-destructive"
+                      ? "border-amber-500 text-amber-500 flex-shrink-0"
+                      : "border-destructive text-destructive flex-shrink-0"
                   }
                 >
                   {testResult.connectionOk && testResult.chatOk
@@ -642,8 +656,11 @@ export default function AIApiSettings() {
                   )}
                 </div>
                 {testResult.chatOk ? (
-                  <div>
-                    <p className="text-xs text-emerald-500 mb-1">Inference working</p>
+                  <div className="space-y-1">
+                    <p className="text-xs text-emerald-500">Inference working</p>
+                    {testResult.chatModel && (
+                      <p className="text-xs text-muted-foreground">Model: {testResult.chatModel}</p>
+                    )}
                     {testResult.chatResponse && (
                       <p className="text-xs text-muted-foreground font-mono bg-background rounded px-2 py-1 border border-border">
                         Response: {testResult.chatResponse}
