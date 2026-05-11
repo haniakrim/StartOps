@@ -272,11 +272,11 @@ export default function AIApiSettings() {
           const err = `${chatRes.status}: ${body.slice(0, 200)}`;
           // Only record the last error if all models fail
           result.chatError = err;
-          if (body.toLowerCase().includes("model") && chatRes.status === 404) {
-            // Model not found, try next
+          if (chatRes.status === 404) {
+            // Model not found or endpoint missing — try next model
             continue;
           }
-          // Non-model error, don't retry
+          // Non-404 error (auth, rate limit, server error), don't retry
           break;
         }
       } catch (error: any) {
