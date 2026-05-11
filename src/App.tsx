@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
 import AppShell from "@/components/AppShell";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
@@ -105,15 +104,14 @@ function LazyProtected({ element: Element }: { element: React.ComponentType }) {
 }
 
 const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
               <Route path="/" element={<Index />} />
               <Route
                 path="/login"
@@ -172,7 +170,6 @@ const App = () => (
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
-</ErrorBoundary>
 );
 
 export default App;
