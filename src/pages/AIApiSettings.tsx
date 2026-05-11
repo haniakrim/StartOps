@@ -19,6 +19,41 @@ interface AIProvider {
 
 const STORAGE_KEY = "startops_ai_providers";
 
+function getTroubleshootingTips(result: TestResult): string[] {
+  const tips: string[] = [];
+  const err = (result.connectionError || "").toLowerCase();
+  const chatErr = (result.chatError || "").toLowerCase();
+
+  if (err.includes("load failed") || err.includes("network error") || err.includes("fetch")) {
+    tips.push("Check that the base URL is correct and the server is running.");
+    tips.push("For local Ollama, ensure CORS is enabled or use a proxy.");
+  }
+  if (err.includes("cors") || err.includes("blocked")) {
+    tips.push("CORS error: run Ollama with OLLAMA_ORIGINS=* or use a reverse proxy.");
+  }
+  if (result.connectionStatus === 401 || result.connectionStatus === 403 || err.includes("unauthorized")) {
+    tips.push("Authentication failed: verify your API key is correct and active.");
+  }
+  if (result.connectionStatus === 404) {
+    tips.push("Endpoint not found: confirm the base URL ends with /v1 (e.g. http://localhost:11434/v1).");
+  }
+  if (result.connectionStatus && result.connectionStatus >= 500) {
+    tips.push("Server error: the provider may be overloaded or misconfigured.");
+  }
+  if (result.connectionOk && !result.chatOk) {
+    if (chatErr.includes("model")) {
+      tips.push("No models available: pull a model first (e.g. ollama pull llama3).");
+    }
+    if (chatErr.includes("404")) {
+      tips.push("Chat endpoint missing: confirm the provider supports /chat/completions.");
+    }
+  }
+  if (!result.connectionOk && !result.chatOk && tips.length === 0) {
+    tips.push("Verify the URL and try the provider in a local curl request first.");
+  }
+  return tips;
+}
+
 function generateId() {
   return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
@@ -555,6 +590,28 @@ export default function AIApiSettings() {
                   <p className="text-xs text-destructive">{testResult.chatError}</p>
                 )}
               </div>
+
+              {/* Troubleshooting */}
+              {(() => {
+                const tips = getTroubleshootingTips(testResult);
+                if (tips.length === 0) return null;
+                return (
+                  <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500" />
+                      <span className="text-sm font-medium text-foreground">Troubleshooting</span>
+                    </div>
+                    <ul className="space-y-1">
+                      {tips.map((tip, i) => (
+                        <li key={i} className="text-xs text-amber-600 dark:text-amber-400 flex items-start gap-1.5">
+                          <span className="mt-0.5">•</span>
+                          <span>{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
 
               <div className="flex justify-end pt-2">
                 <Button size="sm" onClick={() => setTestDialogOpen(false)}>
