@@ -50,6 +50,7 @@ import { cn } from "@/lib/utils";
 import CommandPalette from "@/components/CommandPalette";
 import RealtimeNotifications from "@/components/RealtimeNotifications";
 import ThemeToggle from "@/components/ThemeToggle";
+import { prefetchRoutes } from "@/lib/prefetchRoutes";
 
 interface NavItem {
   path: string;
@@ -146,6 +147,10 @@ function SidebarNavItem({
   return (
     <NavLink
       to={item.path}
+      onMouseEnter={() => {
+        const prefetch = prefetchRoutes[item.path];
+        if (prefetch) prefetch();
+      }}
       className={cn(
         "group flex items-center gap-3 px-3 py-2 rounded-expo-lg text-sm font-medium transition-all duration-200 relative",
         isActive
