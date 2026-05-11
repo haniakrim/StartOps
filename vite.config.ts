@@ -31,6 +31,17 @@ export default defineConfig({
       "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.supabase.co; connect-src 'self' https://dtrwtbmxvscrfkzdpsqt.supabase.co https://*.supabase.co wss://dtrwtbmxvscrfkzdpsqt.supabase.co wss://*.supabase.co; font-src 'self'; base-uri 'self'; form-action 'self';",
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+          ui: ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-select", "@radix-ui/react-tabs"],
+          query: ["@tanstack/react-query"],
+        },
+      },
+    },
+  },
   clearScreen: false,
   ...(host
     ? {
