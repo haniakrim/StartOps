@@ -63,6 +63,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
+    if (!supabase.auth) {
+      setLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       const currentUser = session?.user ?? null;
@@ -95,12 +100,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      subscription?.unsubscribe?.();
     };
   }, [fetchUserData]);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await supabase.auth?.signOut?.();
   };
 
   return (
