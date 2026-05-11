@@ -13,6 +13,7 @@ interface AIProvider {
   name: string;
   baseUrl: string;
   apiKey: string;
+  defaultModel?: string;
   isDefault: boolean;
   createdAt: string;
 }
@@ -42,7 +43,7 @@ function getTroubleshootingTips(result: TestResult): string[] {
   }
   if (result.connectionOk && !result.chatOk) {
     if (chatErr.includes("model")) {
-      tips.push("No models available: pull a model first (e.g. ollama pull llama3).");
+      tips.push("No models available: set a Default Model in the provider settings or pull a model first (e.g. ollama pull llama3).");
     }
     if (chatErr.includes("404")) {
       tips.push("Chat endpoint missing: confirm the provider supports /chat/completions.");
@@ -97,6 +98,7 @@ export default function AIApiSettings() {
     name: "",
     baseUrl: "",
     apiKey: "",
+    defaultModel: "",
   });
 
   useEffect(() => {
@@ -104,7 +106,7 @@ export default function AIApiSettings() {
   }, [providers]);
 
   const resetForm = () => {
-    setForm({ name: "", baseUrl: "", apiKey: "" });
+    setForm({ name: "", baseUrl: "", apiKey: "", defaultModel: "" });
     setEditingId(null);
   };
 
@@ -118,6 +120,7 @@ export default function AIApiSettings() {
       name: provider.name,
       baseUrl: provider.baseUrl,
       apiKey: provider.apiKey,
+      defaultModel: provider.defaultModel || "",
     });
     setEditingId(provider.id);
     setDialogOpen(true);
@@ -134,7 +137,7 @@ export default function AIApiSettings() {
       setProviders((prev) =>
         prev.map((p) =>
           p.id === editingId
-            ? { ...p, name: form.name.trim(), baseUrl: form.baseUrl.trim(), apiKey: form.apiKey.trim() }
+            ? { ...p, name: form.name.trim(), baseUrl: form.baseUrl.trim(), apiKey: form.apiKey.trim(), defaultModel: form.defaultModel.trim() || undefined }
             : p
         )
       );
@@ -145,6 +148,7 @@ export default function AIApiSettings() {
         name: form.name.trim(),
         baseUrl: form.baseUrl.trim(),
         apiKey: form.apiKey.trim(),
+        defaultModel: form.defaultModel.trim() || undefined,
         isDefault: providers.length === 0,
         createdAt: new Date().toISOString(),
       };
@@ -222,6 +226,7 @@ export default function AIApiSettings() {
     // Step 2: Test chat completion
     try {
       const chatUrl = `${provider.baseUrl.replace(/\/$/, "")}/chat/completions`;
+      const testModel = provider.defaultModel || result.models?.[0] || "";
       const chatRes = await fetch(chatUrl, {
         method: "POST",
         headers: {
@@ -229,7 +234,7 @@ export default function AIApiSettings() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: result.models?.[0] || "",
+          model: testModel,
           messages: [{ role: "user", content: "Say exactly: OK" }],
           max_tokens: 10,
           temperature: 0,
@@ -328,6 +333,12 @@ export default function AIApiSettings() {
                         {provider.apiKey ? "••••••••" + provider.apiKey.slice(-4) : "No key"}
                       </span>
                     </div>
+                    {provider.defaultModel && (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                        <Brain className="w-3 h-3" />
+                        <span className="font-mono truncate">{provider.defaultModel}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-1 flex-shrink-0">
@@ -406,7 +417,7 @@ export default function AIApiSettings() {
         <CardContent className="p-6 pt-0 space-y-3">
           <button
             onClick={() => {
-              setForm({ name: "Ollama Cloud", baseUrl: "https://ollama.com/v1", apiKey: "" });
+              setForm({ name: "Ollama Cloud", baseUrl: "https://ollama.com/v1", apiKey: "", defaultModel: "llama3" });
               setEditingId(null);
               setDialogOpen(true);
             }}
@@ -469,6 +480,19 @@ export default function AIApiSettings() {
               />
               <p className="text-xs text-muted-foreground">
                 Optional for local providers like Ollama. Required for cloud endpoints.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="provider-model">Default Model</Label>
+              <Input
+                id="provider-model"
+                value={form.defaultModel}
+                onChange={(e) => setForm((p) => ({ ...p, defaultModel: e.target.value }))}
+                placeholder="llama3, gpt-4, kimi-k2.6..."
+                className="bg-muted border-border"
+              />
+              <p className="text-xs text-muted-foreground">
+                Model used for testing and chat completion. Required if model discovery fails.
               </p>
             </div>
             <div className="flex justify-end gap-2 pt-2">
