@@ -49,7 +49,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setProfile(profileData || null);
-      setOrganizationId(membershipData?.[0]?.organization_id ?? null);
+
+      let orgId = membershipData?.[0]?.organization_id ?? null;
+
+      // Auto-create a personal organization if user has none
+      if (!orgId && supabase?.from) {
+        try {
+          const { data: newOrg, error: orgError } = await supabase
+            .from("organizations")
+            .insert({ name: "My Organization" })
+            .select("id")
+            .single();
+
+          if (!orgError && newOrg?.id) {
+            await supabase
+              .from("organization_members")
+              .insert({ user_id: userId, organization_id: newOrg.id, role: "admin" });
+            orgId = newOrg.id;
+          }
+        } catch (err) {
+          console.log("[AuthContext] Auto-org creation skipped:", err);
+        }
+      }
+
+      setOrganizationId(orgId);
     } catch (err: any) {
       console.error("[AuthContext] Failed to fetch user data:", err);
       setProfile(null);
