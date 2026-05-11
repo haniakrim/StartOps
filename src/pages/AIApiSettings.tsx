@@ -196,15 +196,18 @@ export default function AIApiSettings() {
       latencyMs: 0,
     };
 
+    const makeHeaders = () => {
+      const h: Record<string, string> = { "Content-Type": "application/json" };
+      if (provider.apiKey) h.Authorization = `Bearer ${provider.apiKey}`;
+      return h;
+    };
+
     try {
       // Step 1: Test connectivity via /models
       const modelsUrl = `${provider.baseUrl.replace(/\/$/, "")}/models`;
       const modelsRes = await fetch(modelsUrl, {
         method: "GET",
-        headers: {
-          Authorization: provider.apiKey ? `Bearer ${provider.apiKey}` : "",
-          "Content-Type": "application/json",
-        },
+        headers: provider.apiKey ? { Authorization: `Bearer ${provider.apiKey}` } : {},
       });
 
       result.connectionStatus = modelsRes.status;
@@ -229,10 +232,7 @@ export default function AIApiSettings() {
       const testModel = provider.defaultModel || result.models?.[0] || "";
       const chatRes = await fetch(chatUrl, {
         method: "POST",
-        headers: {
-          Authorization: provider.apiKey ? `Bearer ${provider.apiKey}` : "",
-          "Content-Type": "application/json",
-        },
+        headers: makeHeaders(),
         body: JSON.stringify({
           model: testModel,
           messages: [{ role: "user", content: "Say exactly: OK" }],
