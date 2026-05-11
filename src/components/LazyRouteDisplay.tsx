@@ -1,7 +1,7 @@
 import { lazy, Suspense, type ComponentType } from "react";
 
-const PageSpinner = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
+const InlineSpinner = () => (
+  <div className="flex items-center justify-center py-12">
     <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
   </div>
 );
@@ -13,7 +13,7 @@ export function LazyRouteDisplay(
 
   return function LazyRouteWrapper() {
     return (
-      <Suspense fallback={<PageSpinner />}>
+      <Suspense fallback={<InlineSpinner />}>
         <LazyComponent />
       </Suspense>
     );
