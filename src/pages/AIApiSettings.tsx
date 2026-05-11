@@ -27,10 +27,10 @@ function getTroubleshootingTips(result: TestResult): string[] {
 
   if (err.includes("load failed") || err.includes("network error") || err.includes("fetch")) {
     tips.push("Check that the base URL is correct and the server is running.");
-    tips.push("For local Ollama, ensure CORS is enabled or use a proxy.");
+    tips.push("If using a local server, ensure CORS is enabled or use a proxy.");
   }
   if (err.includes("cors") || err.includes("blocked")) {
-    tips.push("CORS error: run Ollama with OLLAMA_ORIGINS=* or use a reverse proxy.");
+    tips.push("CORS error: the server must allow browser requests with Access-Control-Allow-Origin.");
   }
   if (result.connectionStatus === 401 || result.connectionStatus === 403 || err.includes("unauthorized")) {
     tips.push("Authentication failed: verify your API key is correct and active.");
@@ -43,7 +43,7 @@ function getTroubleshootingTips(result: TestResult): string[] {
   }
   if (result.connectionOk && !result.chatOk) {
     if (chatErr.includes("model")) {
-      tips.push("No models available: set a Default Model in the provider settings or pull a model first (e.g. ollama pull llama3).");
+      tips.push("No models available: set a Default Model in the provider settings.");
     }
     if (chatErr.includes("404")) {
       tips.push("Chat endpoint missing: confirm the provider supports /chat/completions.");
@@ -284,7 +284,7 @@ export default function AIApiSettings() {
               AI Providers
             </CardTitle>
             <CardDescription className="text-muted-foreground text-sm mt-1">
-              Configure custom OpenAI-compatible endpoints (Ollama, vLLM, etc.)
+              Configure custom OpenAI-compatible endpoints
             </CardDescription>
           </div>
           <Button size="sm" onClick={openAddDialog}>
@@ -417,22 +417,6 @@ export default function AIApiSettings() {
         <CardContent className="p-6 pt-0 space-y-3">
           <button
             onClick={() => {
-              setForm({ name: "Local Ollama", baseUrl: "http://localhost:11434/v1", apiKey: "", defaultModel: "llama3" });
-              setEditingId(null);
-              setDialogOpen(true);
-            }}
-            className="w-full text-left p-3 rounded-lg border border-border bg-muted/50 hover:bg-muted transition-colors"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">Local Ollama</p>
-                <p className="text-xs text-muted-foreground">http://localhost:11434/v1 · requires CORS</p>
-              </div>
-              <Plus className="w-4 h-4 text-muted-foreground" />
-            </div>
-          </button>
-          <button
-            onClick={() => {
               setForm({ name: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", apiKey: "", defaultModel: "anthropic/claude-3.5-sonnet" });
               setEditingId(null);
               setDialogOpen(true);
@@ -464,7 +448,7 @@ export default function AIApiSettings() {
             </div>
           </button>
           <p className="text-xs text-muted-foreground/60 pt-1">
-            For local Ollama, run: <code className="bg-muted rounded px-1">OLLAMA_ORIGINS=* ollama serve</code> to enable browser access.
+            Cloud providers work out of the box with CORS-enabled endpoints.
           </p>
         </CardContent>
       </Card>
@@ -484,7 +468,7 @@ export default function AIApiSettings() {
                 required
                 value={form.name}
                 onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                placeholder="Ollama Cloud"
+                placeholder="OpenRouter"
                 className="bg-muted border-border"
               />
             </div>
@@ -496,7 +480,7 @@ export default function AIApiSettings() {
                 type="url"
                 value={form.baseUrl}
                 onChange={(e) => setForm((p) => ({ ...p, baseUrl: e.target.value }))}
-                placeholder="https://ollama.com/v1"
+                placeholder="https://openrouter.ai/api/v1"
                 className="bg-muted border-border"
               />
               <p className="text-xs text-muted-foreground">
@@ -514,7 +498,7 @@ export default function AIApiSettings() {
                 className="bg-muted border-border"
               />
               <p className="text-xs text-muted-foreground">
-                Optional for local providers like Ollama. Required for cloud endpoints.
+                Required for cloud endpoints (OpenRouter, Groq, etc.).
               </p>
             </div>
             <div className="space-y-2">
