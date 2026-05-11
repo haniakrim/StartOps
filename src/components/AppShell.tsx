@@ -281,7 +281,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const userRole = profile?.role || "Member";
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="h-screen bg-background text-foreground flex overflow-hidden">
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
@@ -320,7 +320,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-3 px-2 overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+        <nav className="flex-1 py-3 px-2 overflow-y-auto">
           {navGroups.map((group) => (
             <NavGroupSection
               key={group.label}
@@ -384,11 +384,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <CommandPalette />
 
         {/* Header */}
-        <header className="h-16 flex items-center gap-4 px-6 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-30">
+        <header className="h-16 flex items-center gap-4 px-6 border-b border-border bg-background/80 backdrop-blur-xl z-30 flex-shrink-0">
           <button
             onClick={() => setMobileOpen(true)}
             className="lg:hidden text-muted-foreground hover:text-foreground p-2 -ml-2 rounded-lg hover:bg-accent transition-colors"
