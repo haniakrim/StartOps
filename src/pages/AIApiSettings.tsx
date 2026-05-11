@@ -436,7 +436,7 @@ export default function AIApiSettings() {
         <CardContent className="p-6 pt-0 space-y-3">
           <button
             onClick={() => {
-              setForm({ name: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", apiKey: "", defaultModel: "anthropic/claude-3.5-sonnet" });
+              setForm({ name: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", apiKey: "", defaultModel: "google/gemini-3.1-flash-lite" });
               setEditingId(null);
               setDialogOpen(true);
             }}
