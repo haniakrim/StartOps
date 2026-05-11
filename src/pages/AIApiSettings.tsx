@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Brain, Plus, Trash2, Check, Copy, Loader2, Edit2, X, Save, Globe, KeyRound } from "lucide-react";
+import { Brain, Plus, Trash2, Check, Copy, Loader2, Edit2, X, Save, Globe, KeyRound, Activity, MessageSquare, List, AlertTriangle, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,12 +37,26 @@ function saveProviders(providers: AIProvider[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(providers));
 }
 
+interface TestResult {
+  providerName: string;
+  connectionOk: boolean;
+  connectionStatus?: number;
+  connectionError?: string;
+  models?: string[];
+  chatOk: boolean;
+  chatError?: string;
+  chatResponse?: string;
+  latencyMs: number;
+}
+
 export default function AIApiSettings() {
   const [providers, setProviders] = useState<AIProvider[]>(loadProviders);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [testingId, setTestingId] = useState<string | null>(null);
+  const [testResult, setTestResult] = useState<TestResult | null>(null);
+  const [testDialogOpen, setTestDialogOpen] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -135,26 +149,84 @@ export default function AIApiSettings() {
 
   const testProvider = async (provider: AIProvider) => {
     setTestingId(provider.id);
+    const start = performance.now();
+    const result: TestResult = {
+      providerName: provider.name,
+      connectionOk: false,
+      chatOk: false,
+      latencyMs: 0,
+    };
+
     try {
-      const response = await fetch(`${provider.baseUrl.replace(/\/$/, "")}/models`, {
+      // Step 1: Test connectivity via /models
+      const modelsUrl = `${provider.baseUrl.replace(/\/$/, "")}/models`;
+      const modelsRes = await fetch(modelsUrl, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${provider.apiKey}`,
+          Authorization: provider.apiKey ? `Bearer ${provider.apiKey}` : "",
           "Content-Type": "application/json",
         },
       });
 
-      if (response.ok) {
-        toast.success(`${provider.name} is connected and responding`);
+      result.connectionStatus = modelsRes.status;
+      if (modelsRes.ok) {
+        result.connectionOk = true;
+        const data = await modelsRes.json().catch(() => ({}));
+        const list = data.data || data.models || data;
+        result.models = Array.isArray(list)
+          ? list.slice(0, 5).map((m: any) => m.id || m.name || m.model || String(m))
+          : undefined;
       } else {
-        const body = await response.text().catch(() => "");
-        toast.error(`Connection failed (${response.status}): ${body.slice(0, 200)}`);
+        const body = await modelsRes.text().catch(() => "");
+        result.connectionError = `${modelsRes.status}: ${body.slice(0, 200)}`;
       }
     } catch (error: any) {
-      toast.error("Connection failed: " + (error.message || "Network error"));
-    } finally {
-      setTestingId(null);
+      result.connectionError = error.message || "Network error";
     }
+
+    // Step 2: Test chat completion
+    try {
+      const chatUrl = `${provider.baseUrl.replace(/\/$/, "")}/chat/completions`;
+      const chatRes = await fetch(chatUrl, {
+        method: "POST",
+        headers: {
+          Authorization: provider.apiKey ? `Bearer ${provider.apiKey}` : "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: result.models?.[0] || "",
+          messages: [{ role: "user", content: "Say exactly: OK" }],
+          max_tokens: 10,
+          temperature: 0,
+        }),
+      });
+
+      if (chatRes.ok) {
+        const data = await chatRes.json().catch(() => ({}));
+        const content = data.choices?.[0]?.message?.content;
+        result.chatOk = true;
+        result.chatResponse = content;
+      } else {
+        const body = await chatRes.text().catch(() => "");
+        result.chatError = `${chatRes.status}: ${body.slice(0, 200)}`;
+      }
+    } catch (error: any) {
+      result.chatError = error.message || "Network error";
+    }
+
+    result.latencyMs = Math.round(performance.now() - start);
+    setTestResult(result);
+    setTestDialogOpen(true);
+
+    if (result.connectionOk && result.chatOk) {
+      toast.success(`${provider.name} is fully operational (${result.latencyMs}ms)`);
+    } else if (result.connectionOk) {
+      toast.warning(`${provider.name} connected but chat test failed`);
+    } else {
+      toast.error(`${provider.name} connection failed`);
+    }
+
+    setTestingId(null);
   };
 
   return (
@@ -382,6 +454,116 @@ export default function AIApiSettings() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={testDialogOpen} onOpenChange={setTestDialogOpen}>
+        <DialogContent className="bg-card border-border text-card-foreground sm:max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Activity className="w-5 h-5 text-primary" />
+              Provider Test Results
+            </DialogTitle>
+          </DialogHeader>
+          {testResult && (
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-foreground">{testResult.providerName}</span>
+                <Badge
+                  variant="outline"
+                  className={
+                    testResult.connectionOk && testResult.chatOk
+                      ? "border-emerald-500 text-emerald-500"
+                      : testResult.connectionOk
+                      ? "border-amber-500 text-amber-500"
+                      : "border-destructive text-destructive"
+                  }
+                >
+                  {testResult.connectionOk && testResult.chatOk
+                    ? "Fully Operational"
+                    : testResult.connectionOk
+                    ? "Partial"
+                    : "Failed"}
+                </Badge>
+              </div>
+
+              <div className="text-xs text-muted-foreground">
+                Latency: {testResult.latencyMs}ms
+              </div>
+
+              {/* Connection */}
+              <div className="rounded-lg border border-border bg-muted p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">Connection</span>
+                  {testResult.connectionOk ? (
+                    <Check className="w-4 h-4 text-emerald-500 ml-auto" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-destructive ml-auto" />
+                  )}
+                </div>
+                {testResult.connectionOk ? (
+                  <p className="text-xs text-emerald-500">
+                    Connected (HTTP {testResult.connectionStatus})
+                  </p>
+                ) : (
+                  <p className="text-xs text-destructive">{testResult.connectionError}</p>
+                )}
+              </div>
+
+              {/* Models */}
+              {testResult.models && testResult.models.length > 0 && (
+                <div className="rounded-lg border border-border bg-muted p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <List className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">Available Models</span>
+                    <Badge variant="outline" className="ml-auto text-[10px] h-5">
+                      {testResult.models.length} found
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {testResult.models.map((m) => (
+                      <Badge key={m} variant="secondary" className="text-[10px] h-5">
+                        {m}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Chat Test */}
+              <div className="rounded-lg border border-border bg-muted p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">Chat Completion</span>
+                  {testResult.chatOk ? (
+                    <Check className="w-4 h-4 text-emerald-500 ml-auto" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-destructive ml-auto" />
+                  )}
+                </div>
+                {testResult.chatOk ? (
+                  <div>
+                    <p className="text-xs text-emerald-500 mb-1">Inference working</p>
+                    {testResult.chatResponse && (
+                      <p className="text-xs text-muted-foreground font-mono bg-background rounded px-2 py-1 border border-border">
+                        Response: {testResult.chatResponse}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-xs text-destructive">{testResult.chatError}</p>
+                )}
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <Button size="sm" onClick={() => setTestDialogOpen(false)}>
+                  <Zap className="w-3.5 h-3.5 mr-2" />
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
