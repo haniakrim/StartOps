@@ -26,8 +26,8 @@ function getTroubleshootingTips(result: TestResult): string[] {
   const chatErr = (result.chatError || "").toLowerCase();
 
   if (err.includes("load failed") || err.includes("network error") || err.includes("fetch")) {
-    tips.push("Browser blocked the request. Open the browser console (F12 → Console) and look for red errors.");
-    tips.push("Common causes: CSP / CORS failure, ad-blocker / privacy extension, or mixed-content (HTTP on HTTPS site).");
+    tips.push("Browser blocked the request. Try testing in an Incognito/Private window to rule out extensions.");
+    tips.push("Common causes: ad-blocker (uBlock, AdGuard), privacy extension (Privacy Badger), or mixed-content.");
     tips.push("If you just updated CSP, hard-refresh the page (Ctrl+Shift+R or Cmd+Shift+R) to clear cached headers.");
   }
   if (err.includes("cors") || err.includes("blocked")) {
@@ -201,7 +201,13 @@ export default function AIApiSettings() {
 
     const isOpenRouter = provider.baseUrl.includes("openrouter.ai");
 
-    const makeHeaders = () => {
+    const authHeaders = () => {
+      const h: Record<string, string> = {};
+      if (provider.apiKey) h.Authorization = `Bearer ${provider.apiKey}`;
+      return h;
+    };
+
+    const chatHeaders = () => {
       const h: Record<string, string> = { "Content-Type": "application/json" };
       if (provider.apiKey) h.Authorization = `Bearer ${provider.apiKey}`;
       if (isOpenRouter) {
@@ -212,11 +218,11 @@ export default function AIApiSettings() {
     };
 
     try {
-      // Step 1: Test connectivity via /models
+      // Step 1: Test connectivity via /models (minimal headers for GET)
       const modelsUrl = `${provider.baseUrl.replace(/\/$/, "")}/models`;
       const modelsRes = await fetch(modelsUrl, {
         method: "GET",
-        headers: makeHeaders(),
+        headers: authHeaders(),
       });
 
       result.connectionStatus = modelsRes.status;
@@ -243,7 +249,7 @@ export default function AIApiSettings() {
       const testModel = provider.defaultModel || result.models?.[0] || "";
       const chatRes = await fetch(chatUrl, {
         method: "POST",
-        headers: makeHeaders(),
+        headers: chatHeaders(),
         body: JSON.stringify({
           model: testModel,
           messages: [{ role: "user", content: "Say exactly: OK" }],
