@@ -9,6 +9,26 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      window.__startops_debug = [];
+      function log(msg) { window.__startops_debug.push(msg); console.log(msg); }
+      log("HTML parsed");
+      window.addEventListener("error", function(e) {
+        log("ERROR: " + e.message + " at " + (e.filename || "") + ":" + (e.lineno || ""));
+        var d = document.getElementById("root");
+        if (d) d.innerHTML = '<pre style="color:red;padding:20px">' + window.__startops_debug.join("\n") + "\nERROR: " + e.message + "</pre>";
+      });
+      window.addEventListener("unhandledrejection", function(e) {
+        log("PROMISE REJECTION: " + e.reason);
+        var d = document.getElementById("root");
+        if (d) d.innerHTML = '<pre style="color:red;padding:20px">' + window.__startops_debug.join("\n") + "\nPROMISE REJECTION: " + e.reason + "</pre>";
+      });
+      setTimeout(function() {
+        if (document.getElementById("root") && !document.getElementById("root").hasChildNodes()) {
+          log("React did not mount within 3s");
+        }
+      }, 3000);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
