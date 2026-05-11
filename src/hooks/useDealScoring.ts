@@ -7,11 +7,21 @@ export interface DealScore {
 }
 
 export function useDealScoring(_dealId?: string) {
-  const [score, setScore] = useState<DealScore | null>(null);
+  const [scores, setScores] = useState<Record<string, DealScore>>({});
 
-  const calculateScore = useCallback(() => {
-    setScore({ id: _dealId || "", score: 75, factors: ["engagement", "timeline"] });
-  }, [_dealId]);
+  const getScore = useCallback(
+    (dealId: string): DealScore | null => {
+      return scores[dealId] || { id: dealId, score: 50, factors: ["engagement", "timeline"] };
+    },
+    [scores]
+  );
 
-  return { score, calculateScore };
+  const calculateScore = useCallback((dealId: string) => {
+    setScores((prev) => ({
+      ...prev,
+      [dealId]: { id: dealId, score: 75, factors: ["engagement", "timeline"] },
+    }));
+  }, []);
+
+  return { scores, getScore, calculateScore };
 }

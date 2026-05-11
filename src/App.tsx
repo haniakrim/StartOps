@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import AppShell from "@/components/AppShell";
@@ -51,7 +51,7 @@ const StaffDirectory = LazyRouteDisplay(() => import("./pages/StaffDirectory"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
       retry: 1,
     },
   },
@@ -65,7 +65,7 @@ function PageSpinner() {
   );
 }
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedLayout() {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -76,10 +76,16 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
-  return <AppShell>{children}</AppShell>;
+  return (
+    <AppShell>
+      <Suspense fallback={<PageSpinner />}>
+        <Outlet />
+      </Suspense>
+    </AppShell>
+  );
 }
 
-function PublicRoute({ children }: { children: React.ReactNode }) {
+function PublicRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -90,17 +96,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <>{children}</>;
-}
-
-function LazyProtected({ element: Element }: { element: React.ComponentType }) {
-  return (
-    <ProtectedRoute>
-      <Suspense fallback={<PageSpinner />}>
-        <Element />
-      </Suspense>
-    </ProtectedRoute>
-  );
+  return <Outlet />;
 }
 
 function App() {
@@ -114,56 +110,46 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route
-                  path="/login"
-                  element={
-                    <PublicRoute>
-                      <Login />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/today" element={<LazyProtected element={Today} />} />
-                <Route path="/contacts" element={<LazyProtected element={Contacts} />} />
-                <Route path="/companies" element={<LazyProtected element={Companies} />} />
-                <Route path="/deals" element={<LazyProtected element={Deals} />} />
-                <Route path="/organization" element={<LazyProtected element={Organization} />} />
-                <Route path="/security" element={<LazyProtected element={Security} />} />
-                <Route path="/analytics" element={<LazyProtected element={Analytics} />} />
-                <Route path="/reports" element={<LazyProtected element={Reports} />} />
-                <Route path="/goals" element={<LazyProtected element={Goals} />} />
-                <Route path="/notifications" element={<LazyProtected element={Notifications} />} />
-                <Route path="/api" element={<LazyProtected element={Api} />} />
-                <Route path="/ai-api-settings" element={<LazyProtected element={AIApiSettings} />} />
-                <Route path="/audit" element={<LazyProtected element={Audit} />} />
-                <Route path="/support" element={<LazyProtected element={Support} />} />
-                <Route path="/activities" element={<LazyProtected element={Activities} />} />
-                <Route path="/profile" element={<LazyProtected element={Profile} />} />
-                <Route path="/settings" element={<LazyProtected element={Settings} />} />
-                <Route path="/assistant" element={<LazyProtected element={Assistant} />} />
-                <Route path="/finance" element={<LazyProtected element={Finance} />} />
-                <Route path="/inventory" element={<LazyProtected element={Inventory} />} />
-                <Route path="/projects" element={<LazyProtected element={Projects} />} />
-                <Route path="/employees" element={<LazyProtected element={Employees} />} />
-                <Route path="/workflows" element={<LazyProtected element={Workflows} />} />
-                <Route path="/custom-fields" element={<LazyProtected element={CustomFields} />} />
-                <Route path="/communications" element={<LazyProtected element={Communications} />} />
-                <Route path="/calendar" element={<LazyProtected element={Calendar} />} />
-                <Route path="/forecasts" element={<LazyProtected element={Forecasts} />} />
-                <Route path="/timesheets" element={<LazyProtected element={Timesheets} />} />
-                <Route path="/quotes" element={<LazyProtected element={Quotes} />} />
-                <Route path="/email-templates" element={<LazyProtected element={EmailTemplates} />} />
-                <Route path="/documents" element={<LazyProtected element={Documents} />} />
-                <Route path="/subscriptions" element={<LazyProtected element={Subscriptions} />} />
-                <Route path="/campaigns" element={<LazyProtected element={Campaigns} />} />
-                <Route path="/staff-directory" element={<LazyProtected element={StaffDirectory} />} />
+                <Route element={<PublicRoute />}>
+                  <Route path="/login" element={<Login />} />
+                </Route>
+                <Route element={<ProtectedLayout />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/today" element={<Today />} />
+                  <Route path="/contacts" element={<Contacts />} />
+                  <Route path="/companies" element={<Companies />} />
+                  <Route path="/deals" element={<Deals />} />
+                  <Route path="/organization" element={<Organization />} />
+                  <Route path="/security" element={<Security />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/reports" element={<Reports />} />
+                  <Route path="/goals" element={<Goals />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/api" element={<Api />} />
+                  <Route path="/ai-api-settings" element={<AIApiSettings />} />
+                  <Route path="/audit" element={<Audit />} />
+                  <Route path="/support" element={<Support />} />
+                  <Route path="/activities" element={<Activities />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/assistant" element={<Assistant />} />
+                  <Route path="/finance" element={<Finance />} />
+                  <Route path="/inventory" element={<Inventory />} />
+                  <Route path="/projects" element={<Projects />} />
+                  <Route path="/employees" element={<Employees />} />
+                  <Route path="/workflows" element={<Workflows />} />
+                  <Route path="/custom-fields" element={<CustomFields />} />
+                  <Route path="/communications" element={<Communications />} />
+                  <Route path="/calendar" element={<Calendar />} />
+                  <Route path="/forecasts" element={<Forecasts />} />
+                  <Route path="/timesheets" element={<Timesheets />} />
+                  <Route path="/quotes" element={<Quotes />} />
+                  <Route path="/email-templates" element={<EmailTemplates />} />
+                  <Route path="/documents" element={<Documents />} />
+                  <Route path="/subscriptions" element={<Subscriptions />} />
+                  <Route path="/campaigns" element={<Campaigns />} />
+                  <Route path="/staff-directory" element={<StaffDirectory />} />
+                </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
