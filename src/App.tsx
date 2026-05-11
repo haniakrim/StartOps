@@ -103,73 +103,75 @@ function LazyProtected({ element: Element }: { element: React.ComponentType }) {
   );
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route
-                path="/login"
-                element={
-                  <PublicRoute>
-                    <Login />
-                  </PublicRoute>
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/today" element={<LazyProtected element={Today} />} />
-              <Route path="/contacts" element={<LazyProtected element={Contacts} />} />
-              <Route path="/companies" element={<LazyProtected element={Companies} />} />
-              <Route path="/deals" element={<LazyProtected element={Deals} />} />
-              <Route path="/organization" element={<LazyProtected element={Organization} />} />
-              <Route path="/security" element={<LazyProtected element={Security} />} />
-              <Route path="/analytics" element={<LazyProtected element={Analytics} />} />
-              <Route path="/reports" element={<LazyProtected element={Reports} />} />
-              <Route path="/goals" element={<LazyProtected element={Goals} />} />
-              <Route path="/notifications" element={<LazyProtected element={Notifications} />} />
-              <Route path="/api" element={<LazyProtected element={Api} />} />
-              <Route path="/ai-api-settings" element={<LazyProtected element={AIApiSettings} />} />
-              <Route path="/audit" element={<LazyProtected element={Audit} />} />
-              <Route path="/support" element={<LazyProtected element={Support} />} />
-              <Route path="/activities" element={<LazyProtected element={Activities} />} />
-              <Route path="/profile" element={<LazyProtected element={Profile} />} />
-              <Route path="/settings" element={<LazyProtected element={Settings} />} />
-              <Route path="/assistant" element={<LazyProtected element={Assistant} />} />
-              <Route path="/finance" element={<LazyProtected element={Finance} />} />
-              <Route path="/inventory" element={<LazyProtected element={Inventory} />} />
-              <Route path="/projects" element={<LazyProtected element={Projects} />} />
-              <Route path="/employees" element={<LazyProtected element={Employees} />} />
-              <Route path="/workflows" element={<LazyProtected element={Workflows} />} />
-              <Route path="/custom-fields" element={<LazyProtected element={CustomFields} />} />
-              <Route path="/communications" element={<LazyProtected element={Communications} />} />
-              <Route path="/calendar" element={<LazyProtected element={Calendar} />} />
-              <Route path="/forecasts" element={<LazyProtected element={Forecasts} />} />
-              <Route path="/timesheets" element={<LazyProtected element={Timesheets} />} />
-              <Route path="/quotes" element={<LazyProtected element={Quotes} />} />
-              <Route path="/email-templates" element={<LazyProtected element={EmailTemplates} />} />
-              <Route path="/documents" element={<LazyProtected element={Documents} />} />
-              <Route path="/subscriptions" element={<LazyProtected element={Subscriptions} />} />
-              <Route path="/campaigns" element={<LazyProtected element={Campaigns} />} />
-              <Route path="/staff-directory" element={<LazyProtected element={StaffDirectory} />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/today" element={<LazyProtected element={Today} />} />
+                <Route path="/contacts" element={<LazyProtected element={Contacts} />} />
+                <Route path="/companies" element={<LazyProtected element={Companies} />} />
+                <Route path="/deals" element={<LazyProtected element={Deals} />} />
+                <Route path="/organization" element={<LazyProtected element={Organization} />} />
+                <Route path="/security" element={<LazyProtected element={Security} />} />
+                <Route path="/analytics" element={<LazyProtected element={Analytics} />} />
+                <Route path="/reports" element={<LazyProtected element={Reports} />} />
+                <Route path="/goals" element={<LazyProtected element={Goals} />} />
+                <Route path="/notifications" element={<LazyProtected element={Notifications} />} />
+                <Route path="/api" element={<LazyProtected element={Api} />} />
+                <Route path="/ai-api-settings" element={<LazyProtected element={AIApiSettings} />} />
+                <Route path="/audit" element={<LazyProtected element={Audit} />} />
+                <Route path="/support" element={<LazyProtected element={Support} />} />
+                <Route path="/activities" element={<LazyProtected element={Activities} />} />
+                <Route path="/profile" element={<LazyProtected element={Profile} />} />
+                <Route path="/settings" element={<LazyProtected element={Settings} />} />
+                <Route path="/assistant" element={<LazyProtected element={Assistant} />} />
+                <Route path="/finance" element={<LazyProtected element={Finance} />} />
+                <Route path="/inventory" element={<LazyProtected element={Inventory} />} />
+                <Route path="/projects" element={<LazyProtected element={Projects} />} />
+                <Route path="/employees" element={<LazyProtected element={Employees} />} />
+                <Route path="/workflows" element={<LazyProtected element={Workflows} />} />
+                <Route path="/custom-fields" element={<LazyProtected element={CustomFields} />} />
+                <Route path="/communications" element={<LazyProtected element={Communications} />} />
+                <Route path="/calendar" element={<LazyProtected element={Calendar} />} />
+                <Route path="/forecasts" element={<LazyProtected element={Forecasts} />} />
+                <Route path="/timesheets" element={<LazyProtected element={Timesheets} />} />
+                <Route path="/quotes" element={<LazyProtected element={Quotes} />} />
+                <Route path="/email-templates" element={<LazyProtected element={EmailTemplates} />} />
+                <Route path="/documents" element={<LazyProtected element={Documents} />} />
+                <Route path="/subscriptions" element={<LazyProtected element={Subscriptions} />} />
+                <Route path="/campaigns" element={<LazyProtected element={Campaigns} />} />
+                <Route path="/staff-directory" element={<LazyProtected element={StaffDirectory} />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
