@@ -66,11 +66,23 @@ function PageSpinner() {
   );
 }
 
+function ContentSpinner() {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
 function ProtectedLayout() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <PageSpinner />;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -79,7 +91,7 @@ function ProtectedLayout() {
 
   return (
     <AppShell>
-      <Suspense fallback={<PageSpinner />}>
+      <Suspense fallback={<ContentSpinner />}>
         <Outlet />
       </Suspense>
     </AppShell>
