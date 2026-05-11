@@ -24,3 +24,14 @@ dist-ssr
 *.sw?
 .dyad/
 .vercel
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/blob-report/

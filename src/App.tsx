@@ -6,48 +6,57 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import AppShell from "@/components/AppShell";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Index from "./pages/Index";
+import { LazyRouteDisplay } from "@/components/LazyRouteDisplay";
 
-const Contacts = lazy(() => import("./pages/Contacts"));
-const Companies = lazy(() => import("./pages/Companies"));
-const Deals = lazy(() => import("./pages/Deals"));
-const Organization = lazy(() => import("./pages/Organization"));
-const Security = lazy(() => import("./pages/Security"));
-const Analytics = lazy(() => import("./pages/Analytics"));
-const Api = lazy(() => import("./pages/Api"));
-const Audit = lazy(() => import("./pages/Audit"));
-const Support = lazy(() => import("./pages/Support"));
-const Activities = lazy(() => import("./pages/Activities"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Settings = lazy(() => import("./pages/Settings"));
-const Assistant = lazy(() => import("./pages/Assistant"));
-const Finance = lazy(() => import("./pages/Finance"));
-const Inventory = lazy(() => import("./pages/Inventory"));
-const Projects = lazy(() => import("./pages/Projects"));
-const Employees = lazy(() => import("./pages/Employees"));
-const Workflows = lazy(() => import("./pages/Workflows"));
-const CustomFields = lazy(() => import("./pages/CustomFields"));
-const Communications = lazy(() => import("./pages/Communications"));
-const Forecasts = lazy(() => import("./pages/Forecasts"));
-const Timesheets = lazy(() => import("./pages/Timesheets"));
-const Calendar = lazy(() => import("./pages/Calendar"));
-const Reports = lazy(() => import("./pages/Reports"));
-const Goals = lazy(() => import("./pages/Goals"));
-const Notifications = lazy(() => import("./pages/Notifications"));
-const Today = lazy(() => import("./pages/Today"));
-const Quotes = lazy(() => import("./pages/Quotes"));
-const EmailTemplates = lazy(() => import("./pages/EmailTemplates"));
-const Documents = lazy(() => import("./pages/Documents"));
-const Subscriptions = lazy(() => import("./pages/Subscriptions"));
-const Campaigns = lazy(() => import("./pages/Campaigns"));
-const StaffDirectory = lazy(() => import("./pages/StaffDirectory"));
-const AIApiSettings = lazy(() => import("./pages/AIApiSettings"));
+const Dashboard = LazyRouteDisplay(() => import("./pages/Dashboard"));
+const Today = LazyRouteDisplay(() => import("./pages/Today"));
+const Contacts = LazyRouteDisplay(() => import("./pages/Contacts"));
+const Companies = LazyRouteDisplay(() => import("./pages/Companies"));
+const Deals = LazyRouteDisplay(() => import("./pages/Deals"));
+const Organization = LazyRouteDisplay(() => import("./pages/Organization"));
+const Security = LazyRouteDisplay(() => import("./pages/Security"));
+const Analytics = LazyRouteDisplay(() => import("./pages/Analytics"));
+const Reports = LazyRouteDisplay(() => import("./pages/Reports"));
+const Goals = LazyRouteDisplay(() => import("./pages/Goals"));
+const Notifications = LazyRouteDisplay(() => import("./pages/Notifications"));
+const Api = LazyRouteDisplay(() => import("./pages/Api"));
+const AIApiSettings = LazyRouteDisplay(() => import("./pages/AIApiSettings"));
+const Audit = LazyRouteDisplay(() => import("./pages/Audit"));
+const Support = LazyRouteDisplay(() => import("./pages/Support"));
+const Activities = LazyRouteDisplay(() => import("./pages/Activities"));
+const Profile = LazyRouteDisplay(() => import("./pages/Profile"));
+const Settings = LazyRouteDisplay(() => import("./pages/Settings"));
+const Assistant = LazyRouteDisplay(() => import("./pages/Assistant"));
+const Finance = LazyRouteDisplay(() => import("./pages/Finance"));
+const Inventory = LazyRouteDisplay(() => import("./pages/Inventory"));
+const Projects = LazyRouteDisplay(() => import("./pages/Projects"));
+const Employees = LazyRouteDisplay(() => import("./pages/Employees"));
+const Workflows = LazyRouteDisplay(() => import("./pages/Workflows"));
+const CustomFields = LazyRouteDisplay(() => import("./pages/CustomFields"));
+const Communications = LazyRouteDisplay(() => import("./pages/Communications"));
+const Calendar = LazyRouteDisplay(() => import("./pages/Calendar"));
+const Forecasts = LazyRouteDisplay(() => import("./pages/Forecasts"));
+const Timesheets = LazyRouteDisplay(() => import("./pages/Timesheets"));
+const Quotes = LazyRouteDisplay(() => import("./pages/Quotes"));
+const EmailTemplates = LazyRouteDisplay(() => import("./pages/EmailTemplates"));
+const Documents = LazyRouteDisplay(() => import("./pages/Documents"));
+const Subscriptions = LazyRouteDisplay(() => import("./pages/Subscriptions"));
+const Campaigns = LazyRouteDisplay(() => import("./pages/Campaigns"));
+const StaffDirectory = LazyRouteDisplay(() => import("./pages/StaffDirectory"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function PageSpinner() {
   return (
@@ -96,14 +105,15 @@ function LazyProtected({ element: Element }: { element: React.ComponentType }) {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
               <Route path="/" element={<Index />} />
               <Route
                 path="/login"
@@ -160,8 +170,8 @@ const App = () => (
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

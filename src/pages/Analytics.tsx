@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   BarChart3, TrendingUp, TrendingDown, Users, DollarSign, Activity, Loader2,
-  Target, GitBranch, Calendar, Filter, ArrowUpRight, BrainCircuit
+  Target, GitBranch, Calendar, Filter, ArrowUpRight, BrainCircuit, Zap, Lightbulb
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,12 +11,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useDealScoring } from "@/hooks/useDealScoring";
+import { DealScoreBadge } from "@/components/deals/DealScoreBadge";
+import { usePipelineInsights } from "@/hooks/usePipelineInsights";
+import { PipelineInsights } from "@/components/analytics/PipelineInsights";
+import { isAIConfigured } from "@/lib/ai";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
 const COLORS = ["hsl(var(--primary))", "#8dc572", "#ff8964", "#5683da", "#f0ad4e", "#be6464"];
 
 export default function Analytics() {
   const { organizationId } = useOrganization();
+  const { insights, loading: insightsLoading, error: insightsError, regenerate } = usePipelineInsights(organizationId);
+  const aiEnabled = isAIConfigured();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalRevenue: 0, activeDeals: 0, totalContacts: 0, totalCompanies: 0,
@@ -243,6 +250,8 @@ export default function Analytics() {
           <TabsTrigger value="funnel" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Filter className="w-4 h-4 mr-2" />Conversion Funnel</TabsTrigger>
           <TabsTrigger value="cohorts" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Users className="w-4 h-4 mr-2" />Cohorts</TabsTrigger>
           <TabsTrigger value="sources" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><GitBranch className="w-4 h-4 mr-2" />Sources</TabsTrigger>
+          <TabsTrigger value="scoring" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Zap className="w-4 h-4 mr-2" />Lead Scoring</TabsTrigger>
+          <TabsTrigger value="insights" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"><Lightbulb className="w-4 h-4 mr-2" />Insights</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 space-y-4">
@@ -554,7 +563,131 @@ export default function Analytics() {
             </Card>
           </div>
         </TabsContent>
+
+        <TabsContent value="scoring" className="mt-6">
+          <LeadScoringOverview />
+        </TabsContent>
+
+        <TabsContent value="insights" className="mt-6">
+          <PipelineInsights
+            insights={insights}
+            loading={insightsLoading}
+            error={insightsError}
+            onRegenerate={regenerate}
+            aiEnabled={aiEnabled}
+          />
+        </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function LeadScoringOverview() {
+  const { scores, sortedByScore, loading } = useDealScoring();
+  const topDeals = sortedByScore().slice(0, 10);
+
+  const distribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+  Object.values(scores).forEach((s) => {
+    distribution[s.grade]++;
+  });
+  const total = Object.values(distribution).reduce((a, b) => a + b, 0);
+
+  const gradeColors: Record<string, string> = {
+    A: "#34C759", B: "#007AFF", C: "#FF9500", D: "#FF2D55", F: "#8E8E93",
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="bg-card border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary" />
+              Score Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {total > 0 ? (
+              <div className="space-y-3">
+                {Object.entries(distribution).map(([grade, count]) => {
+                  const pct = total > 0 ? (count / total) * 100 : 0;
+                  return (
+                    <div key={grade}>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                            style={{ backgroundColor: gradeColors[grade] }}
+                          >
+                            {grade}
+                          </div>
+                          <span className="text-sm text-foreground">Grade {grade}</span>
+                        </div>
+                        <span className="text-sm font-medium text-foreground">{count}</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${pct}%`, backgroundColor: gradeColors[grade] }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Zap className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">No scored deals yet</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2 bg-card border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-foreground text-base font-medium flex items-center gap-2">
+              <Target className="w-4 h-4 text-primary" />
+              Top Deals by Score
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-5 h-5 text-primary animate-spin" />
+              </div>
+            ) : topDeals.length > 0 ? (
+              <div className="space-y-2">
+                {topDeals.map(({ dealId, score }, i) => (
+                  <div
+                    key={dealId}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted border border-border"
+                  >
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                      style={{ backgroundColor: score.color }}
+                    >
+                      {i + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        Deal {dealId.slice(0, 8)}...
+                      </p>
+                      <p className="text-xs text-muted-foreground">{score.recommendation}</p>
+                    </div>
+                    <DealScoreBadge score={score} size="md" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Target className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">No deals to score</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

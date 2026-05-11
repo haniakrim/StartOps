@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { SmartForecastGenerator } from "@/components/forecasts/SmartForecastGenerator";
 
 interface Forecast {
   id: string;
@@ -252,6 +253,8 @@ export default function Forecasts() {
           </Dialog>
         </div>
       </div>
+
+      <SmartForecastGenerator />
 
       {forecasts.length === 0 ? (
         <Card>

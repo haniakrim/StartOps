@@ -20,9 +20,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Plus, Trash2, Pencil, Search, X } from "lucide-react";
+import { Upload, Plus, Trash2, Pencil, Search, X, ShieldAlert, Sparkles, Wand2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { validateCsvData } from "@/lib/csv-validation";
+import { useDuplicateDetection } from "@/hooks/useDuplicateDetection";
+import { DuplicateDetectionPanel } from "@/components/contacts/DuplicateDetectionPanel";
+import { useContactEnrichment, type EnrichmentSuggestion } from "@/hooks/useContactEnrichment";
 
 interface Contact {
   id: string;
@@ -53,6 +57,10 @@ const Contacts = () => {
     title: "",
   });
   const [selected, setSelected] = useState<string[]>([]);
+  const [showDuplicates, setShowDuplicates] = useState(false);
+  const [suggestions, setSuggestions] = useState<EnrichmentSuggestion[]>([]);
+  const { duplicates, loading: dupLoading, scanned, scan, mergeDuplicate, dismissDuplicate } = useDuplicateDetection();
+  const { enrichFromEmail } = useContactEnrichment();
 
   const fetchContacts = useCallback(async () => {
     if (!organizationId) {
@@ -61,14 +69,20 @@ const Contacts = () => {
       return;
     }
     setLoading(true);
-    const { data } = await supabase
-      .from("contacts")
-      .select("*")
-      .eq("organization_id", organizationId)
-      .order("last_name");
-    if (data) setContacts(data);
-    setLoading(false);
-  }, [organizationId]);
+    try {
+      const { data, error } = await supabase
+        .from("contacts")
+        .select("*")
+        .eq("organization_id", organizationId)
+        .order("last_name");
+      if (error) throw error;
+      if (data) setContacts(data);
+    } catch (error: any) {
+      toast({ title: "Failed to load contacts", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }, [organizationId, toast]);
 
   useEffect(() => {
     fetchContacts();
@@ -168,6 +182,7 @@ const Contacts = () => {
       company: contact.company || "",
       title: contact.title || "",
     });
+    setSuggestions([]);
     setShowDialog(true);
   };
 
@@ -218,6 +233,7 @@ const Contacts = () => {
             if (!open) {
               setEditingContact(null);
               setNewContact({ first_name: "", last_name: "", email: "", phone: "", company: "", title: "" });
+              setSuggestions([]);
             }
           }}>
             <DialogTrigger asChild>
@@ -243,7 +259,49 @@ const Contacts = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Email</label>
-                  <Input type="email" value={newContact.email} onChange={(e) => setNewContact({ ...newContact, email: e.target.value })} maxLength={254} />
+                  <Input
+                    type="email"
+                    value={newContact.email}
+                    onChange={(e) => {
+                      const email = e.target.value;
+                      setNewContact({ ...newContact, email });
+                      const enriched = enrichFromEmail(email);
+                      setSuggestions(enriched);
+                      // Auto-apply high-confidence company if field is empty
+                      const companySuggestion = enriched.find(s => s.field === "company" && s.confidence >= 90);
+                      if (companySuggestion && !newContact.company) {
+                        setNewContact((p) => ({ ...p, company: companySuggestion.value }));
+                      }
+                      const titleSuggestion = enriched.find(s => s.field === "title" && s.confidence >= 80);
+                      if (titleSuggestion && !newContact.title) {
+                        setNewContact((p) => ({ ...p, title: titleSuggestion.value }));
+                      }
+                    }}
+                    maxLength={254}
+                  />
+                  {suggestions.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-muted-foreground">AI detected:</span>
+                      {suggestions.map((s) => (
+                        <button
+                          key={s.field}
+                          type="button"
+                          onClick={() => {
+                            setNewContact((p) => ({ ...p, [s.field]: s.value }));
+                            setSuggestions((prev) => prev.filter((x) => x.field !== s.field));
+                          }}
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                        >
+                          <Wand2 className="w-3 h-3" />
+                          {s.field === "company" ? "Company" : "Title"}: {s.value}
+                          <Badge variant="secondary" className="text-[10px] h-4 px-1 ml-1 bg-primary/20 text-primary border-0">
+                            {s.confidence}%
+                          </Badge>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Phone</label>
@@ -268,15 +326,37 @@ const Contacts = () => {
         </div>
       </div>
 
-      <div className="relative max-w-md mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search contacts..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
-        />
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search contacts..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`${duplicates.length > 0 ? "border-hp-orange/50 text-hp-orange" : ""}`}
+          onClick={() => setShowDuplicates((p) => !p)}
+        >
+          <ShieldAlert className="w-4 h-4 mr-2" />
+          {duplicates.length > 0 ? `${duplicates.length} Duplicates` : "Check Duplicates"}
+        </Button>
       </div>
+
+      {showDuplicates && (
+        <DuplicateDetectionPanel
+          duplicates={duplicates}
+          loading={dupLoading}
+          scanned={scanned}
+          onScan={scan}
+          onMerge={mergeDuplicate}
+          onDismiss={dismissDuplicate}
+        />
+      )}
 
       {selected.length > 0 && (
         <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20 mb-4">

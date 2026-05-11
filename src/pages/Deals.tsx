@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { DealDetail } from "@/components/DealDetail";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useRealtimeTable } from "@/hooks/useRealtime";
+import { useDealScoring } from "@/hooks/useDealScoring";
+import { DealScoreBadge } from "@/components/deals/DealScoreBadge";
 
 interface Deal {
   id: string;
@@ -55,6 +57,8 @@ export default function Deals() {
     name: "", value: "", probability: "50", stage: "lead", expected_close_date: "", contact_id: "", source: "",
   });
   const [contacts, setContacts] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
+
+  const { scores, getScore } = useDealScoring();
 
   useEffect(() => { fetchPipelineAndDeals(); fetchContactsForSelect(); }, [organizationId]);
   useRealtimeTable("deals", fetchPipelineAndDeals);
@@ -264,7 +268,10 @@ export default function Deals() {
                 {stage.deals.map(deal => (
                   <Card key={deal.id} className="bg-card border-border hover:border-border/80 transition-colors cursor-pointer" draggable onDragStart={() => setDraggedDeal(deal)} onClick={() => { setDetailDealId(deal.id); setDetailOpen(true); }}>
                     <CardContent className="p-4">
-                      <h3 className="text-sm font-medium text-foreground">{deal.name}</h3>
+                      <div className="flex items-start justify-between">
+                        <h3 className="text-sm font-medium text-foreground">{deal.name}</h3>
+                        <DealScoreBadge score={getScore(deal.id)} />
+                      </div>
                       <p className="text-sm text-muted-foreground mt-1">${(deal.value || 0).toLocaleString()}</p>
                       <div className="mt-2">
                         <Progress value={deal.probability || 0} className="h-1 bg-muted" />

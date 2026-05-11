@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Mail, Plus, Search, Loader2, BookOpen, Trash2, Pencil, Eye, Copy, LayoutTemplate } from "lucide-react";
+import { Mail, Plus, Search, Loader2, BookOpen, Trash2, Pencil, Eye, Copy, LayoutTemplate, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { EmailTemplateForm } from "@/components/email-templates/EmailTemplateForm";
+import { AIEmailComposer } from "@/components/email-templates/AIEmailComposer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
@@ -31,6 +32,7 @@ export default function EmailTemplates() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
+  const [aiComposerOpen, setAiComposerOpen] = useState(false);
 
   useEffect(() => { fetchTemplates(); }, [organizationId]);
   useRealtimeTable("email_templates", fetchTemplates, [], organizationId);
@@ -91,9 +93,14 @@ export default function EmailTemplates() {
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">Email Templates</h1>
           <p className="text-sm text-muted-foreground mt-1">Reusable email templates for consistent outreach</p>
         </div>
-        <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openCreate}>
-          <Plus className="w-4 h-4 mr-2" />New Template
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" className="border-border hover:border-primary/50" onClick={() => setAiComposerOpen(true)}>
+            <Sparkles className="w-4 h-4 mr-2 text-primary" />AI Compose
+          </Button>
+          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={openCreate}>
+            <Plus className="w-4 h-4 mr-2" />New Template
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -169,6 +176,24 @@ export default function EmailTemplates() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AIEmailComposer
+        open={aiComposerOpen}
+        onOpenChange={setAiComposerOpen}
+        onSaveAsTemplate={(subject, body) => {
+          setEditingTemplate({
+            id: "",
+            name: "",
+            category: "General",
+            subject,
+            body,
+            usage_count: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+          setDialogOpen(true);
+        }}
+      />
     </div>
   );
 }

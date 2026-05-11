@@ -34,6 +34,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    host: true,
     headers: {
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "strict-origin-when-cross-origin",
@@ -54,6 +55,16 @@ export default defineConfig({
     },
   },
   clearScreen: false,
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.ts",
+    include: ["**/*.test.{ts,tsx}"],
+    coverage: {
+      reporter: ["text", "json", "html"],
+      exclude: ["node_modules/", "src/test/"],
+    },
+  },
   ...(host
     ? {
         server: {

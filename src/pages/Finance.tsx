@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, FileText, CreditCard, AlertTriangle,
   Plus, Search, Filter, Loader2, Download, CheckCircle, Clock, XCircle,
-  BarChart3, ArrowUpRight, Truck, Star, MapPin, Globe, Mail
+  BarChart3, ArrowUpRight, Truck, Star, MapPin, Globe, Mail, Wand2, Zap, Sparkles
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useRealtimeTable } from "@/hooks/useRealtime";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useExpenseCategorization, suggestCategory, getAISuggestion, EXPENSE_CATEGORIES } from "@/hooks/useExpenseCategorization";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
+import { callAI } from "@/lib/ai";
 
 interface Invoice {
   id: string;
@@ -27,28 +29,6 @@ interface Invoice {
   due_date: string;
   paid_date: string | null;
   contacts: { first_name: string; last_name: string; company: string | null } | null;
-}
-
-interface Expense {
-  id: string;
-  category: string;
-  amount: number;
-  description: string;
-  status: string;
-  created_at: string;
-}
-
-interface Vendor {
-  id: string;
-  name: string;
-  email: string | null;
-  phone: string | null;
-  website: string | null;
-  address: string | null;
-  category: string | null;
-  rating: number;
-  payment_terms: string | null;
-  is_active: boolean;
 }
 
 const statusColors: Record<string, string> = {
@@ -78,6 +58,11 @@ export default function Finance() {
   const [anomalies, setAnomalies] = useState<any[]>([]);
   const [vendorDialogOpen, setVendorDialogOpen] = useState(false);
   const [newVendor, setNewVendor] = useState({ name: "", email: "", phone: "", website: "", address: "", category: "", payment_terms: "" });
+  const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+  const [newExpense, setNewExpense] = useState({ description: "", amount: "", category: "", status: "pending" });
+  const [aiSuggestion, setAiSuggestion] = useState<{ category: string; confidence: number } | null>(null);
+  const [categorizing, setCategorizing] = useState(false);
+  const [suggestions, setSuggestions] = useState<Array<{ id: string; category: string; confidence: number }>>([]);
 
   // Fetch all finance data
   const fetchFinanceData = async () => {
@@ -197,6 +182,63 @@ export default function Finance() {
       fetchVendors();
     } catch (error: any) {
       toast.error("Failed to add vendor: " + error.message);
+    }
+  }
+
+  async function createExpense(e: React.FormEvent) {
+    e.preventDefault();
+    if (!organizationId) {
+      toast.error("No organization found");
+      return;
+    }
+    try {
+      const { error } = await supabase.from("expenses").insert({
+        description: newExpense.description,
+        amount: parseFloat(newExpense.amount) || 0,
+        category: newExpense.category || aiSuggestion?.category || "Other",
+        status: newExpense.status,
+        organization_id: organizationId,
+      });
+      if (error) throw error;
+      toast.success("Expense recorded");
+      setExpenseDialogOpen(false);
+      setNewExpense({ description: "", amount: "", category: "", status: "pending" });
+      setAiSuggestion(null);
+      fetchFinanceData();
+    } catch (error: any) {
+      toast.error("Failed to record expense: " + error.message);
+    }
+  }
+
+  async function smartCategorize() {
+    if (!organizationId) return;
+    const uncategorized = expenses.filter(e => !e.category || e.category === "Other");
+    if (uncategorized.length === 0) {
+      toast.info("No uncategorized expenses to categorize");
+      return;
+    }
+    setCategorizing(true);
+    try {
+      const results = uncategorized.map(e => {
+        const suggestion = suggestCategory(e.description);
+        return { id: e.id, suggestion };
+      }).filter(r => r.suggestion && r.suggestion.confidence >= 60);
+
+      if (results.length === 0) {
+        toast.info("No confident category suggestions found");
+        setCategorizing(false);
+        return;
+      }
+
+      for (const r of results) {
+        await supabase.from("expenses").update({ category: r.suggestion!.category }).eq("id", r.id);
+      }
+      toast.success(`${results.length} expenses auto-categorized`);
+      fetchFinanceData();
+    } catch (error: any) {
+      toast.error("Failed to categorize: " + error.message);
+    } finally {
+      setCategorizing(false);
     }
   }
 
@@ -386,6 +428,92 @@ export default function Finance() {
         </TabsContent>
 
         <TabsContent value="expenses" className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="w-4 h-4 mr-2" />New Expense
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader><DialogTitle>Record Expense</DialogTitle></DialogHeader>
+                  <form onSubmit={createExpense} className="space-y-4 pt-4">
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Input
+                        required
+                        value={newExpense.description}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setNewExpense(p => ({ ...p, description: val }));
+                          const suggestion = suggestCategory(val);
+                          setAiSuggestion(suggestion);
+                          if (suggestion && suggestion.confidence >= 70) {
+                            setNewExpense(p => ({ ...p, category: suggestion.category }));
+                          }
+                        }}
+                        placeholder="e.g., AWS hosting subscription"
+                      />
+                      {aiSuggestion && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <Sparkles className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-muted-foreground">
+                            AI suggests <span className="font-medium text-foreground">{aiSuggestion.category}</span>
+                          </span>
+                          <Badge variant="secondary" className="text-[10px] h-4 px-1.5 bg-primary/15 text-primary border-0">
+                            {aiSuggestion.confidence}% confidence
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Amount ($)</Label>
+                        <Input type="number" required value={newExpense.amount} onChange={(e) => setNewExpense(p => ({ ...p, amount: e.target.value }))} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Category</Label>
+                        <Select value={newExpense.category} onValueChange={(v) => setNewExpense(p => ({ ...p, category: v }))}>
+                          <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                          <SelectContent>
+                            {EXPENSE_CATEGORIES.map(c => (
+                              <SelectItem key={c} value={c}>{c}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Status</Label>
+                      <Select value={newExpense.status} onValueChange={(v) => setNewExpense(p => ({ ...p, status: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="approved">Approved</SelectItem>
+                          <SelectItem value="rejected">Rejected</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button type="submit" className="w-full">Record Expense</Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+              <Button size="sm" variant="outline" onClick={smartCategorize} disabled={categorizing}>
+                {categorizing ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Wand2 className="w-4 h-4 mr-2" />
+                )}
+                Smart Categorize
+              </Button>
+            </div>
+            {expenses.filter(e => !e.category || e.category === "Other").length > 0 && (
+              <Badge variant="secondary" className="text-xs bg-hp-orange/15 text-hp-orange border-0">
+                {expenses.filter(e => !e.category || e.category === "Other").length} uncategorized
+              </Badge>
+            )}
+          </div>
           <Card>
             <CardContent className="p-0">
               <table className="w-full">
@@ -403,7 +531,12 @@ export default function Finance() {
                   )}
                   {expenses.map(exp => (
                     <tr key={exp.id} className="border-b border-border/50 hover:bg-muted/30">
-                      <td className="py-3 px-4 text-sm text-muted-foreground capitalize">{exp.category || "Other"}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground capitalize">
+                        {exp.category || "Other"}
+                        {!exp.category && (
+                          <Badge variant="secondary" className="ml-2 text-[10px] h-4 px-1.5 bg-hp-orange/15 text-hp-orange border-0">Uncategorized</Badge>
+                        )}
+                      </td>
                       <td className="py-3 px-4 text-sm text-foreground">{exp.description || "-"}</td>
                       <td className="py-3 px-4 text-sm text-foreground">${(exp.amount || 0).toLocaleString()}</td>
                       <td className="py-3 px-4"><Badge variant="secondary" className={`text-xs ${statusColors[exp.status] || statusColors.pending}`}>{exp.status}</Badge></td>

@@ -13,6 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useOrganization } from "@/hooks/useOrganization";
+import { useDealScoring } from "@/hooks/useDealScoring";
+import { DealScorePanel } from "@/components/deals/DealScorePanel";
+import { generateNextActions } from "@/hooks/useNextActionSuggestions";
+import { NextActionCard } from "@/components/deals/NextActionCard";
 
 interface DealDetailProps {
   dealId: string | null;
@@ -23,6 +27,7 @@ interface DealDetailProps {
 
 export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps) {
   const { organizationId } = useOrganization();
+  const { getScore } = useDealScoring();
   const [deal, setDeal] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -33,6 +38,28 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
   const [quoteBuilderOpen, setQuoteBuilderOpen] = useState(false);
 
   useEffect(() => { if (dealId && open) fetchDeal(); }, [dealId, open]);
+
+  const nextActions = (() => {
+    if (!deal) return [];
+    const daysInStage = Math.floor((Date.now() - new Date(deal.updated_at || deal.created_at).getTime()) / 86400000);
+    const lastActivity = activities[0];
+    const daysSinceLastActivity = lastActivity
+      ? Math.floor((Date.now() - new Date(lastActivity.created_at).getTime()) / 86400000)
+      : daysInStage;
+    const daysUntilClose = deal.expected_close_date
+      ? Math.ceil((new Date(deal.expected_close_date).getTime() - Date.now()) / 86400000)
+      : null;
+    const scoreData = getScore(dealId || "");
+    return generateNextActions({
+      stage: deal.stage,
+      probability: deal.probability || 0,
+      daysInStage,
+      daysSinceLastActivity,
+      daysUntilClose,
+      activityCount: activities.length,
+      score: scoreData?.score ?? 50,
+    });
+  })();
 
   async function fetchDeal() {
     if (!organizationId) return;
@@ -175,6 +202,13 @@ export function DealDetail({ dealId, open, onClose, onUpdate }: DealDetailProps)
                 </TabsList>
 
                 <TabsContent value="overview" className="mt-4 space-y-4">
+                  <DealScorePanel score={dealId ? getScore(dealId) : null} />
+                  <NextActionCard
+                    actions={nextActions}
+                    dealId={dealId || ""}
+                    contactId={deal?.contact_id}
+                    onActionCreated={fetchDeal}
+                  />
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 rounded-lg bg-muted border border-border">
                       <p className="text-xs text-muted-foreground mb-1">Deal Value</p>

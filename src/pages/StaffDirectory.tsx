@@ -54,8 +54,8 @@ export default function StaffDirectory() {
   const deleteStaff = useDeleteStaff();
 
   const [search, setSearch] = useState("");
-  const [zoneFilter, setZoneFilter] = useState("");
-  const [deptFilter, setDeptFilter] = useState("");
+  const [zoneFilter, setZoneFilter] = useState("all");
+  const [deptFilter, setDeptFilter] = useState("all");
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileMember, setProfileMember] = useState<StaffMember | null>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -68,8 +68,8 @@ export default function StaffDirectory() {
     const q = search.toLowerCase().trim();
     return staff.filter((s) => {
       const matchQ = !q || [s.name, s.job_title, s.department, s.bio].some((f) => (f || "").toLowerCase().includes(q));
-      const matchZone = !zoneFilter || s.zone === zoneFilter;
-      const matchDept = !deptFilter || s.department === deptFilter;
+      const matchZone = zoneFilter === "all" || s.zone === zoneFilter;
+      const matchDept = deptFilter === "all" || s.department === deptFilter;
       return matchQ && matchZone && matchDept;
     });
   }, [staff, search, zoneFilter, deptFilter]);
@@ -139,7 +139,7 @@ export default function StaffDirectory() {
         <Select value={zoneFilter} onValueChange={setZoneFilter}>
           <SelectTrigger className="w-[180px]"><SelectValue placeholder="All Zones" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Zones</SelectItem>
+            <SelectItem value="all">All Zones</SelectItem>
             {ZONES.map((z) => (
               <SelectItem key={z} value={z}>{z === "Aml" ? "Aml Clinics" : z === "HQ" ? "HQ" : `${z} — ${z === "Zone 1" ? "Primary Care" : "Screening"}`}</SelectItem>
             ))}
@@ -148,7 +148,7 @@ export default function StaffDirectory() {
         <Select value={deptFilter} onValueChange={setDeptFilter}>
           <SelectTrigger className="w-[180px]"><SelectValue placeholder="All Departments" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Departments</SelectItem>
+            <SelectItem value="all">All Departments</SelectItem>
             {DEPARTMENTS.map((d) => (
               <SelectItem key={d} value={d}>{d}</SelectItem>
             ))}
