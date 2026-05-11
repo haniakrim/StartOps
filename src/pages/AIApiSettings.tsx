@@ -26,8 +26,9 @@ function getTroubleshootingTips(result: TestResult): string[] {
   const chatErr = (result.chatError || "").toLowerCase();
 
   if (err.includes("load failed") || err.includes("network error") || err.includes("fetch")) {
-    tips.push("Check that the base URL is correct and the server is running.");
-    tips.push("If using a local server, ensure CORS is enabled or use a proxy.");
+    tips.push("Browser blocked the request. Open the browser console (F12 → Console) and look for red errors.");
+    tips.push("Common causes: CSP / CORS failure, ad-blocker / privacy extension, or mixed-content (HTTP on HTTPS site).");
+    tips.push("If you just updated CSP, hard-refresh the page (Ctrl+Shift+R or Cmd+Shift+R) to clear cached headers.");
   }
   if (err.includes("cors") || err.includes("blocked")) {
     tips.push("CORS error: the server must allow browser requests with Access-Control-Allow-Origin.");
@@ -36,7 +37,7 @@ function getTroubleshootingTips(result: TestResult): string[] {
     tips.push("Authentication failed: verify your API key is correct and active.");
   }
   if (result.connectionStatus === 404) {
-    tips.push("Endpoint not found: confirm the base URL ends with /v1 (e.g. http://localhost:11434/v1).");
+    tips.push("Endpoint not found: confirm the base URL ends with /v1 (e.g. https://openrouter.ai/api/v1).");
   }
   if (result.connectionStatus && result.connectionStatus >= 500) {
     tips.push("Server error: the provider may be overloaded or misconfigured.");
@@ -196,9 +197,15 @@ export default function AIApiSettings() {
       latencyMs: 0,
     };
 
+    const isOpenRouter = provider.baseUrl.includes("openrouter.ai");
+
     const makeHeaders = () => {
       const h: Record<string, string> = { "Content-Type": "application/json" };
       if (provider.apiKey) h.Authorization = `Bearer ${provider.apiKey}`;
+      if (isOpenRouter) {
+        h["HTTP-Referer"] = window.location.origin;
+        h["X-Title"] = "StartOps";
+      }
       return h;
     };
 
@@ -207,7 +214,7 @@ export default function AIApiSettings() {
       const modelsUrl = `${provider.baseUrl.replace(/\/$/, "")}/models`;
       const modelsRes = await fetch(modelsUrl, {
         method: "GET",
-        headers: provider.apiKey ? { Authorization: `Bearer ${provider.apiKey}` } : {},
+        headers: makeHeaders(),
       });
 
       result.connectionStatus = modelsRes.status;
@@ -223,6 +230,7 @@ export default function AIApiSettings() {
         result.connectionError = `${modelsRes.status}: ${body.slice(0, 200)}`;
       }
     } catch (error: any) {
+      console.error("[AI Test] Connection error:", error);
       result.connectionError = error.message || "Network error";
     }
 
@@ -251,6 +259,7 @@ export default function AIApiSettings() {
         result.chatError = `${chatRes.status}: ${body.slice(0, 200)}`;
       }
     } catch (error: any) {
+      console.error("[AI Test] Chat error:", error);
       result.chatError = error.message || "Network error";
     }
 
