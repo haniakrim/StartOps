@@ -79,9 +79,11 @@ interface TestResult {
   connectionOk: boolean;
   connectionStatus?: number;
   connectionError?: string;
+  connectionErrorType?: string;
   models?: string[];
   chatOk: boolean;
   chatError?: string;
+  chatErrorType?: string;
   chatResponse?: string;
   latencyMs: number;
 }
@@ -231,7 +233,8 @@ export default function AIApiSettings() {
       }
     } catch (error: any) {
       console.error("[AI Test] Connection error:", error);
-      result.connectionError = error.message || "Network error";
+      result.connectionErrorType = error?.name || "Error";
+      result.connectionError = error.message || String(error);
     }
 
     // Step 2: Test chat completion
@@ -260,7 +263,8 @@ export default function AIApiSettings() {
       }
     } catch (error: any) {
       console.error("[AI Test] Chat error:", error);
-      result.chatError = error.message || "Network error";
+      result.chatErrorType = error?.name || "Error";
+      result.chatError = error.message || String(error);
     }
 
     result.latencyMs = Math.round(performance.now() - start);
@@ -594,7 +598,9 @@ export default function AIApiSettings() {
                     Connected (HTTP {testResult.connectionStatus})
                   </p>
                 ) : (
-                  <p className="text-xs text-destructive">{testResult.connectionError}</p>
+                  <div className="space-y-1">
+                    <p className="text-xs text-destructive font-mono">{testResult.connectionErrorType}: {testResult.connectionError}</p>
+                  </div>
                 )}
               </div>
 
@@ -639,7 +645,9 @@ export default function AIApiSettings() {
                     )}
                   </div>
                 ) : (
-                  <p className="text-xs text-destructive">{testResult.chatError}</p>
+                  <div className="space-y-1">
+                    <p className="text-xs text-destructive font-mono">{testResult.chatErrorType}: {testResult.chatError}</p>
+                  </div>
                 )}
               </div>
 
