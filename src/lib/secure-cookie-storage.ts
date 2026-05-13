@@ -1,9 +1,9 @@
 /**
  * Secure cookie-based storage adapter for Supabase auth.
  * Replaces default localStorage to prevent XSS token theft.
- * Cookies with HttpOnly are not accessible via JavaScript,
- * but since Supabase JS client needs to read the token,
- * we use SameSite=Strict + Secure cookies instead.
+ * Note: While HttpOnly cookies are most secure against XSS, the Supabase JS client
+ * requires access to the token for session management. We use Secure and SameSite=Lax
+ * to provide a significant security improvement over localStorage.
  */
 
 interface StorageItem {
@@ -12,7 +12,9 @@ interface StorageItem {
 }
 
 const COOKIE_OPTIONS = {
-  secure: typeof window !== "undefined" && window.location.protocol === "https:",
+  // Use Secure flag if on HTTPS or in production
+  secure: typeof window !== "undefined" &&
+    (window.location.protocol === "https:" || import.meta.env.PROD),
   sameSite: "Lax" as const,
   path: "/",
   maxAge: 60 * 60 * 24 * 7, // 7 days
