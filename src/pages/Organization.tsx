@@ -102,7 +102,7 @@ export default function Organization() {
       if (membersError) throw membersError;
 
       const userIds = [...new Set((membersData || []).map((m: any) => m.user_id).filter(Boolean))];
-      let profilesMap: Record<string, any> = {};
+      const profilesMap: Record<string, any> = {};
       if (userIds.length > 0) {
         const { data: profilesData } = await supabase
           .from("profiles")
