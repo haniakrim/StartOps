@@ -88,7 +88,7 @@ serve(async (req) => {
     // 1. Create or get demo auth user
     console.log("[seed-demo] Checking for demo user")
     const { data: listData } = await supabaseAdmin.auth.admin.listUsers()
-    let demoUser = listData?.users?.find((u: any) => u.email === demoEmail)
+    const demoUser = listData?.users?.find((u: any) => u.email === demoEmail)
     let demoUserId: string
 
     if (demoUser) {
