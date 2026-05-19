@@ -1,0 +1,298 @@
+# Instincts generated from https://github.com/haniakrim/StartOps
+# Generated: 2026-05-19T18:24:37.498Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: StartOps-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/haniakrim/StartOps
+---
+
+# StartOps Commit Length
+
+## Action
+
+Write moderate-length commit messages (~57 characters)
+
+## Evidence
+
+- Average commit message length: 57 chars
+- Based on 1 commits
+
+---
+id: StartOps-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/haniakrim/StartOps
+---
+
+# StartOps Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: StartOps-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/haniakrim/StartOps
+---
+
+# StartOps Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: StartOps-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/haniakrim/StartOps
+---
+
+# StartOps Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: StartOps-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/haniakrim/StartOps
+---
+
+# StartOps Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: lib, test
+
+---
+id: StartOps-test-colocate
+trigger: "when writing tests"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/haniakrim/StartOps
+---
+
+# StartOps Test Colocate
+
+## Action
+
+Place test file next to the source file (e.g., Button.test.tsx next to Button.tsx)
+
+## Evidence
+
+- Colocated test pattern detected
+- Tests live alongside source files
+
+---
+id: startops-instinct-file-naming-camelcase
+trigger: "When creating a new file in the codebase"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct File Naming Camelcase
+
+## Action
+
+Name the file using camelCase
+
+## Evidence
+
+- Pattern in namingConventions.files: camelCase
+
+---
+id: startops-instinct-function-naming-camelcase
+trigger: "When defining a new function"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct Function Naming Camelcase
+
+## Action
+
+Name the function using camelCase
+
+## Evidence
+
+- Pattern in namingConventions.functions: camelCase
+
+---
+id: startops-instinct-class-naming-pascalcase
+trigger: "When defining a new class"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct Class Naming Pascalcase
+
+## Action
+
+Name the class using PascalCase
+
+## Evidence
+
+- Pattern in namingConventions.classes: PascalCase
+
+---
+id: startops-instinct-constant-naming-screaming-snake-case
+trigger: "When declaring a constant"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct Constant Naming Screaming Snake Case
+
+## Action
+
+Name the constant using SCREAMING_SNAKE_CASE
+
+## Evidence
+
+- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+
+---
+id: startops-instinct-import-style-relative
+trigger: "When importing modules"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct Import Style Relative
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern in importStyle: relative
+
+---
+id: startops-instinct-export-style-named
+trigger: "When exporting modules or functions"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct Export Style Named
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in exportStyle: named
+
+---
+id: startops-instinct-test-location-colocated
+trigger: "When adding or updating tests for a module"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct Test Location Colocated
+
+## Action
+
+Place the test file in the same folder as the module (colocated)
+
+## Evidence
+
+- Pattern in architecture.testLocation: colocated
+
+---
+id: startops-instinct-test-folder-lib-test
+trigger: "When organizing source and test files"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct Test Folder Lib Test
+
+## Action
+
+Place source files in 'lib' and test files in 'test' folders
+
+## Evidence
+
+- Pattern in srcLayout: ['lib', 'test']
+
+---
+id: startops-instinct-commit-format-freeform
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: haniakrim/StartOps
+---
+
+# Startops Instinct Commit Format Freeform
+
+## Action
+
+Use a freeform commit message, optionally starting with an emoji and a subsystem label
+
+## Evidence
+
+- Pattern in commits.type: freeform
+- Example: '🛡️ Sentinel: Fix weak HTML stripping in sanitize utility'
+
