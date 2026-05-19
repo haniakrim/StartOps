@@ -13,10 +13,24 @@ export function sanitizeColor(value: unknown): string {
 }
 
 /**
- * Strips HTML tags from a string to prevent XSS.
+ * Strips HTML tags and sensitive content (like scripts/styles) from a string.
+ * This is a more robust implementation than a simple regex.
  */
 export function stripHtml(input: string): string {
-  return input.replace(/<[^>]*>/g, "");
+  if (!input) return "";
+
+  // 1. Remove script and style tags and their content
+  let sanitized = input.replace(/<(script|style|title|textarea|noscript)[^>]*>[\s\S]*?<\/\1\s*>/gi, "");
+
+  // 2. Remove comments
+  sanitized = sanitized.replace(/<!--[\s\S]*?-->/g, "");
+
+  // 3. Remove all other tags but keep their content
+  sanitized = sanitized.replace(/<[^>]*>/g, "");
+
+  // 4. Decode basic entities if needed, but for simple stripping,
+  // we primarily want to ensure no tags remain.
+  return sanitized;
 }
 
 /**
